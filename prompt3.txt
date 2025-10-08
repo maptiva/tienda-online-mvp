@@ -1,8 +1,0 @@
-Mejora 1: Añadir "Descripción" a la Página de Detalle
-Este es un ajuste muy importante para darle valor a la página de detalle.
-Prompt para GCA/CLI:
-"Necesito añadir la descripción completa en la página de detalle del producto. Por favor, modifica el archivo client/src/pages/ProductDetail.jsx. Busca dónde se renderiza el nombre y el precio del producto, y justo debajo, añade un nuevo subtítulo que diga <h3>Descripción</h3> y un párrafo <p> que muestre el campo description del producto que se ha cargado desde Supabase."
-Mejora 2: Actualizar el Número de WhatsApp
-Un ajuste rápido pero vital para que los pedidos lleguen al lugar correcto.
-Prompt para GCA/CLI:
-"Por favor, actualiza el número de teléfono para los pedidos de WhatsApp. Modifica el archivo client/src/components/CartModal.jsx y busca la función que maneja el envío del formulario. Localiza la variable o constante que define el número de teléfono y reemplázala por el número correcto en formato internacional: 5493456533273.
