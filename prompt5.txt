@@ -1,5 +1,0 @@
-Necesito ajustar el espaciado de la sección del título 'Nuestros Productos' y la barra de búsqueda para que sea más compacta.
-Por favor, modifica el archivo de estilos client/src/components/ProductList.module.css:
-Busca el selector del contenedor principal de la lista (probablemente .container o similar) y reduce su padding-top. Cámbialo a padding-top: 1rem;.
-Busca el selector del título (h2) y ajusta su margin-bottom para que coincida con el espacio que hay por encima de la barra de búsqueda. Cámbialo a margin-bottom: 1rem;.
-Busca el selector de la barra de búsqueda (probablemente .searchContainer o el selector del propio SearchBar) y asegúrate de que su margin-bottom también sea de 1rem para que el espacio arriba y abajo sea simétrico.

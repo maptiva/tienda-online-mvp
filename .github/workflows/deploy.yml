@@ -19,20 +19,19 @@ jobs:
           node-version: '18' # Usa una versión de Node LTS
 
       - name: Install Dependencies 📦
-        run: |
-          cd client
-          npm install
+        # 👇 CAMBIO AQUÍ: Ya no necesitamos 'cd client' 👇
+        run: npm install
 
       - name: Build 🏗️
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-        run: |
-          cd client
-          npm run build
+        # 👇 CAMBIO AQUÍ: Ya no necesitamos 'cd client' 👇
+        run: npm run build
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages # La rama donde se desplegará el build
-          folder: client/dist # La carpeta que contiene el build de Vite
+          # 👇 CAMBIO AQUÍ: La carpeta de build ahora es 'dist' 👇
+          folder: dist # La carpeta que contiene el build de Vite
