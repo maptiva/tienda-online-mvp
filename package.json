@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "homepage": "https://maptiva.github.io/tienda-online",
+  "homepage": "https://maptiva.github.io/tienda-online-mvp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
