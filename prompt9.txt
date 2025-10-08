@@ -1,0 +1,100 @@
+Objetivo: Arreglar el layout de un header en la vista móvil (max-width: 900px). El header debe mostrar un logo a la izquierda y dos íconos a la derecha.
+
+Problema: El logo (headerTitleImage) se encoge y se ve demasiado pequeño en pantallas móviles, a pesar de los intentos de controlar su tamaño con max-width y varias propiedades de Flexbox. Los íconos de la derecha se posicionan correctamente, pero el logo no ocupa el espacio que debería.
+
+Pregunta: ¿Qué modificación se necesita en el CSS para que el logo (headerTitleImage) no se encoja y mantenga un tamaño visible (respetando su max-width de 180px), mientras los íconos permanecen a la derecha?
+
+Código JSX (Header.jsx):
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import styles from './Header.module.css';
+import logoIcon from '../assets/logo.png';
+import logoTitle from '../assets/titulo1.png';
+import { useCart } from '../context/CartContext';
+
+const Header = ({ onCartClick }) => {
+  const { cart } = useCart();
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  return (
+    <header className={styles.header}>
+      <Link to="/" className={styles.brandLink}>
+        <img src={logoIcon} alt="Sport Store Icon" className={styles.headerLogo} />
+        <div className={styles.headerContent}>
+          <img src={logoTitle} alt="Sport Store Title" className={styles.headerTitleImage} />
+        </div>
+      </Link>
+      <div className={styles.headerIcons}>
+        {/* ... SVG de íconos ... */}
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+Código CSS (Header.module.css):
+
+
+/* Estilos base */
+.header {
+    background-color: #2c3e50;
+    padding: 3.375rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.headerContent {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.brandLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.headerTitleImage {
+    height: 156.25px;
+    width: auto;
+}
+
+/* Media Query para móvil (donde está el problema) */
+@media (max-width: 900px) {
+    .header {
+        justify-content: initial;
+        padding: 1rem 15px;
+        flex-wrap: nowrap;
+    }
+
+    .headerContent {
+        position: static;
+        transform: none;
+        left: auto;
+        padding-top: 0;
+        text-align: left;
+        flex-basis: auto;
+        order: 0;
+    }
+
+    .brandLink {
+        flex-grow: 1;
+    }
+
+    .headerLogo {
+        display: none;
+    }
+
+    .headerTitleImage {
+        max-width: 180px;
+        height: auto;
+    }
+}

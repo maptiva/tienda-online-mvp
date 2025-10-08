@@ -1,0 +1,21 @@
+Hemos detectado una regresión funcional: el botón 'Agregar al Pedido' no funciona ni en la página principal ni en la de detalle. Vamos a solucionarlo implementando un estado global para el carrito usando React Context. Por favor, sigue estos pasos:
+1. Crear el Contexto del Carrito:
+Crea una nueva carpeta client/src/context.
+Dentro, crea un archivo CartContext.jsx.
+En este archivo, define y exporta un CartProvider que gestione el estado del carrito (un array de productos) y exponga una función addToCart(product, quantity) que añada productos al estado.
+2. Envolver la Aplicación en el Provider:
+Modifica el archivo client/src/App.jsx.
+Importa el CartProvider y envuelve toda la estructura de Rutas (<Routes>) dentro de él. Esto dará acceso global al carrito.
+3. Corregir la ProductCard (Página Principal):
+Modifica el componente client/src/components/ProductCard.jsx.
+Quita el <Link> que envuelve a toda la tarjeta.
+En su lugar, envuelve solamente la imagen y el título del producto en un <Link> que apunte a la página de detalle.
+Usa el hook useContext para acceder a la función addToCart desde nuestro CartContext.
+Añade un onClick al botón 'Agregar al Pedido' para que llame a la función addToCart con los datos del producto y la cantidad seleccionada.
+4. Actualizar la ProductDetail (Página de Detalle):
+Abre el componente client/src/pages/ProductDetail.jsx.
+Al igual que en la ProductCard, usa useContext para obtener la función addToCart y conéctala al onClick del botón 'Agregar al Pedido' de esta página.
+5. Reflejar el Cambio en el Header:
+Modifica el componente client/src/components/Header.jsx.
+Usa useContext para acceder al estado del carrito (cart).
+Calcula la cantidad total de artículos en el carrito y muestra ese número en el contador del ícono del carrito para que el usuario vea la actualización en tiempo real.

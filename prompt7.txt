@@ -1,0 +1,16 @@
+Ahora, vamos a actualizar el ícono de la pestaña del navegador (favicon). Sigue estos pasos:
+Modifica el archivo client/src/App.jsx.
+Importa el nuevo ícono al principio del archivo: import favicon from './assets/logo.png';.
+Usa un hook useEffect para cambiar el favicon dinámicamente cuando la aplicación se carga. Añade este bloque de código dentro del componente App:
+code
+Jsx
+import { useEffect } from 'react';
+
+// ... (dentro del componente App)
+useEffect(() => {
+  const link = document.querySelector("link[rel~='icon']");
+  if (link) {
+    link.href = favicon;
+  }
+}, []);
+Esto encontrará la etiqueta del ícono en el index.html y reemplazará su href con la ruta a nuestro nuevo logo.
