@@ -6,7 +6,7 @@ import './index.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter  basename="/tienda-online-mvp">
+    <BrowserRouter basename="/tienda-online-mvp">
       <App />
     </BrowserRouter>
   </StrictMode>,
