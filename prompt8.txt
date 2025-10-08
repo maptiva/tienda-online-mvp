@@ -1,0 +1,6 @@
+Necesito arreglar el layout del header en la vista móvil. La estrategia será ocultar el logo pequeño y ajustar el logo principal.
+Por favor, modifica el archivo de estilos client/src/components/Header.module.css:
+Busca la media query para móviles (@media (max-width: 900px)).
+Dentro de esta regla, quiero que ocultes completamente el logo pequeño (el que tiene la clase .header-logo o similar, el que contiene logo.png). Para ello, añádele la propiedad display: none;.
+Ahora, para el logo principal (el que contiene titulo1.png y está dentro de .header-content), vamos a ajustar su tamaño. Busca el selector correspondiente (probablemente .headerContent img) y añádele max-width: 150px; para asegurarte de que encaje bien.
+Finalmente, para que el título 'Sport Store' y los íconos se alineen, asegúrate de que el selector del header en esta media query tenga display: flex; y justify-content: space-between;.

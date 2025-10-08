@@ -1,0 +1,35 @@
+Las imágenes en miniatura del modal del carrito no se muestran correctamente. Vamos a solucionarlo.
+Por favor, sigue estos dos pasos:
+Paso 1: Modificar la Estructura en CartModal.jsx
+Abre el archivo client/src/components/CartModal.jsx.
+Localiza el .map() que renderiza la lista de productos del carrito.
+Asegúrate de que cada elemento de la lista (<li> o <div>) tenga una estructura similar a esta, con la imagen y el texto como hermanos:
+jsx <li key={item.id} className={styles.productItem}> <img src={item.image_url} alt={item.name} className={styles.productImage} /> <div className={styles.productDetails}> <span>{item.quantity} x {item.name}</span> <span>${(item.price * item.quantity).toFixed(2)}</span> </div> </li>
+Paso 2: Añadir los Estilos en CartModal.module.css
+Abre el archivo client/src/components/CartModal.module.css.
+Añade los siguientes estilos:
+```css
+.productItem {
+display: flex;
+align-items: center;
+margin-bottom: 15px;
+padding-bottom: 15px;
+border-bottom: 1px solid #eee;
+}
+code
+Code
+.productImage {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+
+.productDetails {
+  display: flex;
+  justify-content: space-between;
+  flex-grow: 1;
+  align-items: center;
+}
+```"
