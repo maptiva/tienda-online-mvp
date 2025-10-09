@@ -9,7 +9,7 @@
     flex-wrap: wrap;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .headerLogo {
@@ -129,9 +129,8 @@
     }
 
     .headerTitleImage {
-        max-width: 180px;
-        height: auto;
-        width: 100%; /* Asegura que el logo use el espacio disponible hasta max-width */
+        height: 40px;
+        width: auto;
     }
 
     .headerIcons {
