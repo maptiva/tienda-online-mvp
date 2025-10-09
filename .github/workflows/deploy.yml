@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main # O la rama que quieras desplegar
+      - main
 
 jobs:
   build-and-deploy:
@@ -16,22 +16,26 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Usa una versión de Node LTS
+          node-version: '18'
+
+      # 👇 --- NUEVO PASO DE DEPURACIÓN --- 👇
+      - name: 🐞 Debug Secrets
+        run: |
+          echo "VITE_SUPABASE_URL_length: ${{ secrets.VITE_SUPABASE_URL && 'OK' || 'MISSING' }}"
+          echo "VITE_SUPABASE_ANON_KEY_length: ${{ secrets.VITE_SUPABASE_ANON_KEY && 'OK' || 'MISSING' }}"
+      # ------------------------------------
 
       - name: Install Dependencies 📦
-        # 👇 CAMBIO AQUÍ: Ya no necesitamos 'cd client' 👇
         run: npm install
 
       - name: Build 🏗️
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-        # 👇 CAMBIO AQUÍ: Ya no necesitamos 'cd client' 👇
         run: npm run build
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages # La rama donde se desplegará el build
-          # 👇 CAMBIO AQUÍ: La carpeta de build ahora es 'dist' 👇
-          folder: dist # La carpeta que contiene el build de Vite
+          branch: gh-pages
+          folder: dist
