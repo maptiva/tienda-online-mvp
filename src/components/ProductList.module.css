@@ -8,8 +8,8 @@
 .stickyWrapper {
   position: sticky;
   top: 168px; /* Altura del header */
-  background-color: #f4f4f4;
-  z-index: 999;
+  background-color: #fff;
+  z-index: 99;
   padding: 1rem 0;
   margin-bottom: 1rem;
   display: flex;
@@ -34,7 +34,6 @@
 
 @media (max-width: 900px) {
     .stickyWrapper {
-        top: 72px; /* Altura del header en móvil */
         padding-left: 20px;
         padding-right: 20px;
     }
