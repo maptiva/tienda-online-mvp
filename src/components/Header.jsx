@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import styles from './Header.module.css';
-import logoIcon from '../assets/logo.png';
 import logoTitle from '../assets/titulo1.png';
 import { useCart } from '../context/CartContext';
+import { CiLocationOn } from 'react-icons/ci';
+import { PiPhone } from 'react-icons/pi';
+import { BsClock } from 'react-icons/bs';
+import { FaInstagram } from 'react-icons/fa';
+import { MdOutlineShoppingCart } from 'react-icons/md';
 
 const Header = ({ onCartClick }) => {
   const { cart } = useCart();
@@ -11,21 +14,50 @@ const Header = ({ onCartClick }) => {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <header className={styles.header}>
-      <Link to="/" className={styles.brandLink}>
-        <img src={logoIcon} alt="Sport Store Icon" className={styles.headerLogo} />
-        <div className={styles.headerContent}>
-          <img src={logoTitle} alt="Sport Store Title" className={styles.headerTitleImage} />
+    <header className='bg-slate-800'>
+      <div className='border-b border-slate-700'>
+        <div className="container mx-auto px-4 py-3">
+          <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm'>
+            <div className='flex gap-2 items-center' >
+              <CiLocationOn color='#ff6900' size={20} />
+              <p className='text-slate-300'>AV. Principal 123, Ciudad</p>
+            </div>
+
+            <div className='flex gap-2 items-center' >
+              <PiPhone color='#ff6900' size={20} />
+              <p className='text-slate-300'>+ (3456) 445977</p>
+            </div>
+
+            <div className='flex gap-2 items-center' >
+              <BsClock color='#ff6900' size={20} />
+              <p className='text-slate-300'>Lun-Sab: 9:00 - 20:00</p>
+            </div>
+          </div>
         </div>
-      </Link>
-      <div className={styles.headerIcons}>
-        <span className={styles.instagramBtn}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        </span>
-        <button className={styles.carritoBtn} onClick={onCartClick}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-          <span className={`${styles.carritoContador} ${totalItems > 0 ? styles.visible : ''}`}>{totalItems}</span>
-        </button>
+      </div>
+
+      <div className='flex justify-between py-5'>
+        <Link to="/">
+          <div className='mx-10'>
+            <img src={logoTitle} className='w-25 h-15' alt="Sport Store Title" />
+          </div>
+        </Link>
+        <div className='flex gap-5 m-2'>
+          <div className='cursor-pointer'>
+            <FaInstagram size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />
+          </div>
+          <div onClick={onCartClick} className='cursor-pointer'>
+            <div className="relative">
+              <MdOutlineShoppingCart size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />
+              {
+                totalItems !== 0 &&
+                <p className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
       </div>
     </header>
   );

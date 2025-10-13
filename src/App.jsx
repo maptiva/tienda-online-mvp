@@ -8,6 +8,7 @@ import ProductDetail from './components/ProductDetail';
 import CartModal from './components/CartModal';
 import { CartProvider } from './context/CartContext';
 import favicon from './assets/logo.png';
+import Footer from './components/Footer';
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -30,6 +31,7 @@ function App() {
       </main>
       <WhatsAppButton />
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <Footer />
     </CartProvider>
   );
 }

@@ -26,7 +26,7 @@ const ProductList = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.stickyWrapper}>
+      <div className='my-5'>
         <h2>Nuestros Productos</h2>
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>

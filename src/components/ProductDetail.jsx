@@ -38,10 +38,10 @@ const ProductDetail = () => {
   return (
     <div className={styles.container}>
       <div className={styles.imageContainer}>
-        <img 
-          src={imageUrl} 
-          alt={product.name} 
-          onError={(e) => { e.target.onerror = null; e.target.src=placeholder; }}
+        <img
+          src={imageUrl}
+          alt={product.name}
+          onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
         />
       </div>
       <div className={styles.detailsContainer}>
@@ -51,11 +51,11 @@ const ProductDetail = () => {
         <p className={styles.description}>{product.description}</p>
         {/* Aquí podrías agregar los selectores de tallas y colores */}
         <div className={styles.actions}>
-          <input 
-            type="number" 
+          <input
+            type="number"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
-            min="1" 
+            min="1"
           />
           <button onClick={handleAddToCart}>Agregar al Pedido</button>
         </div>
