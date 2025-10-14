@@ -50,8 +50,8 @@ const ProductList = () => {
 
   return (
     <div className={styles.container}>
-      <div className='my-5'>
-        <h2>Nuestros Productos</h2>
+      <div className='sticky top-[145px] z-40 bg-[#f4f4f4] pb-4 border-b border-slate-200 shadow-md'>
+        <h2 className='text-3xl font-bold text-slate-800 mb-4'>Nuestros Productos</h2>
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
       {filteredProducts.length > 0 ? (

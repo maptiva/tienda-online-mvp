@@ -14,7 +14,7 @@ const Header = ({ onCartClick }) => {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <header className='bg-slate-800'>
+    <header className='bg-slate-800 sticky top-0 z-50'>
       <div className='border-b border-slate-700'>
         <div className="container mx-auto px-4 py-3">
           <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm'>
