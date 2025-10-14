@@ -7,7 +7,17 @@ const Footer = () => {
                 <div className='flex flex-col md:flex-row items-center justify-between gap-4 text-sm'>
 
                     <p className='text-slate-300 text-center md:text-left'>© 2025 Sport Store. Todos los derechos reservados</p>
-                    <p className='text-slacte-400 text-center md:text-rigth'>Desarrollado por <span className='text-orange-500 font-semibold'>Tu Nombre</span></p>
+                    <p className='text-slacte-400 text-center md:text-rigth'>
+                        Desarrollado por{' '}
+                        <a
+                            href='https://maptiva.github.io/maptiva/'
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-orange-500 font-semibold hover:underline'
+                        >
+                            Maptiva
+                        </a>
+                    </p>
 
                 </div>
             </div>
