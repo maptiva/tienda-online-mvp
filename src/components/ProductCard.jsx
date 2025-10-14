@@ -40,7 +40,7 @@ const ProductCard = ({ product }) => {
       </Link>
       <p className='text-sm'>{product.description}</p>
 
-      <p className='font-bold text-[#27ae60] text-lg'>${product.price ? product.price.toFixed(2) : '0.00'}</p>
+      <p className='font-bold text-[#27ae60] text-xl mt-auto'>${product.price ? product.price.toFixed(2) : '0.00'}</p>
 
       <div className='grid mt-auto grid-cols-2 gap-2 items-center justify-between'>
         <input

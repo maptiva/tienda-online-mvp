@@ -36,9 +36,9 @@ const Header = ({ onCartClick }) => {
         </div>
       </div>
 
-      <div className='flex justify-between py-5'>
+      <div className='flex justify-between py-5 mx-10'>
         <Link to="/">
-          <div className='mx-10'>
+          <div className=''>
             <img src={logoTitle} className='w-25 h-15' alt="Sport Store Title" />
           </div>
         </Link>
