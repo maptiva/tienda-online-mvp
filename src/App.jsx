@@ -9,6 +9,10 @@ import CartModal from './components/CartModal';
 import { CartProvider } from './context/CartContext';
 import favicon from './assets/logo.png';
 import Footer from './components/Footer';
+import Login from './pages/Login';
+import AdminDashboard from './pages/AdminDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
+import ProductForm from './components/ProductForm';
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -27,6 +31,31 @@ function App() {
         <Routes>
           <Route path="/" element={<ProductList />} />
           <Route path="/product/:productId" element={<ProductDetail />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/new"
+            element={
+              <ProtectedRoute>
+                <ProductForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/edit/:productId"
+            element={
+              <ProtectedRoute>
+                <ProductForm />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
       <WhatsAppButton />

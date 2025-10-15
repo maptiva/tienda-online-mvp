@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Scratch directory for agent
 /jules-scratch
+
+# Ignorar archivos de texto genéricos y de prompts
+*.txt
