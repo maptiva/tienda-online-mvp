@@ -1,0 +1,10 @@
+.admin-wrapper {
+  display: flex;
+  gap: 20px;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.admin-content {
+  flex-grow: 1;
+}
