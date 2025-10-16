@@ -11,8 +11,12 @@ import favicon from './assets/logo.png';
 import Footer from './components/Footer';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './router/ProtectedRoute';
 import ProductForm from './components/ProductForm';
+
+import { Error404 } from './pages/Error404';
+import CategoriaPage from './pages/dashboard/CategoriaPage';
+import { ProductPage } from './pages/dashboard/ProductPage';
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -27,19 +31,29 @@ function App() {
   return (
     <CartProvider>
       <Header onCartClick={() => setIsCartOpen(true)} />
-      <main>
+      <main className='p-0 m-0'>
         <Routes>
           <Route path="/" element={<ProductList />} />
+
           <Route path="/product/:productId" element={<ProductDetail />} />
           <Route path="/login" element={<Login />} />
           <Route
             path="/admin"
             element={
               <ProtectedRoute>
-                <AdminDashboard />
+                <AdminDashboard>
+                  <ProductPage />
+                </AdminDashboard>
               </ProtectedRoute>
             }
           />
+          <Route path="admin/categoria" element={
+            <ProtectedRoute>
+              <AdminDashboard>
+                <CategoriaPage />
+              </AdminDashboard>
+            </ProtectedRoute>
+          } />
           <Route
             path="/admin/new"
             element={
@@ -56,6 +70,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path='*' element={<Error404 />} />
         </Routes>
       </main>
       <WhatsAppButton />
