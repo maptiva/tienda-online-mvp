@@ -17,7 +17,7 @@ function AdminDashboard() {
                 <h2 className='text-3xl font-bold'>Panel de Administración</h2>
                 <button className='bg-green-500 text-white p-2 cursor-pointer hover:opacity-80 mt-5 rounded-lg' onClick={() => navigate('/admin/new')}>Añadir Nuevo Producto</button>
             </div>
-            <div className='overflow-y-scroll'>
+            <div className='overflow-y-scroll h-[440px]'>
                 <table className='w-full overflow-y-scroll'>
                     <thead>
                         <tr className='bg-slate-200'>
