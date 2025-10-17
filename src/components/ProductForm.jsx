@@ -11,9 +11,9 @@ function ProductForm() {
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [originalImageUrl, setOriginalImageUrl] = useState(null); // Estado para la URL original
 
   useEffect(() => {
-    // Inicializar formData con null para campos opcionales y cadenas vacías solo para requeridos
     const initialData = {};
     formConfig.forEach(field => {
       initialData[field.name] = field.required ? '' : null;
@@ -29,25 +29,14 @@ function ProductForm() {
             .eq('id', parseInt(productId, 10))
             .single();
           
-          console.log('Datos del producto recibidos de Supabase:', data);
+          if (error) throw error;
+          if (!data) throw new Error('Producto no encontrado');
 
-          if (error) {
-            setError(`Error al cargar el producto: ${error.message}`);
-            console.error('Error fetching product:', error);
-            return;
-          }
-
-          if (!data) {
-            setError('Producto no encontrado');
-            console.error('No product found for ID:', productId);
-            return;
-          }
-
-          // Usar los datos directamente, preservando null para campos opcionales
           setFormData(data);
+          setOriginalImageUrl(data.image_url); // Guardar la URL de la imagen original
         } catch (err) {
-          setError('Error inesperado al cargar el producto');
-          console.error('Unexpected error:', err);
+          setError(`Error al cargar el producto: ${err.message}`);
+          console.error('Error fetching product:', err);
         } finally {
           setLoading(false);
         }
@@ -60,14 +49,10 @@ function ProductForm() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-
     if (name === 'image_url' && files && files[0]) {
       setImageFile(files[0]);
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value === '' && !formConfig.find(f => f.name === name).required ? null : value,
-      }));
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
@@ -77,100 +62,69 @@ function ProductForm() {
     setError(null);
 
     let finalFormData = { ...formData };
+    let newImageUrl = null;
 
-    // Convertir campos numéricos a números
-    formConfig.forEach(field => {
-      if (field.type === 'number' && finalFormData[field.name] !== null) {
-        const numValue = parseFloat(finalFormData[field.name]);
-        finalFormData[field.name] = isNaN(numValue) ? null : numValue;
-      }
-    });
-
-    // Manejo de la subida de imágenes
+    // 1. Subir nueva imagen si existe
     if (imageFile) {
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `product-images/${fileName}`;
-
-      const { error: uploadError, data: uploadData } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(filePath, imageFile, {
-          cacheControl: '3600',
-          upsert: true,
-        });
+        .upload(fileName, imageFile);
 
       if (uploadError) {
         setError(`Error al subir la imagen: ${uploadError.message}`);
-        console.error('Error uploading image:', uploadError);
         setLoading(false);
         return;
       }
-
+      
+      // Obtener la URL pública de la nueva imagen
       const { data: publicUrlData } = supabase.storage
         .from('product-images')
-        .getPublicUrl(filePath);
-
-      if (publicUrlData && publicUrlData.publicUrl) {
-        finalFormData.image_url = publicUrlData.publicUrl;
-      } else {
-        setError('No se pudo obtener la URL pública de la imagen');
-        console.error('No public URL for image');
-        setLoading(false);
-        return;
-      }
-    } else if (productId && !formData.image_url && !imageFile) {
-      finalFormData.image_url = null;
+        .getPublicUrl(uploadData.path);
+        
+      newImageUrl = publicUrlData.publicUrl;
+      finalFormData.image_url = newImageUrl;
     }
 
+    // 2. Si es una actualización y se subió una nueva imagen, borrar la antigua
+    if (productId && newImageUrl && originalImageUrl) {
+      const oldImageName = originalImageUrl.split('/').pop();
+      if (oldImageName) {
+        const { error: removeError } = await supabase.storage
+          .from('product-images')
+          .remove([oldImageName]);
+        if (removeError) {
+          // Opcional: manejar el error si no se puede borrar la imagen antigua
+          console.warn(`No se pudo eliminar la imagen antigua: ${removeError.message}`);
+        }
+      }
+    }
+
+    // 3. Preparar y ejecutar la operación en la base de datos
     try {
+      const { id, ...updateData } = finalFormData;
       let operation;
+
       if (productId) {
-        // Actualizar producto existente
-        const { id, ...updateData } = finalFormData;
-        console.log('ID del producto a actualizar:', productId);
-        console.log('Datos que se enviarán para actualizar:', updateData);
-        console.log('Updating product with ID:', parseInt(productId, 10), 'Data:', updateData);
-        operation = await supabase
-          .from('products')
-          .update(updateData)
-          .eq('id', parseInt(productId, 10))
-          .select(); // Usar select() para obtener las filas afectadas
+        operation = supabase.from('products').update(updateData).eq('id', id);
       } else {
-        // Insertar nuevo producto
-        console.log('Inserting new product:', finalFormData);
-        operation = await supabase
-          .from('products')
-          .insert(finalFormData)
-          .select();
+        operation = supabase.from('products').insert(finalFormData);
       }
 
-      const { data, error: dbError } = operation;
+      const { error: dbError } = await operation;
+      if (dbError) throw dbError;
 
-      if (dbError) {
-        setError(`Error al guardar el producto: ${dbError.message}`);
-        console.error('Database error:', dbError);
-        setLoading(false);
-        return;
-      }
-
-      if (productId && (!data || data.length === 0)) {
-        setError('No se encontró el producto para actualizar. Verifica el ID.');
-        console.error('No rows updated for product ID:', productId);
-        setLoading(false);
-        return;
-      }
-
-      console.log('Operation successful:', data);
       navigate('/admin');
     } catch (err) {
-      setError('Error inesperado al guardar el producto');
-      console.error('Unexpected error:', err);
+      setError(`Error al guardar el producto: ${err.message}`);
+      console.error('Database error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
+  if (loading && !formData.name) { // Evita recargar si ya hay datos
     return <div>Cargando formulario...</div>;
   }
 
@@ -198,11 +152,10 @@ function ProductForm() {
                     id={field.name}
                     name={field.name}
                     onChange={handleChange}
-                    required={field.required && !formData.image_url && !imageFile}
                   />
-                  {formData.image_url && (
+                  {originalImageUrl && !imageFile && (
                     <p className={styles.currentImageText}>
-                      Imagen actual: <a href={formData.image_url} target="_blank" rel="noopener noreferrer">Ver Imagen</a>
+                      Imagen actual: <a href={originalImageUrl} target="_blank" rel="noopener noreferrer">Ver Imagen</a>
                     </p>
                   )}
                 </>

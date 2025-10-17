@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const ProductElement = ({ product }: Props) => {
-    const { id, category, name, price } = product
+    const { id, category, name, price, image_url } = product
     const navigate = useNavigate();
     const [estado, setEstado] = useState<boolean>(true);
 
@@ -25,7 +25,7 @@ export const ProductElement = ({ product }: Props) => {
         });
 
         if (isConfirmed) {
-            const eliminado = await useProductDelete(id)
+            const eliminado = await useProductDelete(id, image_url)
 
             if (eliminado) {
                 setEstado(false);
