@@ -34,6 +34,10 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
 
+      # 👇 --- AÑADE ESTE NUEVO PASO AQUÍ --- 👇
+      - name: Create 404.html for SPA fallback
+        run: cp dist/index.html dist/404.html
+
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
