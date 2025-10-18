@@ -12,7 +12,7 @@ export const useProducts = () => {
         setLoading(true);
         const { data, error } = await supabase
           .from('products')
-          .select('*')
+          .select('*, categories(name)')
           .order('id', { ascending: true });
 
         if (error) {

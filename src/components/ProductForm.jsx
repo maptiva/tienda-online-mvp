@@ -11,7 +11,8 @@ function ProductForm() {
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [originalImageUrl, setOriginalImageUrl] = useState(null); // Estado para la URL original
+  const [originalImageUrl, setOriginalImageUrl] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const initialData = {};
@@ -19,6 +20,19 @@ function ProductForm() {
       initialData[field.name] = field.required ? '' : null;
     });
     setFormData(initialData);
+
+    const fetchCategories = async () => {
+      try {
+        const { data, error } = await supabase.from('categories').select('*');
+        if (error) throw error;
+        setCategories(data);
+      } catch (err) {
+        setError(`Error al cargar categorías: ${err.message}`);
+        console.error('Error fetching categories:', err);
+      }
+    };
+
+    fetchCategories();
 
     if (productId) {
       const fetchProduct = async () => {
@@ -33,7 +47,7 @@ function ProductForm() {
           if (!data) throw new Error('Producto no encontrado');
 
           setFormData(data);
-          setOriginalImageUrl(data.image_url); // Guardar la URL de la imagen original
+          setOriginalImageUrl(data.image_url);
         } catch (err) {
           setError(`Error al cargar el producto: ${err.message}`);
           console.error('Error fetching product:', err);
@@ -64,7 +78,6 @@ function ProductForm() {
     let finalFormData = { ...formData };
     let newImageUrl = null;
 
-    // 1. Subir nueva imagen si existe
     if (imageFile) {
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
@@ -78,7 +91,6 @@ function ProductForm() {
         return;
       }
       
-      // Obtener la URL pública de la nueva imagen
       const { data: publicUrlData } = supabase.storage
         .from('product-images')
         .getPublicUrl(uploadData.path);
@@ -87,7 +99,6 @@ function ProductForm() {
       finalFormData.image_url = newImageUrl;
     }
 
-    // 2. Si es una actualización y se subió una nueva imagen, borrar la antigua
     if (productId && newImageUrl && originalImageUrl) {
       const oldImageName = originalImageUrl.split('/').pop();
       if (oldImageName) {
@@ -95,13 +106,11 @@ function ProductForm() {
           .from('product-images')
           .remove([oldImageName]);
         if (removeError) {
-          // Opcional: manejar el error si no se puede borrar la imagen antigua
           console.warn(`No se pudo eliminar la imagen antigua: ${removeError.message}`);
         }
       }
     }
 
-    // 3. Preparar y ejecutar la operación en la base de datos
     try {
       const { id, ...updateData } = finalFormData;
       let operation;
@@ -124,7 +133,7 @@ function ProductForm() {
     }
   };
 
-  if (loading && !formData.name) { // Evita recargar si ya hay datos
+  if (loading && !formData.name) {
     return <div>Cargando formulario...</div>;
   }
 
@@ -159,6 +168,19 @@ function ProductForm() {
                     </p>
                   )}
                 </>
+              ) : field.type === 'select' ? (
+                <select
+                  id={field.name}
+                  name={field.name}
+                  value={formData[field.name] || ''}
+                  onChange={handleChange}
+                  required={field.required}
+                >
+                  <option value="">Seleccione una categoría</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
               ) : (
                 <input
                   type={field.type}
