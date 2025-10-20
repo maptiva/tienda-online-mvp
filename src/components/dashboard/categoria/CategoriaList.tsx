@@ -1,18 +1,12 @@
 import React from 'react'
 import { CategoriaElement } from './CategoriaElement'
+import { Categoria } from '../../../interfaces/Categoria'
 
-const categorias = [
-    {
-        nombre: "categoria 1",
-        id: 1
-    },
-    {
-        nombre: "categoria 2",
-        id: 2
-    }
-]
+interface Props {
+    categories: Categoria[]
+}
 
-const CategoriaList = () => {
+const CategoriaList = ({ categories }: Props) => {
     return (
         <div className='mt-5 overflow-y-scroll h-[440px]'>
             <table className='w-full'>
@@ -24,7 +18,7 @@ const CategoriaList = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {categorias.map(categoria => (
+                    {categories.map(categoria => (
                         <CategoriaElement key={categoria.id} categoria={categoria} />
                     ))}
                 </tbody>
