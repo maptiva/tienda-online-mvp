@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useCategory } from '../../hooks/categoria/UseCategory'
+import { useCategory } from '../../hooks/categoria/useCategory'
 
 const CategoriaList = () => {
 
