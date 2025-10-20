@@ -23,13 +23,13 @@ export const AsideBar = () => {
             <h3 className='text-2xl font-bold mb-2 border-b'>Menu</h3>
 
             <nav className='flex flex-col flex-1 gap-3'>
-                <NavLink to={'/admin'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
-                    <span role="img" aria-label="box" style={{ marginRight: '8px' }}>📦</span>
-                    Productos
-                </NavLink>
-                <NavLink to={'/admin/categoria'}>
+                <NavLink to={'/admin/categoria'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
                     <span role="img" aria-label="categories" style={{ marginRight: '8px' }}>🗂️</span>
                     Categorías
+                </NavLink>
+                <NavLink to={'/admin/producto'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
+                    <span role="img" aria-label="box" style={{ marginRight: '8px' }}>📦</span>
+                    Productos
                 </NavLink>
 
                 <div className='mt-auto mb-2'>

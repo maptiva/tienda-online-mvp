@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const ProductElement = ({ product }: Props) => {
-    const { id, category, name, price } = product
+    const { id, name, price, image_url, categories } = product
     const navigate = useNavigate();
     const [estado, setEstado] = useState<boolean>(true);
 
@@ -25,7 +25,7 @@ export const ProductElement = ({ product }: Props) => {
         });
 
         if (isConfirmed) {
-            const eliminado = await useProductDelete(id)
+            const eliminado = await useProductDelete(id, image_url)
 
             if (eliminado) {
                 setEstado(false);
@@ -39,7 +39,7 @@ export const ProductElement = ({ product }: Props) => {
             <td className='py-2 text-lg border-y border-slate-400'>{id}</td>
             <td className='py-2 text-lg border-y border-slate-400'>{name}</td>
             <td className='py-2 text-lg border-y border-slate-400'>${price.toFixed(2)}</td>
-            <td className='py-2 text-lg border-y border-slate-400'>{category}</td>
+            <td className='py-2 text-lg border-y border-slate-400'>{categories.name}</td>
             <td className='py-2 text-lg border-y border-slate-400'>
                 <div className='gap-2 flex items-center justify-center'>
                     <button className='' onClick={(e) => navigate(`/admin/edit/${id}`)}>

@@ -34,6 +34,7 @@ function App() {
 
         <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
           <Route index element={<AdminDashboard />} />
+          <Route path="producto" element={<AdminDashboard />} />
           <Route path="categoria" element={<CategoriaPage />} />
           <Route path="new" element={<ProductForm />} />
           <Route path="edit/:productId" element={<ProductForm />} />
