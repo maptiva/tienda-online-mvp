@@ -4,7 +4,7 @@ import { useProducts } from '../hooks/useProducts';
 import SearchBar from './SearchBar'; // Importar SearchBar
 import styles from './ProductList.module.css';
 import { MdErrorOutline } from 'react-icons/md';
-import { useCategory } from '../hooks/categoria/UseCategory';
+import { useCategory } from '../hooks/categoria/useCategory';
 
 const ProductList = () => {
   const { categoryActive } = useCategory()
