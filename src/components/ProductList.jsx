@@ -4,18 +4,25 @@ import { useProducts } from '../hooks/useProducts';
 import SearchBar from './SearchBar'; // Importar SearchBar
 import styles from './ProductList.module.css';
 import { MdErrorOutline } from 'react-icons/md';
+import { useCategory } from '../hooks/categoria/UseCategory';
 
 const ProductList = () => {
+  const { categoryActive } = useCategory()
   const { products, loading, error } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
 
   // Usamos useMemo para no recalcular el filtro en cada render, solo si los productos o el término de búsqueda cambian
   const filteredProducts = useMemo(() => {
     if (!products) return [];
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    return products.filter((product) => {
+      if (categoryActive) {
+        return product.name.toLowerCase().includes(searchTerm.toLowerCase()) && product.category_id === categoryActive?.id
+      } else {
+        return product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      }
+    }
     );
-  }, [products, searchTerm]);
+  }, [products, searchTerm, categoryActive]);
 
   if (loading) {
     return (

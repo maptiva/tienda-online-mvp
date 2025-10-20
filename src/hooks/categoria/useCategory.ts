@@ -4,7 +4,19 @@ import { supabase } from "../../services/supabase"
 import { useCategoryState } from "../../store/useCategoryStore";
 
 export const useCategory = () => {
-    const { categories, categoryActive, getCategories, limpiarCategories, addCategory, deleteCategory, updateCategory } = useCategoryState();
+    const { categories, categoryActive, getCategories, activeCategory, limpiarCategories, clearCategoryActive, addCategory, deleteCategory, updateCategory } = useCategoryState();
+
+    const limpiarCategoryActive = async () => {
+        clearCategoryActive()
+    };
+
+    const startActiveCategory = async (id) => {
+        const category = categories.find(elem => elem.id === id);
+
+        if (category) {
+            activeCategory(category)
+        }
+    };
 
     const startAddCategory = async (category: Omit<Categoria, 'id'>) => {
         const { data, error } = await supabase
@@ -57,6 +69,8 @@ export const useCategory = () => {
         categoryActive,
 
         //metodos
+        limpiarCategoryActive,
+        startActiveCategory,
         startAddCategory,
         startDeleteCategory,
         startGetCategories,
