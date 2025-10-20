@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { useCategory } from '../../hooks/categoria/UseCategory'
+import { useCategory } from '../../hooks/categoria/useCategory'
+import styles from './CategoriaList.module.css';
 
 const CategoriaList = () => {
 
@@ -17,11 +18,11 @@ const CategoriaList = () => {
     };
 
     return (
-        <div className='flex ml-2 gap-2 overflow-x-scroll w-full'>
+        <div className={styles.categoryContainer}>
             <div
                 onClick={(e) => activarCategoria(0)}
                 key={0}
-                className={`${!categoryActive ? 'bg-blue-300' : 'bg-white'} rounded-xl p-3 hover:cursor-pointer my-3 shadow hover:shadow-lg transition-shadow border border-slate-100`}
+                className={`${styles.categoryItem} ${!categoryActive ? styles.active : ''}`}
             >
                 <h3 className="text-lg font-semibold text-slate-800 m-0">Todos</h3>
             </div>
@@ -30,7 +31,7 @@ const CategoriaList = () => {
                     <div
                         onClick={(e) => activarCategoria(elem.id)}
                         key={elem.id}
-                        className={`${categoryActive?.id === elem.id ? 'bg-blue-300' : 'bg-white'} rounded-xl p-3 hover:cursor-pointer my-3 shadow hover:shadow-lg transition-shadow border border-slate-100`}
+                        className={`${styles.categoryItem} ${categoryActive?.id === elem.id ? styles.active : ''}`}
                     >
                         <h3 className="text-lg font-semibold text-slate-800 m-0">{elem.name}</h3>
                     </div>
