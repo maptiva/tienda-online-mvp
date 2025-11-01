@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
+import { Product } from '../interfaces/Producto';
 
 export const useProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
+
         const { data, error } = await supabase
           .from('products')
           .select('*, categories(name)')
@@ -17,7 +19,7 @@ export const useProducts = () => {
 
         if (error) {
           throw error;
-        }
+        };
 
         setProducts(data);
       } catch (err) {
