@@ -32,6 +32,7 @@
 
 .form h3 {
     margin-top: 0;
+    margin-bottom: 1rem;
 }
 
 .form input {
@@ -90,8 +91,31 @@
 }
 
 .deleteButton {
+
     background-color: transparent;
+
     border: none;
+
     cursor: pointer;
+
     margin-left: 10px;
+
+}
+
+
+
+.emptyCartMessage {
+
+    text-align: center;
+
+    padding: 2rem 0;
+
+}
+
+
+
+.emptyCartMessage h3 {
+
+    margin-bottom: 0.5rem;
+
 }
