@@ -7,13 +7,13 @@ import { useCart } from '../context/CartContext';
 import placeholder from '../assets/placeholder.jpg';
 
 const ProductCard = ({ product }) => {
+  const { addToCart } = useCart();
+  const [quantity, setQuantity] = useState(1);
+
   // Si no hay producto, no renderizamos nada o un esqueleto. Por ahora, nada.
   if (!product) {
     return null;
   }
-
-  const { addToCart } = useCart();
-  const [quantity, setQuantity] = useState(1);
 
   const imageUrl = product.image_url || placeholder;
 

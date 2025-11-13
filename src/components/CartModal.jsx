@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import styles from './CartModal.module.css';
+import { MdOutlineDelete } from 'react-icons/md'; // Importar el icono
 
 const CartModal = ({ isOpen, onClose }) => {
-  const { cart } = useCart();
+  const { cart, removeFromCart } = useCart();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -54,6 +55,9 @@ const CartModal = ({ isOpen, onClose }) => {
                 <span>{item.quantity}x {item.product.name}</span>
                 <span>${(item.product.price * item.quantity).toFixed(2)}</span>
               </div>
+              <button onClick={() => removeFromCart(item.product.id)} className={styles.deleteButton}>
+                <MdOutlineDelete className='text-red-500' size={25} /> {/* Usar el icono y color rojo */}
+              </button>
             </div>
           ))}
         </div>
