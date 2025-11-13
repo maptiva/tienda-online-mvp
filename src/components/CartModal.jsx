@@ -4,7 +4,7 @@ import styles from './CartModal.module.css';
 import { MdOutlineDelete } from 'react-icons/md';
 
 const CartModal = ({ isOpen, onClose }) => {
-  const { cart, removeFromCart } = useCart();
+  const { cart, removeFromCart, clearCart } = useCart();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -22,7 +22,7 @@ const CartModal = ({ isOpen, onClose }) => {
       return;
     }
 
-    let message = `Hola, me gustaría hacer el siguiente pedido:\n\n`;
+    let message = "Hola, me gustaría hacer el siguiente pedido:\n\n";
     message += `*Nombre:* ${name}\n`;
     message += `*Teléfono:* ${phone}\n`;
     if (address) {
@@ -31,14 +31,16 @@ const CartModal = ({ isOpen, onClose }) => {
     message += `\n*Pedido:*\n`;
 
     cart.forEach(item => {
-      message += `- ${item.quantity}x ${item.product.name} - ${(item.product.price * item.quantity).toFixed(2)}\n`;
+      message += `- ${item.quantity}x ${item.product.name} - $${(item.product.price * item.quantity).toFixed(2)}\n`;
     });
 
     const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    message += `\n*Total:* ${total.toFixed(2)}`;
+    message += `\n*Total:* $${total.toFixed(2)}`;
 
     const whatsappUrl = `https://wa.me/5493456533273?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
+    onClose(); // Close the modal after sending the order
+    clearCart(); // Empty the cart
   };
 
   const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
