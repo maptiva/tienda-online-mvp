@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from './Header';
-import Footer from './Footer';
-import WhatsAppButton from './WhatsAppButton';
+import Header from './ui/Header';
+import Footer from './ui/Footer';
+
 import CartModal from './CartModal';
 import CategoriaList from './public/CategoriaList';
+import WhatsAppButton from './ui/WhatsAppButton';
 
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);

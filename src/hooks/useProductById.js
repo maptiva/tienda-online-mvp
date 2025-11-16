@@ -3,7 +3,7 @@ import { supabase } from '../services/supabase';
 
 export const useProductById = (productId) => {
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {

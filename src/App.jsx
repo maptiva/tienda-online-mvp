@@ -1,20 +1,23 @@
 import { Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import './App.css';
-import ProductList from './components/ProductList.jsx';
+
 import ProductDetail from './components/ProductDetail.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import favicon from './assets/logo.png';
 
 
 import ProtectedRoute from './router/ProtectedRoute.jsx';
-import ProductForm from './components/ProductForm.jsx';
+
 import { Error404 } from './pages/Error404.tsx';
 import CategoriaPage from './pages/dashboard/CategoriaPage.tsx';
 import PublicLayout from './components/PublicLayout.jsx';
 import AdminLayout from './components/AdminLayout.jsx';
 import { Login } from './pages/Login.tsx';
 import AdminDashboard from './pages/AdminDashboard.tsx';
+import ProductList from './components/public/ProductList.tsx';
+import ProductForm from './components/ProductForm.tsx';
+
 
 function App() {
   useEffect(() => {

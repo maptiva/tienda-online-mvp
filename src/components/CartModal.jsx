@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import styles from './CartModal.module.css';
+import { MdDeleteOutline } from 'react-icons/md';
 
 const CartModal = ({ isOpen, onClose }) => {
-  const { cart } = useCart();
+  const { cart, deleteCart } = useCart();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -35,6 +36,10 @@ const CartModal = ({ isOpen, onClose }) => {
     window.open(whatsappUrl, '_blank');
   };
 
+  const onDeleteProductCart = (id) => {
+    deleteCart(id)
+  };
+
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
@@ -47,15 +52,23 @@ const CartModal = ({ isOpen, onClose }) => {
           <input type="text" placeholder="Dirección de Envío (Opcional)" value={address} onChange={e => setAddress(e.target.value)} />
         </div>
         <div className={styles.cartItems}>
-          {cart.map(item => (
-            <div key={item.product.id} className={styles.productItem}>
-              <img src={item.product.image_url} alt={item.product.name} className={styles.productImage} />
-              <div className={styles.productDetails}>
-                <span>{item.quantity}x {item.product.name}</span>
-                <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+          {
+            cart.length === 0 ? (
+              <div className='flex flex-col items-center py-5 justify-center'>
+                <h3>Tu carrito esta vacio</h3>
+                <p className='text-gray-500'>¡Anade productos para verlos aqui!</p>
               </div>
-            </div>
-          ))}
+            ) :
+              cart.map(item => (
+                <div key={item.product.id} className='flex items-center mb-4 pb-4 border-b border-[#eee] gap-5'>
+                  <img src={item.product.image_url} alt={item.product.name} className={styles.productImage} />
+                  <div className={styles.productDetails}>
+                    <span>{item.quantity}x {item.product.name}</span>
+                    <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                  <MdDeleteOutline className='text-red-500 cursor-pointer hover:bg-red-300 rounded-sm' size={20} onClick={() => onDeleteProductCart(item.product.id)} />
+                </div>
+              ))}
         </div>
         <div className={styles.total}>
           Total: ${cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0).toFixed(2)}

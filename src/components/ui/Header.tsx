@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoTitle from '../assets/titulo1.png';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../../context/CartContext';
+import { MdOutlineShoppingCart } from 'react-icons/md';
+
+import logoTitle from '../../assets/titulo1.png';
+
 import { CiLocationOn } from 'react-icons/ci';
 import { PiPhone } from 'react-icons/pi';
 import { BsClock } from 'react-icons/bs';
 import { FaInstagram } from 'react-icons/fa';
-import { MdOutlineShoppingCart } from 'react-icons/md';
 
 const Header = ({ onCartClick }) => {
   const { cart } = useCart();

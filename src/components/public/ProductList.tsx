@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import ProductCard from './ProductCard';
-import { useProducts } from '../hooks/useProducts';
-import SearchBar from './SearchBar'; // Importar SearchBar
-import styles from './ProductList.module.css';
+import ProductCard from '../ProductCard';
+
+import { useProducts } from '../../hooks/useProducts';
+import { useCategory } from '../../hooks/categoria/useCategory';
+
 import { MdErrorOutline } from 'react-icons/md';
-import { useCategory } from '../hooks/categoria/UseCategory';
+import SearchBar from './SearchBar';
 
 const ProductList = () => {
   const { categoryActive } = useCategory()
@@ -56,13 +57,13 @@ const ProductList = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className="w-full max-w-[1200px] mx-auto px-8">
       <div className='sticky top-[145px] z-40 bg-[#f4f4f4] pb-4 border-b border-slate-200'>
         <h2 className='text-3xl font-bold text-slate-800 mb-4'>Nuestros Productos</h2>
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
       {filteredProducts.length > 0 ? (
-        <div className={styles.productosContainer}>
+        <div className="grid gap-5 grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

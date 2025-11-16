@@ -22,8 +22,16 @@ export const CartProvider = ({ children }) => {
         });
     };
 
+    const deleteCart = (id) => {
+        const existingProduct = cart.find(elem => elem.product.id === id);
+        console.log(existingProduct)
+        if (existingProduct !== -1) {
+            setCart(prevCart => prevCart.filter(elem => elem.product.id !== id));
+        }
+    }
+
     return (
-        <CartContext.Provider value={{ cart, addToCart }}>
+        <CartContext.Provider value={{ cart, addToCart, deleteCart }}>
             {children}
         </CartContext.Provider>
     );

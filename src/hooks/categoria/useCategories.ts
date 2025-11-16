@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase"
+import { Categoria } from "../../interfaces/Categoria";
 
 export const useCategories = () => {
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<Categoria[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
