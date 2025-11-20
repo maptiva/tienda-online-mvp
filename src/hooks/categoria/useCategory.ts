@@ -2,9 +2,12 @@ import Swal from "sweetalert2";
 import { Categoria } from "../../interfaces/Categoria"
 import { supabase } from "../../services/supabase"
 import { useCategoryState } from "../../store/useCategoryStore";
+import { useAuth } from "../../context/AuthContext";
 
 export const useCategory = () => {
+    const { user } = useAuth();
     const { categories, categoryActive, getCategories, activeCategory, limpiarCategories, clearCategoryActive, addCategory, deleteCategory, updateCategory } = useCategoryState();
+
 
     const limpiarCategoryActive = async () => {
         clearCategoryActive()
@@ -19,9 +22,15 @@ export const useCategory = () => {
     };
 
     const startAddCategory = async (category: Omit<Categoria, 'id'>) => {
+        // Agregar user_id al crear categoría
+        const categoryWithUser = {
+            ...category,
+            user_id: user?.id
+        };
+
         const { data, error } = await supabase
             .from('categories')
-            .insert(category)
+            .insert(categoryWithUser)
             .select()
             .single();
 
@@ -30,6 +39,7 @@ export const useCategory = () => {
 
         return data;
     };
+
 
     const startDeleteCategory = async (id: number) => {
         const { data, error } = await supabase
@@ -43,12 +53,18 @@ export const useCategory = () => {
     };
 
     const startGetCategories = async () => {
-        const { data, error } = await supabase
-            .from('categories')
-            .select()
+        let query = supabase.from('categories').select();
+
+        // Filtrar por user_id si hay usuario autenticado
+        if (user) {
+            query = query.eq('user_id', user.id);
+        }
+
+        const { data, error } = await query;
 
         getCategories(data as Categoria[])
     };
+
 
     const startUpdateCategory = async (category: Categoria) => {
         const { data, error } = await supabase

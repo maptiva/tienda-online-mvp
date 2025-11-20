@@ -1,14 +1,31 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { supabase } from '../../services/supabase';
 import { useCategory } from '../../hooks/categoria/useCategory'
 import styles from './CategoriaList.module.css';
 
-const CategoriaList = () => {
-
-    const { categories, startGetCategories, startActiveCategory, categoryActive, limpiarCategoryActive } = useCategory();
+const CategoriaList = ({ userId }) => {
+    const [categories, setCategories] = useState([]);
+    const { categoryActive, startActiveCategory, limpiarCategoryActive } = useCategory();
 
     useEffect(() => {
-        startGetCategories();
-    }, [])
+        const fetchCategories = async () => {
+            if (!userId) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('categories')
+                    .select('*')
+                    .eq('user_id', userId);
+
+                if (error) throw error;
+                setCategories(data || []);
+            } catch (err) {
+                console.error('Error fetching categories:', err);
+            }
+        };
+
+        fetchCategories();
+    }, [userId]);
 
     const activarCategoria = (id: number) => {
         if (id === 0) {

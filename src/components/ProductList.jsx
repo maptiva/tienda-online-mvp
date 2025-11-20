@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { useProducts } from '../hooks/useProducts';
 import SearchBar from './SearchBar'; // Importar SearchBar
@@ -7,9 +8,11 @@ import { MdErrorOutline } from 'react-icons/md';
 import { useCategory } from '../hooks/categoria/useCategory';
 
 const ProductList = () => {
+  const { store } = useOutletContext();
   const { categoryActive } = useCategory()
-  const { products, loading, error } = useProducts();
+  const { products, loading, error } = useProducts(store?.user_id);
   const [searchTerm, setSearchTerm] = useState('');
+
 
   // Usamos useMemo para no recalcular el filtro en cada render, solo si los productos o el término de búsqueda cambian
   const filteredProducts = useMemo(() => {

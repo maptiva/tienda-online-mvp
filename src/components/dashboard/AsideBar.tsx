@@ -31,6 +31,11 @@ export const AsideBar = () => {
                     <span role="img" aria-label="box" style={{ marginRight: '8px' }}>📦</span>
                     Productos
                 </NavLink>
+                <NavLink to={'/admin/settings'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
+                    <span role="img" aria-label="settings" style={{ marginRight: '8px' }}>⚙️</span>
+                    Configuración
+                </NavLink>
+
 
                 <div className='mt-auto mb-2'>
                     <button onClick={handleLogout} className="flex items-center gap-2 mt-10 text-red-600 w-full text-left">

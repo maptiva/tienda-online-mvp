@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
+import { useAuth } from '../context/AuthContext';
 import { formConfig } from '../config/productFormConfig';
 import styles from './ProductForm.module.css';
+
 
 function ProductForm() {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,18 +17,42 @@ function ProductForm() {
   const [originalImageUrl, setOriginalImageUrl] = useState(null);
   const [categories, setCategories] = useState([]);
 
+  const STORAGE_KEY = `product-form-draft-${productId || 'new'}`;
+
+
   useEffect(() => {
+    // Intentar recuperar datos guardados de localStorage
+    const savedData = localStorage.getItem(STORAGE_KEY);
+
     const initialData = {};
     formConfig.forEach(field => {
       initialData[field.name] = field.required ? '' : null;
     });
-    setFormData(initialData);
+
+    // Si hay datos guardados y no estamos editando, usarlos
+    if (savedData && !productId) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setFormData({ ...initialData, ...parsed });
+      } catch (e) {
+        setFormData(initialData);
+      }
+    } else {
+      setFormData(initialData);
+    }
 
     const fetchCategories = async () => {
       try {
-        const { data, error } = await supabase.from('categories').select('*');
+        let query = supabase.from('categories').select('*');
+
+        // Filtrar categorías por user_id del usuario autenticado
+        if (user) {
+          query = query.eq('user_id', user.id);
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
-        setCategories(data);
+        setCategories(data || []);
       } catch (err) {
         setError(`Error al cargar categorías: ${err.message}`);
         console.error('Error fetching categories:', err);
@@ -42,7 +69,7 @@ function ProductForm() {
             .select('*')
             .eq('id', parseInt(productId, 10))
             .single();
-          
+
           if (error) throw error;
           if (!data) throw new Error('Producto no encontrado');
 
@@ -59,14 +86,20 @@ function ProductForm() {
     } else {
       setLoading(false);
     }
-  }, [productId]);
+  }, [productId, user]); // Agregado user a las dependencias
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'image_url' && files && files[0]) {
       setImageFile(files[0]);
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      const newData = { ...formData, [name]: value };
+      setFormData(newData);
+
+      // Auto-guardar en localStorage (solo para productos nuevos)
+      if (!productId) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+      }
     }
   };
 
@@ -90,11 +123,11 @@ function ProductForm() {
         setLoading(false);
         return;
       }
-      
+
       const { data: publicUrlData } = supabase.storage
         .from('product-images')
         .getPublicUrl(uploadData.path);
-        
+
       newImageUrl = publicUrlData.publicUrl;
       finalFormData.image_url = newImageUrl;
     }
@@ -113,16 +146,23 @@ function ProductForm() {
 
     try {
       const { id, ...updateData } = finalFormData;
+
+      // Agregar user_id al guardar
+      const dataToSave = productId ? updateData : { ...finalFormData, user_id: user.id };
+
       let operation;
 
       if (productId) {
-        operation = supabase.from('products').update(updateData).eq('id', id);
+        operation = supabase.from('products').update(dataToSave).eq('id', id);
       } else {
-        operation = supabase.from('products').insert(finalFormData);
+        operation = supabase.from('products').insert(dataToSave);
       }
 
       const { error: dbError } = await operation;
       if (dbError) throw dbError;
+
+      // Limpiar localStorage al guardar exitosamente
+      localStorage.removeItem(STORAGE_KEY);
 
       navigate('/admin');
     } catch (err) {
@@ -131,6 +171,7 @@ function ProductForm() {
     } finally {
       setLoading(false);
     }
+
   };
 
   if (loading && !formData.name) {

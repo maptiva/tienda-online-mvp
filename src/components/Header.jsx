@@ -1,17 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import logoTitle from '../assets/titulo1.png';
 import { useCart } from '../context/CartContext';
 import { CiLocationOn } from 'react-icons/ci';
 import { PiPhone } from 'react-icons/pi';
 import { BsClock } from 'react-icons/bs';
-import { FaInstagram } from 'react-icons/fa';
+import { FaInstagram, FaFacebook } from 'react-icons/fa';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 
-const Header = ({ onCartClick }) => {
+const Header = ({ storeData, onCartClick }) => {
   const { cart } = useCart();
+  const { storeName } = useParams();
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Usar datos de la tienda si existen, sino valores por defecto
+  const displayLogo = storeData?.logo_url || logoTitle;
+  const displayPhone = storeData?.contact_phone || '+ (3456) 445977';
+  const displayInstagram = storeData?.instagram_url;
+  const displayFacebook = storeData?.facebook_url;
 
   return (
     <header className='bg-slate-800 sticky top-0 z-50'>
@@ -20,12 +27,12 @@ const Header = ({ onCartClick }) => {
           <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm'>
             <div className='flex gap-2 items-center' >
               <CiLocationOn color='#ff6900' size={20} />
-              <p className='text-slate-300'>AV. Principal 123, Ciudad</p>
+              <p className='text-slate-300'>Tienda Online</p>
             </div>
 
             <div className='flex gap-2 items-center' >
               <PiPhone color='#ff6900' size={20} />
-              <p className='text-slate-300'>+ (3456) 445977</p>
+              <p className='text-slate-300'>{displayPhone}</p>
             </div>
 
             <div className='flex gap-2 items-center' >
@@ -37,15 +44,36 @@ const Header = ({ onCartClick }) => {
       </div>
 
       <div className='flex justify-between py-5 mx-10'>
-        <Link to="/">
+        <Link to={`/${storeName}`}>
           <div className=''>
-            <img src={logoTitle} className='w-25 h-15' alt="Sport Store Title" />
+            <img
+              src={displayLogo}
+              className='w-25 h-15 max-h-16 object-contain'
+              alt={storeData?.store_name || "Store Logo"}
+            />
           </div>
         </Link>
         <div className='flex gap-5 m-2'>
-          <div className='cursor-pointer'>
-            <FaInstagram size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />
-          </div>
+          {displayInstagram && (
+            <a
+              href={displayInstagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className='cursor-pointer'
+            >
+              <FaInstagram size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />
+            </a>
+          )}
+          {displayFacebook && (
+            <a
+              href={displayFacebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className='cursor-pointer'
+            >
+              <FaFacebook size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />
+            </a>
+          )}
           <div onClick={onCartClick} className='cursor-pointer'>
             <div className="relative">
               <MdOutlineShoppingCart size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />

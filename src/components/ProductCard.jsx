@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
 // La imagen de placeholder ya no es necesaria por defecto,
@@ -8,7 +8,9 @@ import placeholder from '../assets/placeholder.jpg';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
+  const { storeName } = useParams();
   const [quantity, setQuantity] = useState(1);
+
 
   // Si no hay producto, no renderizamos nada o un esqueleto. Por ahora, nada.
   if (!product) {
@@ -30,7 +32,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className='bg-white border-[#ddd] rounded-sm p-4 text-center shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-1.5'>
-      <Link to={`/product/${product.id}`} className='flex justify-center flex-col items-center'>
+      <Link to={`/${storeName}/product/${product.id}`} className='flex justify-center flex-col items-center'>
         <img
           src={imageUrl}
           alt={product.name}

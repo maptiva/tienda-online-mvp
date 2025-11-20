@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import styles from './CartModal.module.css';
 import { MdOutlineDelete } from 'react-icons/md';
 
-const CartModal = ({ isOpen, onClose }) => {
+const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
   const { cart, removeFromCart, clearCart } = useCart();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -22,6 +22,11 @@ const CartModal = ({ isOpen, onClose }) => {
       return;
     }
 
+    if (!whatsappNumber) {
+      alert('No hay número de WhatsApp configurado para esta tienda.');
+      return;
+    }
+
     let message = "Hola, me gustaría hacer el siguiente pedido:\n\n";
     message += `*Nombre:* ${name}\n`;
     message += `*Teléfono:* ${phone}\n`;
@@ -37,7 +42,7 @@ const CartModal = ({ isOpen, onClose }) => {
     const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
     message += `\n*Total:* $${total.toFixed(2)}`;
 
-    const whatsappUrl = `https://wa.me/5493456533273?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     onClose(); // Close the modal after sending the order
     clearCart(); // Empty the cart
@@ -50,7 +55,7 @@ const CartModal = ({ isOpen, onClose }) => {
       <div className={styles.modal}>
         <button className={styles.closeButton} onClick={onClose}>X</button>
         <h2><strong>Tu Pedido</strong></h2>
-        
+
         <div className={styles.form}>
           <h3>Completa tus datos para el pedido</h3>
           <input type="text" placeholder="Nombre y Apellido" value={name} onChange={e => setName(e.target.value)} />
@@ -84,7 +89,7 @@ const CartModal = ({ isOpen, onClose }) => {
         <div className={styles.total}>
           Total: ${total.toFixed(2)}
         </div>
-        
+
         <button className={styles.whatsappButton} onClick={handleWhatsAppOrder}>Confirmar Pedido por WhatsApp</button>
       </div>
     </div>

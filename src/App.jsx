@@ -13,6 +13,8 @@ import { Error404 } from './pages/Error404';
 import CategoriaPage from './pages/dashboard/CategoriaPage.tsx';
 import PublicLayout from './components/PublicLayout';
 import AdminLayout from './components/AdminLayout';
+import StoreSettings from './pages/StoreSettings';
+
 
 function App() {
   useEffect(() => {
@@ -27,18 +29,21 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        <Route path="/" element={<PublicLayout />}>
+        <Route path="/:storeName" element={<PublicLayout />}>
           <Route index element={<ProductList />} />
           <Route path="product/:productId" element={<ProductDetail />} />
         </Route>
+
 
         <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="producto" element={<AdminDashboard />} />
           <Route path="categoria" element={<CategoriaPage />} />
+          <Route path="settings" element={<StoreSettings />} />
           <Route path="new" element={<ProductForm />} />
           <Route path="edit/:productId" element={<ProductForm />} />
         </Route>
+
         <Route path='*' element={<Error404 />} />
       </Routes>
     </CartProvider>

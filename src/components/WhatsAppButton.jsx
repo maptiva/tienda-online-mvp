@@ -1,10 +1,14 @@
 import React from 'react';
 import styles from './WhatsAppButton.module.css';
 
-const WhatsAppButton = () => {
-  const numeroWhatsApp = '5493456533273';
-  const mensaje = 'Hola, quisiera hacer una consulta sobre sus productos.';
-  const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+const WhatsAppButton = ({ phoneNumber, customMessage }) => {
+  // Si no hay número de WhatsApp, no mostrar el botón
+  if (!phoneNumber) {
+    return null;
+  }
+
+  const mensaje = customMessage || 'Hola, estoy interesado en sus productos.';
+  const urlWhatsApp = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(mensaje)}`;
 
   return (
     <a href={urlWhatsApp} className={styles.whatsappFlotante} target="_blank" rel="noopener noreferrer">
