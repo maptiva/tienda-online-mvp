@@ -14,6 +14,7 @@ import CategoriaPage from './pages/dashboard/CategoriaPage.tsx';
 import PublicLayout from './components/PublicLayout';
 import AdminLayout from './components/AdminLayout';
 import StoreSettings from './pages/StoreSettings';
+import LandingPage from './pages/LandingPage';
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
   return (
     <CartProvider>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
 
         <Route path="/:storeName" element={<PublicLayout />}>
