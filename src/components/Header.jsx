@@ -17,6 +17,8 @@ const Header = ({ storeData, onCartClick }) => {
   // Usar datos de la tienda si existen, sino valores por defecto
   const displayLogo = storeData?.logo_url || logoTitle;
   const displayPhone = storeData?.contact_phone || '+ (3456) 445977';
+  const displayAddress = storeData?.address || 'Tienda Online';
+  const displayHours = storeData?.business_hours || 'Lun-Sab: 9:00 - 20:00';
   const displayInstagram = storeData?.instagram_url;
   const displayFacebook = storeData?.facebook_url;
 
@@ -27,7 +29,7 @@ const Header = ({ storeData, onCartClick }) => {
           <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm'>
             <div className='flex gap-2 items-center' >
               <CiLocationOn color='#ff6900' size={20} />
-              <p className='text-slate-300'>Tienda Online</p>
+              <p className='text-slate-300'>{displayAddress}</p>
             </div>
 
             <div className='flex gap-2 items-center' >
@@ -37,7 +39,7 @@ const Header = ({ storeData, onCartClick }) => {
 
             <div className='flex gap-2 items-center' >
               <BsClock color='#ff6900' size={20} />
-              <p className='text-slate-300'>Lun-Sab: 9:00 - 20:00</p>
+              <p className='text-slate-300'>{displayHours}</p>
             </div>
           </div>
         </div>

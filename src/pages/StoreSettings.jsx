@@ -10,6 +10,8 @@ function StoreSettings() {
   const [storeData, setStoreData] = useState({
     store_name: '',
     logo_url: '',
+    address: '',
+    business_hours: 'Lun-Sab: 9:00 - 20:00',
     contact_phone: '',
     instagram_url: '',
     facebook_url: '',
@@ -196,6 +198,36 @@ function StoreSettings() {
               />
             </div>
           )}
+        </div>
+
+        {/* Address */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Domicilio
+          </label>
+          <input
+            type="text"
+            name="address"
+            value={storeData.address}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="Av. Ejemplo 1234, Ciudad"
+          />
+        </div>
+
+        {/* Business Hours */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Horarios de Atención
+          </label>
+          <input
+            type="text"
+            name="business_hours"
+            value={storeData.business_hours}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="Lun-Sab: 9:00 - 20:00"
+          />
         </div>
 
         {/* Contact Phone */}

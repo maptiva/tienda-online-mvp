@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../../services/supabase';
 import { useCategory } from '../../hooks/categoria/useCategory'
+import { useCategoryState } from '../../store/useCategoryStore';
 import styles from './CategoriaList.module.css';
 
 const CategoriaList = ({ userId }) => {
     const [categories, setCategories] = useState([]);
-    const { categoryActive, startActiveCategory, limpiarCategoryActive } = useCategory();
+    const { categoryActive, limpiarCategoryActive } = useCategory();
+    const { activeCategory, getCategories } = useCategoryState();
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -18,20 +20,32 @@ const CategoriaList = ({ userId }) => {
                     .eq('user_id', userId);
 
                 if (error) throw error;
-                setCategories(data || []);
+                const fetchedCategories = data || [];
+                setCategories(fetchedCategories);
+                // Actualizar el store global para que el filtrado funcione
+                getCategories(fetchedCategories);
             } catch (err) {
                 console.error('Error fetching categories:', err);
             }
         };
 
         fetchCategories();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
 
     const activarCategoria = (id: number) => {
+        console.log('Activando categoría:', id);
         if (id === 0) {
-            return limpiarCategoryActive()
+            limpiarCategoryActive();
+            return;
         }
-        startActiveCategory(id);
+
+        // Buscar la categoría en el array local
+        const category = categories.find(cat => cat.id === id);
+        if (category) {
+            console.log('Categoría encontrada:', category);
+            activeCategory(category);
+        }
     };
 
     return (
