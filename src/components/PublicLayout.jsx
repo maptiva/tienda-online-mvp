@@ -36,7 +36,7 @@ const PublicLayout = () => {
       <main>
         <Outlet context={{ store }} />
       </main>
-      <Footer />
+      <Footer storeName={store.store_name} />
       <WhatsAppButton
         phoneNumber={store.whatsapp_number}
         customMessage={store.whatsapp_message}

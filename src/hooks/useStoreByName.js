@@ -21,7 +21,7 @@ export const useStoreByName = (storeName) => {
                 const { data, error } = await supabase
                     .from('stores')
                     .select('*')
-                    .eq('store_name', storeName)
+                    .eq('store_slug', storeName)
                     .single();
 
                 if (error) {
