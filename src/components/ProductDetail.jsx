@@ -47,7 +47,7 @@ const ProductDetail = () => {
       <div className={styles.detailsContainer}>
         <h1>{product.name}</h1>
         <p className={styles.price}>${product.price ? product.price.toFixed(2) : '0.00'}</p>
-        <h3>Descripción</h3>
+        <h3 className='text-xl font-bold mt-6 mb-3'>Descripción:</h3>
         <p className={styles.description}>{product.description}</p>
         {/* Aquí podrías agregar los selectores de tallas y colores */}
         <div className={styles.actions}>
