@@ -1,10 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
-import { useEffect } from 'react';
 import './App.css';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
 import { CartProvider } from './context/CartContext';
-import favicon from './assets/logo.png';
+
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './router/ProtectedRoute';
@@ -18,12 +17,7 @@ import LandingPage from './pages/LandingPage';
 
 
 function App() {
-  useEffect(() => {
-    const link = document.querySelector("link[rel~='icon']");
-    if (link) {
-      link.href = favicon;
-    }
-  }, []);
+
 
   return (
     <CartProvider>
