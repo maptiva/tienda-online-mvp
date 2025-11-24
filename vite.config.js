@@ -8,5 +8,5 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
-  base: '/tienda-online-mvp/' // ¡MUY IMPORTANTE! Usa el nombre de tu repositorio
+  base: process.env.VERCEL ? '/' : '/tienda-online-mvp/'
 })
