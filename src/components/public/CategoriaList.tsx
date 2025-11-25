@@ -14,6 +14,16 @@ const CategoriaList = ({ userId }: { userId: string }) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const { categoryActive, limpiarCategoryActive } = useCategory();
     const { activeCategory, getCategories } = useCategoryState();
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 100);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -55,25 +65,30 @@ const CategoriaList = ({ userId }: { userId: string }) => {
     };
 
     return (
-        <div className={styles.categoryContainer}>
-            <div
-                onClick={(e) => activarCategoria(0)}
-                key={0}
-                className={`${styles.categoryItem} ${!categoryActive ? styles.active : ''}`}
-            >
-                <h3 className="text-lg font-semibold text-white m-0">Todos</h3>
+        <div
+            className={`sticky z-40 py-0.5 transition-all duration-300 ${isScrolled ? 'top-[88px]' : 'top-[145px]'}`}
+            style={{ willChange: 'top' }}
+        >
+            <div className={styles.categoryContainer}>
+                <div
+                    onClick={(e) => activarCategoria(0)}
+                    key={0}
+                    className={`${styles.categoryItem} ${!categoryActive ? styles.active : ''}`}
+                >
+                    <h3 className="text-lg font-semibold text-white m-0">Todos</h3>
+                </div>
+                {
+                    categories.map(elem => (
+                        <div
+                            onClick={(e) => activarCategoria(elem.id)}
+                            key={elem.id}
+                            className={`${styles.categoryItem} ${categoryActive?.id === elem.id ? styles.active : ''}`}
+                        >
+                            <h3 className="text-lg font-semibold text-white m-0">{elem.name}</h3>
+                        </div>
+                    ))
+                }
             </div>
-            {
-                categories.map(elem => (
-                    <div
-                        onClick={(e) => activarCategoria(elem.id)}
-                        key={elem.id}
-                        className={`${styles.categoryItem} ${categoryActive?.id === elem.id ? styles.active : ''}`}
-                    >
-                        <h3 className="text-lg font-semibold text-white m-0">{elem.name}</h3>
-                    </div>
-                ))
-            }
         </div>
     )
 }

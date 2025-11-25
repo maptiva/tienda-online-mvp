@@ -43,14 +43,14 @@
   z-index: 40;
   padding-bottom: 1rem;
   padding-top: 0.5rem;
-  /* Ajuste para móvil (Header más alto por flex-col) */
-  top: 205px;
+  /* Ajuste para móvil: Header (88px) + Categorías (~60px) */
+  top: 150px;
 }
 
 @media (min-width: 768px) {
   .stickyBar {
-    /* Ajuste para escritorio */
-    top: 145px;
+    /* Ajuste para escritorio: Header (88px) + Categorías (~60px) */
+    top: 150px;
   }
 }
 

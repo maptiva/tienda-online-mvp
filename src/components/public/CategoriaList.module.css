@@ -4,7 +4,14 @@
   flex-wrap: nowrap;
   padding-bottom: 10px;
   width: 100%;
+  justify-content: flex-start;
   /* Oculta la barra de scroll en navegadores WebKit */
+}
+
+@media (min-width: 768px) {
+  .categoryContainer {
+    justify-content: center;
+  }
 }
 
 .categoryContainer::-webkit-scrollbar {

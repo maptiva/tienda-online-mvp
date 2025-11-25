@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import logoTitle from '../assets/titulo1.png';
 import { useCart } from '../context/CartContext';
@@ -14,6 +14,16 @@ const Header = ({ storeData, onCartClick }) => {
   const { cart } = useCart();
   const { storeName } = useParams();
   const { theme, toggleTheme } = useTheme();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -26,8 +36,17 @@ const Header = ({ storeData, onCartClick }) => {
   const displayFacebook = storeData?.facebook_url;
 
   return (
-    <header className={`sticky top-0 z-50 transition-colors duration-300 ${theme === 'light' ? 'bg-slate-800/50 backdrop-blur' : 'bg-slate-800'}`}>
-      <div className={`border-b transition-colors duration-300 ${theme === 'light' ? 'border-slate-700' : 'border-slate-700'}`}>
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${theme === 'light' ? 'bg-gray-500' : 'bg-slate-800'}`}
+      style={{ willChange: 'height' }}
+    >
+      <div
+        className='border-b border-slate-700 transition-all duration-300 overflow-hidden'
+        style={{
+          maxHeight: isScrolled ? '0px' : '200px',
+          opacity: isScrolled ? 0 : 1
+        }}
+      >
         <div className="container mx-auto px-4 py-3">
           <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm'>
             <div className='flex gap-2 items-center' >
