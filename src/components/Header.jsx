@@ -7,10 +7,13 @@ import { PiPhone } from 'react-icons/pi';
 import { BsClock } from 'react-icons/bs';
 import { FaInstagram, FaFacebook } from 'react-icons/fa';
 import { MdOutlineShoppingCart } from 'react-icons/md';
+import { HiOutlineSun, HiOutlineMoon } from 'react-icons/hi';
+import { useTheme } from '../context/ThemeContext';
 
 const Header = ({ storeData, onCartClick }) => {
   const { cart } = useCart();
   const { storeName } = useParams();
+  const { theme, toggleTheme } = useTheme();
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -23,23 +26,23 @@ const Header = ({ storeData, onCartClick }) => {
   const displayFacebook = storeData?.facebook_url;
 
   return (
-    <header className='bg-slate-800 sticky top-0 z-50'>
-      <div className='border-b border-slate-700'>
+    <header className={`sticky top-0 z-50 transition-colors duration-300 ${theme === 'light' ? 'bg-slate-400' : 'bg-slate-800'}`}>
+      <div className={`border-b transition-colors duration-300 ${theme === 'light' ? 'border-slate-300' : 'border-slate-700'}`}>
         <div className="container mx-auto px-4 py-3">
           <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm'>
             <div className='flex gap-2 items-center' >
               <CiLocationOn color='#ff6900' size={20} />
-              <p className='text-slate-300'>{displayAddress}</p>
+              <p className={`transition-colors duration-300 font-semibold ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>{displayAddress}</p>
             </div>
 
             <div className='flex gap-2 items-center' >
               <PiPhone color='#ff6900' size={20} />
-              <p className='text-slate-300'>{displayPhone}</p>
+              <p className={`transition-colors duration-300 font-semibold ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>{displayPhone}</p>
             </div>
 
             <div className='flex gap-2 items-center' >
               <BsClock color='#ff6900' size={20} />
-              <p className='text-slate-300'>{displayHours}</p>
+              <p className={`transition-colors duration-300 font-semibold ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>{displayHours}</p>
             </div>
           </div>
         </div>
@@ -63,7 +66,7 @@ const Header = ({ storeData, onCartClick }) => {
               rel="noopener noreferrer"
               className='cursor-pointer'
             >
-              <FaInstagram size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />
+              <FaInstagram size={25} className={`hover:text-[#ff6900] transition-all duration-300 ${theme === 'light' ? 'text-slate-700' : 'text-white'}`} />
             </a>
           )}
           {displayFacebook && (
@@ -73,12 +76,12 @@ const Header = ({ storeData, onCartClick }) => {
               rel="noopener noreferrer"
               className='cursor-pointer'
             >
-              <FaFacebook size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />
+              <FaFacebook size={25} className={`hover:text-[#ff6900] transition-all duration-300 ${theme === 'light' ? 'text-slate-700' : 'text-white'}`} />
             </a>
           )}
           <div onClick={onCartClick} className='cursor-pointer'>
             <div className="relative">
-              <MdOutlineShoppingCart size={25} className='hover:text-[#ff6900] text-white transition-all duration-300' />
+              <MdOutlineShoppingCart size={25} className={`hover:text-[#ff6900] transition-all duration-300 ${theme === 'light' ? 'text-slate-700' : 'text-white'}`} />
               {
                 totalItems !== 0 &&
                 <p className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -86,6 +89,13 @@ const Header = ({ storeData, onCartClick }) => {
                 </p>
               }
             </div>
+          </div>
+          <div onClick={toggleTheme} className='cursor-pointer ml-3'>
+            {theme === 'dark' ? (
+              <HiOutlineSun size={25} className={`hover:text-[#ff6900] transition-all duration-300 ${theme === 'light' ? 'text-slate-700' : 'text-white'}`} />
+            ) : (
+              <HiOutlineMoon size={25} className={`hover:text-[#ff6900] transition-all duration-300 ${theme === 'light' ? 'text-slate-700' : 'text-white'}`} />
+            )}
           </div>
         </div>
       </div>

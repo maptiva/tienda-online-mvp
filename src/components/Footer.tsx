@@ -8,14 +8,14 @@ const Footer: React.FC<FooterProps> = ({ storeName }) => {
     const displayName = storeName || 'Tienda Online';
 
     return (
-        <footer className='bg-slate-800 text-white py-6 mt-auto'>
+        <footer className='bg-slate-800 text-white py-6 mt-auto transition-colors duration-300'>
             <div className='container mx-auto px-4'>
                 <div className='flex flex-col md:flex-row items-center justify-between gap-4 text-sm'>
 
-                    <p className='text-slate-300 text-center md:text-left'>
+                    <p className='text-slate-300 text-center md:text-left transition-colors duration-300'>
                         © 2025 {displayName}. Todos los derechos reservados
                     </p>
-                    <p className='text-slate-400 text-center md:text-right'>
+                    <p className='text-slate-400 text-center md:text-right transition-colors duration-300'>
                         Desarrollado por{' '}
                         <a
                             href='https://maptiva.github.io/maptiva/'

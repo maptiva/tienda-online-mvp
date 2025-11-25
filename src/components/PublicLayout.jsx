@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import WhatsAppButton from './WhatsAppButton';
@@ -10,7 +10,11 @@ import { useStoreByName } from '../hooks/useStoreByName';
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { storeName } = useParams();
+  const location = useLocation();
   const { store, loading, error } = useStoreByName(storeName);
+
+  // Verificar si estamos en la página de lista de productos
+  const isProductListPage = location.pathname === `/${storeName}` || location.pathname === `/${storeName}/`;
 
   if (loading) {
     return (
@@ -30,10 +34,10 @@ const PublicLayout = () => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Header storeData={store} onCartClick={() => setIsCartOpen(true)} />
-      <CategoriaList userId={store.user_id} />
-      <main>
+      {isProductListPage && <CategoriaList userId={store.user_id} />}
+      <main className="!mt-0 flex-grow">
         <Outlet context={{ store }} />
       </main>
       <Footer storeName={store.store_name} />

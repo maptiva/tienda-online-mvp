@@ -4,8 +4,14 @@ import { useCategory } from '../../hooks/categoria/useCategory'
 import { useCategoryState } from '../../store/useCategoryStore';
 import styles from './CategoriaList.module.css';
 
-const CategoriaList = ({ userId }) => {
-    const [categories, setCategories] = useState([]);
+interface Category {
+    id: number;
+    name: string;
+    user_id: string;
+}
+
+const CategoriaList = ({ userId }: { userId: string }) => {
+    const [categories, setCategories] = useState<Category[]>([]);
     const { categoryActive, limpiarCategoryActive } = useCategory();
     const { activeCategory, getCategories } = useCategoryState();
 
@@ -20,7 +26,7 @@ const CategoriaList = ({ userId }) => {
                     .eq('user_id', userId);
 
                 if (error) throw error;
-                const fetchedCategories = data || [];
+                const fetchedCategories = (data as Category[]) || [];
                 setCategories(fetchedCategories);
                 // Actualizar el store global para que el filtrado funcione
                 getCategories(fetchedCategories);
@@ -55,7 +61,7 @@ const CategoriaList = ({ userId }) => {
                 key={0}
                 className={`${styles.categoryItem} ${!categoryActive ? styles.active : ''}`}
             >
-                <h3 className="text-lg font-semibold text-slate-800 m-0">Todos</h3>
+                <h3 className="text-lg font-semibold text-white m-0">Todos</h3>
             </div>
             {
                 categories.map(elem => (
@@ -64,7 +70,7 @@ const CategoriaList = ({ userId }) => {
                         key={elem.id}
                         className={`${styles.categoryItem} ${categoryActive?.id === elem.id ? styles.active : ''}`}
                     >
-                        <h3 className="text-lg font-semibold text-slate-800 m-0">{elem.name}</h3>
+                        <h3 className="text-lg font-semibold text-white m-0">{elem.name}</h3>
                     </div>
                 ))
             }

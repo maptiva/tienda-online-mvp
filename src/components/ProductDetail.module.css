@@ -11,17 +11,19 @@
   width: 100%;
   height: auto;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .detailsContainer h1 {
   font-size: 2.8rem;
   margin-bottom: 1rem;
+  color: #f1f5f9;
 }
 
 .description {
   font-size: 1.1rem;
-  color: #555;
+  color: #ffffff;
+  /* white */
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -29,7 +31,8 @@
 .price {
   font-size: 2rem;
   font-weight: bold;
-  color: #27ae60;
+  color: #f97316;
+  /* orange-500 */
   margin-bottom: 2rem;
 }
 
@@ -42,28 +45,37 @@
   width: 80px;
   padding: 0.8rem;
   text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  background-color: rgba(15, 23, 42, 0.5);
+  border: 1px solid #475569;
+  color: white;
+  border-radius: 8px;
   font-size: 1rem;
 }
 
 .actions button {
   flex-grow: 1;
   padding: 0.8rem 1.5rem;
-  background-color: #3498db;
+  background-color: #f97316;
+  /* orange-500 */
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1.1rem;
-  transition: background-color 0.3s;
+  transition: all 0.3s;
+  font-weight: bold;
+  box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.39);
 }
 
 .actions button:hover {
-  background-color: #2980b9;
+  background-color: #ea580c;
+  /* orange-600 */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.23);
 }
 
-.loading, .error {
+.loading,
+.error {
   text-align: center;
   font-size: 1.5rem;
   padding: 4rem;

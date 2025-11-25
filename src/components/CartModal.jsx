@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import styles from './CartModal.module.css';
 import { MdOutlineDelete } from 'react-icons/md';
+import { useTheme } from '../context/ThemeContext';
 
 const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
   const { cart, removeFromCart, clearCart } = useCart();
+  const { theme } = useTheme();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -52,7 +54,7 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
 
   return (
     <div className={styles.overlay}>
-      <div className={styles.modal}>
+      <div className={`${styles.modal} ${theme === 'light' ? styles.light : ''}`}>
         <button className={styles.closeButton} onClick={onClose}>X</button>
         <h2><strong>Tu Pedido</strong></h2>
 

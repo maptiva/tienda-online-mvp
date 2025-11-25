@@ -5,10 +5,12 @@ import { useCart } from '../context/CartContext';
 // La imagen de placeholder ya no es necesaria por defecto,
 // pero la podemos mantener como fallback si la imagen del producto no carga.
 import placeholder from '../assets/placeholder.jpg';
+import { useTheme } from '../context/ThemeContext';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { storeName } = useParams();
+  const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
 
 
@@ -36,31 +38,38 @@ const ProductCard = ({ product }) => {
     : product.description;
 
   return (
-    <div className='bg-white border-[#ddd] rounded-sm p-4 text-center shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-1.5'>
-      <Link to={`/${storeName}/product/${product.id}`} className='flex justify-center flex-col items-center'>
-        <img
-          src={imageUrl}
-          alt={product.name}
-          onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
-        />
-        <h3 className='font-bold text-xl mt-4'>{product.name}</h3>
+    <div className='bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-4 text-center shadow-lg transition-all duration-300 flex flex-col hover:-translate-y-1.5 hover:shadow-orange-500/10 hover:border-orange-500/30 h-full'>
+      <Link to={`/${storeName}/product/${product.id}`} className='flex justify-center flex-col items-center w-full'>
+        <div className="w-full aspect-square mb-4 flex items-center justify-center p-0.5">
+          <img
+            src={imageUrl}
+            alt={product.name}
+            className="w-full h-full object-contain"
+            onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
+          />
+        </div>
+        <h3 className='font-bold text-xl text-white line-clamp-2 min-h-[3.5rem] flex items-center'>{product.name}</h3>
       </Link>
 
-      <p className='text-base text-gray-600 mt-4'>{truncatedDescription}</p>
+      <div className='flex-grow flex flex-col justify-between'>
+        <p className={`text-base mt-2 line-clamp-4 ${theme === 'light' ? 'text-white' : 'text-white'}`}>{product.description}</p>
 
-      <p className='font-bold text-[#27ae60] text-2xl mt-4'>${product.price ? product.price.toFixed(2) : '0.00'}</p>
+        <div className='mt-4'>
+          <p className='font-bold text-orange-500 text-2xl mb-4'>${product.price ? product.price.toFixed(2) : '0.00'}</p>
 
-      <div className='grid grid-cols-2 gap-2 items-center justify-between mt-4'>
-        <input
-          type="number"
-          className='border text-center rounded-sm border-gray-400 py-2'
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          min="1"
-        />
-        <button onClick={handleAddToCart} className='bg-[#3498db] cursor-pointer text-white border-none py-2 px-3 rounded-sm transition-all duration-300 hover:bg-[#2980b9]'>
-          Agregar
-        </button>
+          <div className='grid grid-cols-2 gap-2 items-center justify-between'>
+            <input
+              type="number"
+              className='bg-slate-900/50 border border-slate-600 text-white text-center rounded-lg py-2 focus:outline-none focus:border-orange-500 w-full transition-colors duration-300'
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              min="1"
+            />
+            <button onClick={handleAddToCart} className='bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 rounded-lg transition-all duration-300 shadow-lg shadow-orange-500/20 w-full'>
+              Agregar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -6,12 +6,17 @@ import SearchBar from './SearchBar'; // Importar SearchBar
 import styles from './ProductList.module.css';
 import { MdErrorOutline } from 'react-icons/md';
 import { useCategory } from '../hooks/categoria/useCategory';
+import { useCategoryState } from '../store/useCategoryStore';
+import { useTheme } from '../context/ThemeContext';
 
 const ProductList = () => {
   const { store } = useOutletContext();
-  const { categoryActive } = useCategory()
+  const { categoryActive } = useCategory();
+  const { theme } = useTheme();
   const { products, loading, error } = useProducts(store?.user_id);
   const [searchTerm, setSearchTerm] = useState('');
+
+  console.log('Current theme:', theme); // Debug
 
 
   // Usamos useMemo para no recalcular el filtro en cada render, solo si los productos o el término de búsqueda cambian
@@ -60,8 +65,8 @@ const ProductList = () => {
 
   return (
     <div className={styles.container}>
-      <div className='sticky top-[145px] z-40 bg-[#f4f4f4] pb-4 border-b border-slate-200'>
-        <h2 className='text-3xl font-bold text-slate-800 mb-4'>Nuestros Productos</h2>
+      <h2 className={`text-3xl font-bold mb-0 text-center pt-0 transition-colors duration-300 ${theme === 'light' ? '!text-slate-700' : '!text-white'}`}>Nuestros Productos</h2>
+      <div className={styles.stickyBar}>
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
       {filteredProducts.length > 0 ? (
