@@ -19,12 +19,12 @@ function Login() {
     try {
       const { error } = await signIn({ email, password });
       if (error) {
-        setError(error.message);
+        setError(error.message === 'Invalid login credentials' ? 'Credenciales invalidas' : 'Error al iniciar sesión.');
       } else {
         navigate('/admin');
       }
     } catch (err) {
-      setError('An unexpected error occurred.');
+      setError('Error al iniciar sesión.');
       console.error(err);
     }
   };
@@ -42,6 +42,7 @@ function Login() {
               id="email"
               name="email"
               value={email}
+              className='text-[#666]'
               onChange={(e) => setEmail(e.target.value)}
               required
             />
@@ -53,10 +54,11 @@ function Login() {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
+                className='text-[#666]'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                style={{ paddingRight: '40px' }}
+                style={{ paddingRight: '40px'}}
               />
               <button
                 type="button"

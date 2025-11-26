@@ -18,7 +18,15 @@ const Header = ({ storeData, onCartClick }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 150);
+      if(window.scrollY > 150){
+        setIsScrolled(true);
+      }
+
+      if(window.scrollY < 50){
+        setIsScrolled(false);
+      }
+
+      
     };
 
     // Usar requestAnimationFrame para suavizar la detección
