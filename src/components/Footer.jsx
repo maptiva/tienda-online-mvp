@@ -1,11 +1,8 @@
 import React from 'react'
 import { useTheme } from '../context/ThemeContext'
 
-interface FooterProps {
-    storeName?: string;
-}
 
-const Footer: React.FC<FooterProps> = ({ storeName }) => {
+const Footer = ({ storeName }) => {
     const displayName = storeName || 'Tienda Online';
     const { theme } = useTheme();
 

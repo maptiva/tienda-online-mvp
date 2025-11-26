@@ -4,11 +4,13 @@ import { useProductById } from '../hooks/useProductById';
 import styles from './ProductDetail.module.css';
 import placeholder from '../assets/placeholder.jpg';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
 
 const ProductDetail = () => {
   const { productId } = useParams();
   const { product, loading, error } = useProductById(productId);
   const { addToCart } = useCart();
+  const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
 
 
@@ -45,10 +47,10 @@ const ProductDetail = () => {
         />
       </div>
       <div className={styles.detailsContainer}>
-        <h1>{product.name}</h1>
+        <h1 className={theme === 'light' ? '!text-slate-700' : ''}>{product.name}</h1>
         <p className={styles.price}>${product.price ? product.price.toFixed(2) : '0.00'}</p>
-        <h3>Descripción</h3>
-        <p className={styles.description}>{product.description}</p>
+        <h3 className={`text-xl font-bold mt-6 mb-3 ${theme === 'light' ? '' : 'text-white'}`}>Descripción:</h3>
+        <p className={`${styles.description} ${theme === 'light' ? '!text-slate-700' : ''}`}>{product.description}</p>
         {/* Aquí podrías agregar los selectores de tallas y colores */}
         <div className={styles.actions}>
           <input

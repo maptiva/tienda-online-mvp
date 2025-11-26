@@ -1,13 +1,4 @@
 import React, { useState, useMemo } from 'react';
-<<<<<<< HEAD:src/components/public/ProductList.tsx
-import ProductCard from '../ProductCard';
-
-import { useProducts } from '../../hooks/useProducts';
-import { useCategory } from '../../hooks/categoria/useCategory';
-
-import { MdErrorOutline } from 'react-icons/md';
-import SearchBar from './SearchBar';
-=======
 import { useOutletContext } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { useProducts } from '../hooks/useProducts';
@@ -17,7 +8,6 @@ import { MdErrorOutline } from 'react-icons/md';
 import { useCategory } from '../hooks/categoria/useCategory';
 import { useCategoryState } from '../store/useCategoryStore';
 import { useTheme } from '../context/ThemeContext';
->>>>>>> main:src/components/ProductList.jsx
 
 const ProductList = () => {
   const { store } = useOutletContext();
@@ -74,19 +64,13 @@ const ProductList = () => {
   }
 
   return (
-<<<<<<< HEAD:src/components/public/ProductList.tsx
-    <div className="w-full max-w-[1200px] mx-auto px-8">
-      <div className='sticky top-[145px] z-40 bg-[#f4f4f4] pb-4 border-b border-slate-200'>
-        <h2 className='text-3xl font-bold text-slate-800 mb-4'>Nuestros Productos</h2>
-=======
     <div className={styles.container}>
       <h2 className={`text-3xl font-bold mb-0 text-center pt-0 transition-colors duration-300 ${theme === 'light' ? '!text-slate-700' : '!text-white'}`}>Nuestros Productos</h2>
       <div className={styles.stickyBar}>
->>>>>>> main:src/components/ProductList.jsx
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
       {filteredProducts.length > 0 ? (
-        <div className="grid gap-5 grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
+        <div className={styles.productosContainer}>
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

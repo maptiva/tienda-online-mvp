@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,79 +12,237 @@
 }
 
 .modal {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
+    background: #1e293b;
+    /* slate-800 */
+    padding: 20px;
+    border-radius: 12px;
     width: 90%;
     max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
 }
 
 .closeButton {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
+    top: 15px;
+    right: 15px;
+    background: none;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+
+.closeButton:hover {
+    color: #f1f5f9;
+}
+
+.modal h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #f1f5f9;
+    font-size: 1.5rem;
+}
+
+.form {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    background-color: #0f172a;
+    /* slate-900 */
 }
 
 .form h3 {
     margin-top: 0;
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
 }
 
 .form input {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #1e293b;
+    color: white;
+}
+
+.form input:focus {
+    outline: none;
+    border-color: #f97316;
 }
 
 .cartItems {
-    margin-top: 1rem;
-    max-height: 200px;
-    overflow-y: auto;
+    margin-bottom: 20px;
+    border-top: 1px solid #334155;
+    padding-top: 15px;
 }
 
 .productItem {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #334155;
+}
+
+.productItem:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .productImage {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-right: 15px;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 15px;
+    border: 1px solid #334155;
 }
 
 .productDetails {
-  display: flex;
-  justify-content: space-between;
-  flex-grow: 1;
-  align-items: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.productDetails span:first-child {
+    font-weight: bold;
+    color: #f1f5f9;
+}
+
+.productDetails span:last-child {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.deleteButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease-in-out;
+    opacity: 0.8;
+}
+
+.deleteButton:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.emptyCartMessage {
+    text-align: center;
+    padding: 30px 0;
+    color: #94a3b8;
+}
+
+.emptyCartMessage h3 {
+    margin-bottom: 10px;
+    color: #cbd5e1;
 }
 
 .total {
-    margin-top: 1rem;
-    font-weight: bold;
     text-align: right;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid #334155;
+    color: #f97316;
 }
 
 .whatsappButton {
+    display: block;
+    width: 100%;
+    padding: 12px;
     background-color: #25D366;
+    /* WhatsApp green */
     color: white;
     border: none;
-    padding: 1rem;
-    width: 100%;
-    border-radius: 4px;
-    font-size: 1rem;
+    border-radius: 5px;
+    font-size: 1.1rem;
     cursor: pointer;
-    margin-top: 1rem;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.whatsappButton:hover {
+    background-color: #1DA851;
+}
+
+/* Light Theme Styles */
+.light {
+    background: #f1f5f9; /* slate-100 */
+    color: #1e293b; /* slate-800 */
+    border-color: #cbd5e1; /* slate-300 */
+}
+
+.light .closeButton {
+    color: #475569; /* slate-600 */
+}
+
+.light .closeButton:hover {
+    color: #1e293b; /* slate-800 */
+}
+
+.light h2 {
+    color: #1e293b; /* slate-800 */
+}
+
+.light .form {
+    border-color: #475569; /* slate-600 */
+    background-color: #475569; /* slate-600 */
+}
+
+.light .form h3 {
+    color: #f1f5f9; /* slate-100 */
+}
+
+.light .form input {
+    border-color: #cbd5e1; /* slate-300 */
+    background-color: white;
+    color: #1e293b; /* slate-800 */
+}
+
+.light .form input::placeholder {
+    color: #94a3b8; /* slate-400 */
+}
+
+.light .cartItems,
+.light .productItem,
+.light .total {
+    border-color: #cbd5e1; /* slate-300 */
+}
+
+.light .productImage {
+    border-color: #cbd5e1; /* slate-300 */
+}
+
+.light .productDetails span:first-child {
+    color: #1e293b; /* slate-800 */
+}
+
+.light .productDetails span:last-child {
+    color: #475569; /* slate-600 */
+}
+
+.light .emptyCartMessage {
+    color: #475569; /* slate-600 */
+}
+
+.light .emptyCartMessage h3 {
+    color: #1e293b; /* slate-800 */
 }

@@ -4,15 +4,18 @@ import { BrowserRouter } from 'react-router-dom'
 
 import './index.css'
 import { AuthProvider } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 import App from './App'
 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter basename="/tienda-online-mvp">
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <ThemeProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,
 )

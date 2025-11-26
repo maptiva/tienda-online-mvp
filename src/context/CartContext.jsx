@@ -22,16 +22,16 @@ export const CartProvider = ({ children }) => {
         });
     };
 
-    const deleteCart = (id) => {
-        const existingProduct = cart.find(elem => elem.product.id === id);
-        console.log(existingProduct)
-        if (existingProduct !== -1) {
-            setCart(prevCart => prevCart.filter(elem => elem.product.id !== id));
-        }
-    }
+    const removeFromCart = (productId) => {
+        setCart(prevCart => prevCart.filter(item => item.product.id !== productId));
+    };
+
+    const clearCart = () => {
+        setCart([]);
+    };
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, deleteCart }}>
+        <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
             {children}
         </CartContext.Provider>
     );
