@@ -45,8 +45,8 @@ export const CategoriaElement = ({ categoria }: Props) => {
             <td className='py-2'>{name}</td>
             <td className='py-2'>
                 <div className='flex gap-5 items-center justify-center'>
-                    <BiPencil onClick={handleUpdate} className='text-gray-500 hover:bg-gray-400 hover:text-black cursor-pointer rounded-lg transition-all duration-300' />
-                    <MdDeleteOutline onClick={handleDelete} className='text-red-500 hover:bg-red-400 cursor-pointer rounded-lg transition-all duration-300' />
+                    <BiPencil onClick={handleUpdate} className='text-gray-500 cursor-pointer hover:opacity-70 transition-all duration-300' />
+                    <MdDeleteOutline onClick={handleDelete} className='text-red-500 cursor-pointer hover:opacity-70 transition-all duration-300' />
                 </div>
             </td>
         </tr>

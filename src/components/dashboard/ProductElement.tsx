@@ -42,11 +42,11 @@ export const ProductElement = ({ product }: Props) => {
             <td className='py-2 text-lg border-y border-slate-400'>{categories.name}</td>
             <td className='py-2 text-lg border-y border-slate-400'>
                 <div className='gap-2 flex items-center justify-center'>
-                    <button className='' onClick={(e) => navigate(`/admin/edit/${id}`)}>
+                    <button className='cursor-pointer hover:opacity-70 transition-all duration-300' onClick={(e) => navigate(`/admin/edit/${id}`)}>
                         {/* Icono de lapiz de react-icons/md */}
                         <RiPencilLine size={25} />
                     </button>
-                    <button className='cursor-pointer hover:opacity-70' onClick={handleDlete}>
+                    <button className='cursor-pointer hover:opacity-70 transition-all duration-300' onClick={handleDlete}>
                         <MdOutlineDelete className='text-red-500' size={25} />
                     </button>
                 </div>
