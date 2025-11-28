@@ -40,11 +40,11 @@ const ProductCard = ({ product }) => {
   return (
     <div className='bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-4 text-center shadow-lg transition-all duration-300 flex flex-col hover:-translate-y-1.5 hover:shadow-orange-500/10 hover:border-orange-500/30 h-full'>
       <Link to={`/${storeName}/product/${product.id}`} className='flex justify-center flex-col items-center w-full'>
-        <div className="w-full aspect-square mb-4 flex items-center justify-center p-0.5">
+        <div className="w-full aspect-square mb-4 flex items-center justify-center p-0.5 overflow-hidden">
           <img
             src={imageUrl}
             alt={product.name}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
             onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
           />
         </div>
