@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
+import { compressLogo } from '../utils/imageCompression';
 
 function StoreSettings() {
   const { user } = useAuth();
@@ -67,22 +68,30 @@ function StoreSettings() {
   const uploadLogo = async () => {
     if (!logoFile) return storeData.logo_url;
 
-    const fileExt = logoFile.name.split('.').pop();
-    const fileName = `${user.id}/logo-${Date.now()}.${fileExt}`;
+    try {
+      // Comprimir logo a WebP con calidad premium (90%)
+      const compressedFile = await compressLogo(logoFile);
 
-    const { data, error } = await supabase.storage
-      .from('store-logos')
-      .upload(fileName, logoFile, {
-        upsert: true
-      });
+      // Usar extensión .webp para el archivo comprimido
+      const fileName = `${user.id}/logo-${Date.now()}.webp`;
 
-    if (error) throw error;
+      const { data, error } = await supabase.storage
+        .from('store-logos')
+        .upload(fileName, compressedFile, {
+          upsert: true
+        });
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('store-logos')
-      .getPublicUrl(fileName);
+      if (error) throw error;
 
-    return publicUrl;
+      const { data: { publicUrl } } = supabase.storage
+        .from('store-logos')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (compressionError) {
+      console.error('Error compressing logo:', compressionError);
+      throw new Error(`Error al procesar el logo: ${compressionError.message}`);
+    }
   };
 
   const handleSubmit = async (e) => {

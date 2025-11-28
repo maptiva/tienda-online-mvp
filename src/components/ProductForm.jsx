@@ -4,6 +4,7 @@ import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { formConfig } from '../config/productFormConfig';
 import styles from './ProductForm.module.css';
+import { compressImage } from '../utils/imageCompression';
 
 
 function ProductForm() {
@@ -112,24 +113,33 @@ function ProductForm() {
     let newImageUrl = null;
 
     if (imageFile) {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(fileName, imageFile);
+      try {
+        // Comprimir imagen a WebP antes de subir
+        const compressedFile = await compressImage(imageFile);
 
-      if (uploadError) {
-        setError(`Error al subir la imagen: ${uploadError.message}`);
+        // Usar extensión .webp para el archivo comprimido
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.webp`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, compressedFile);
+
+        if (uploadError) {
+          setError(`Error al subir la imagen: ${uploadError.message}`);
+          setLoading(false);
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(uploadData.path);
+
+        newImageUrl = publicUrlData.publicUrl;
+        finalFormData.image_url = newImageUrl;
+      } catch (compressionError) {
+        setError(`Error al procesar la imagen: ${compressionError.message}`);
         setLoading(false);
         return;
       }
-
-      const { data: publicUrlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(uploadData.path);
-
-      newImageUrl = publicUrlData.publicUrl;
-      finalFormData.image_url = newImageUrl;
     }
 
     if (productId && newImageUrl && originalImageUrl) {
