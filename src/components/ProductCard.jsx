@@ -44,7 +44,7 @@ const ProductCard = ({ product }) => {
           <img
             src={imageUrl}
             alt={product.name}
-            className="w-full h-full object-contain"
+            className="w-full h-56 object-cover"
             onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
           />
         </div>
