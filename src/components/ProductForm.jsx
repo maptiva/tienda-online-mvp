@@ -144,13 +144,19 @@ function ProductForm() {
     }
 
     if (productId && newImageUrl && originalImageUrl) {
-      const oldImageName = originalImageUrl.split('/').pop();
-      if (oldImageName) {
+      // Extraer la ruta del archivo desde la URL completa de Supabase
+      // Ejemplo: https://xxx.supabase.co/storage/v1/object/public/product-images/1234567890-abc.webp
+      // Resultado: 1234567890-abc.webp
+      const urlParts = originalImageUrl.split('/product-images/');
+      if (urlParts.length > 1) {
+        const oldImagePath = urlParts[1];
         const { error: removeError } = await supabase.storage
           .from('product-images')
-          .remove([oldImageName]);
+          .remove([oldImagePath]);
         if (removeError) {
           console.warn(`No se pudo eliminar la imagen antigua: ${removeError.message}`);
+        } else {
+          console.log(`✅ Imagen antigua eliminada: ${oldImagePath}`);
         }
       }
     }
