@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { formConfig } from '../config/productFormConfig';
 import styles from './ProductForm.module.css';
 import { compressImage } from '../utils/imageCompression';
+import Swal from 'sweetalert2';
 
 
 function ProductForm() {
@@ -173,6 +174,15 @@ function ProductForm() {
 
       // Limpiar localStorage al guardar exitosamente
       localStorage.removeItem(STORAGE_KEY);
+
+      // Mostrar mensaje de éxito
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Guardado!',
+        text: productId ? 'Producto actualizado correctamente' : 'Producto creado correctamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
 
       navigate('/admin');
     } catch (err) {
