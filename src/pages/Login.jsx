@@ -1,6 +1,7 @@
 
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import styles from './Login.module.css'; // Import the CSS module
@@ -58,7 +59,7 @@ function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                style={{ paddingRight: '40px'}}
+                style={{ paddingRight: '40px' }}
               />
               <button
                 type="button"
@@ -83,6 +84,19 @@ function Login() {
           </div>
           <button type="submit" className={styles.loginButton}>Log In</button>
         </form>
+        <Link
+          to="/forgot-password"
+          style={{
+            display: 'block',
+            textAlign: 'center',
+            marginTop: '1rem',
+            color: '#ff6900',
+            textDecoration: 'none',
+            fontSize: '0.9rem'
+          }}
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
       </div>
     </div>
   );
