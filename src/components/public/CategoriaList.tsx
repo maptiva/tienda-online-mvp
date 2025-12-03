@@ -84,18 +84,41 @@ const CategoriaList = ({ userId }: { userId: string }) => {
 
   return (
     <div
-      className={`sticky z-40 py-0.5 transition-all duration-300 ${
-        isScrolled ? "top-[88px]" : "top-[145px]"
-      }`}
+      className={`sticky z-40 py-0.5 transition-all duration-300 ${isScrolled ? "top-[88px]" : "top-[145px]"
+        }`}
       style={{ willChange: "top" }}
     >
-      <div className={styles.categoryContainer}>
+      <div
+        className={styles.categoryContainer}
+        onMouseDown={(e) => {
+          const slider = e.currentTarget;
+          const startX = e.pageX - slider.offsetLeft;
+          const scrollLeft = slider.scrollLeft;
+          let isDown = true;
+
+          const handleMouseMove = (e: MouseEvent) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2; // Velocidad del scroll
+            slider.scrollLeft = scrollLeft - walk;
+          };
+
+          const handleMouseUp = () => {
+            isDown = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+          };
+
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
+        }}
+      >
         <div
           onClick={(e) => activarCategoria(0)}
           key={0}
-          className={`${styles.categoryItem} ${
-            !categoryActive ? styles.active : ""
-          }`}
+          className={`${styles.categoryItem} ${!categoryActive ? styles.active : ""
+            }`}
         >
           <h3 className="text-lg font-semibold text-white m-0">Todos</h3>
         </div>
@@ -103,9 +126,8 @@ const CategoriaList = ({ userId }: { userId: string }) => {
           <div
             onClick={(e) => activarCategoria(elem.id)}
             key={elem.id}
-            className={`${styles.categoryItem} ${
-              categoryActive?.id === elem.id ? styles.active : ""
-            }`}
+            className={`${styles.categoryItem} ${categoryActive?.id === elem.id ? styles.active : ""
+              }`}
           >
             <h3 className="text-lg font-semibold text-white m-0">
               {elem.name}

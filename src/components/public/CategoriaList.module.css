@@ -5,15 +5,19 @@
   padding-bottom: 10px;
   width: 100%;
   justify-content: flex-start;
-  /* Oculta la barra de scroll en navegadores WebKit */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Firefox */
+  cursor: grab;
+  user-select: none;
+  /* Prevenir selección de texto al arrastrar */
 }
 
-@media (min-width: 768px) {
-  .categoryContainer {
-    justify-content: center;
-  }
+.categoryContainer:active {
+  cursor: grabbing;
 }
 
+/* Ocultar scrollbar en todos los navegadores */
 .categoryContainer::-webkit-scrollbar {
   display: none;
 }
