@@ -81,4 +81,4 @@ La protección de datos personales se realiza conforme a la Ley 25.326 (Argentin
 
 // Disclaimer corto para el footer
 export const footerDisclaimer =
-    'Los precios, stock y contenido son administrados por el comerciante y pueden contener errores.';
+    'Los precios, stock y contenido son administrados por el comerciante. Ante cualquier duda, contactalo directamente.';
