@@ -84,7 +84,7 @@ const CategoriaList = ({ userId }: { userId: string }) => {
 
   return (
     <div
-      className={`sticky z-40 py-0.5 transition-all duration-300 ${isScrolled ? "top-[88px]" : "top-[145px]"
+      className={`sticky z-40 py-0.5 transition-all duration-300 ${isScrolled ? "top-[72px]" : "top-[72px]"
         }`}
       style={{ willChange: "top" }}
     >

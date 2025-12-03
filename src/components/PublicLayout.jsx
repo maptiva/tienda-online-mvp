@@ -40,7 +40,7 @@ const PublicLayout = () => {
       <main className="!mt-0 flex-grow">
         <Outlet context={{ store }} />
       </main>
-      <Footer storeName={store.store_name} />
+      <Footer storeName={store.store_name} storeData={store} />
       <WhatsAppButton
         phoneNumber={store.whatsapp_number}
         customMessage={store.whatsapp_message}
