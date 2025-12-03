@@ -22,14 +22,24 @@ const ProductList = () => {
   // Usamos useMemo para no recalcular el filtro en cada render, solo si los productos o el término de búsqueda cambian
   const filteredProducts = useMemo(() => {
     if (!products) return [];
+
     return products.filter((product) => {
+      const searchLower = searchTerm.toLowerCase();
+
+      // Buscar en: nombre, descripción y categoría
+      const matchesName = product.name.toLowerCase().includes(searchLower);
+      const matchesDescription = product.description?.toLowerCase().includes(searchLower) || false;
+      const matchesCategory = product.categories?.name?.toLowerCase().includes(searchLower) || false;
+
+      const matchesSearch = matchesName || matchesDescription || matchesCategory;
+
+      // Aplicar filtro de categoría activa si existe
       if (categoryActive) {
-        return product.name.toLowerCase().includes(searchTerm.toLowerCase()) && product.category_id === categoryActive?.id
-      } else {
-        return product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        return matchesSearch && product.category_id === categoryActive?.id;
       }
-    }
-    );
+
+      return matchesSearch;
+    });
   }, [products, searchTerm, categoryActive]);
 
   if (loading) {
@@ -67,7 +77,11 @@ const ProductList = () => {
     <div className={styles.container}>
       <h2 className={`text-3xl font-bold mb-0 text-center pt-0 transition-colors duration-300 ${theme === 'light' ? '!text-slate-700' : '!text-white'}`}>Nuestros Productos</h2>
       <div className={styles.stickyBar}>
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          placeholder="Buscar por nombre, descripción o categoría..."
+        />
       </div>
       {filteredProducts.length > 0 ? (
         <div className={styles.productosContainer}>

@@ -1,7 +1,7 @@
 import { FiSearch } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 
-const SearchBar = ({ searchTerm, setSearchTerm }) => {
+const SearchBar = ({ searchTerm, setSearchTerm, placeholder = "Buscar productos por nombre..." }) => {
   const { theme } = useTheme();
 
   return (
@@ -9,7 +9,7 @@ const SearchBar = ({ searchTerm, setSearchTerm }) => {
       <input
         className="w-full outline-none bg-transparent text-lg text-gray-900 placeholder-gray-500"
         type="text"
-        placeholder="Buscar productos por nombre..."
+        placeholder={placeholder}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
