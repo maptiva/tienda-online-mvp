@@ -179,10 +179,10 @@ function StoreSettings() {
             placeholder="Mi Tienda Online"
           />
           <p className="text-xs text-gray-500 mt-1">
-            Este nombre aparecerá en la URL: tusitio.com/{storeData.store_name?.toLowerCase().replace(/\s+/g, '-')}
+            Este es el nombre que aparecerá en tu tienda (footer, header, etc.)
           </p>
-          <p className="text-xs text-amber-600 mt-1 font-medium">
-            ⚠️ Importante: Elige bien este nombre. Si lo cambias después, los enlaces que hayas compartido dejarán de funcionar.
+          <p className="text-xs text-blue-600 mt-1">
+            ℹ️ La URL de tu tienda se genera automáticamente la primera vez y no cambia aunque modifiques el nombre.
           </p>
         </div>
 
