@@ -75,8 +75,27 @@ const ProductList = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={`text - 3xl font - bold mb - 0 text - center pt - 0 transition - colors duration - 300 ${theme === 'light' ? '!text-slate-700' : '!text-white'} `}>Nuestros Productos</h2>
-      <div className={`${styles.stickyBar} md: hidden`}>
+      {/* Título con línea decorativa */}
+      <div className="text-center mb-8 pt-6">
+        <h2
+          className="text-3xl font-bold mb-2"
+          style={{ color: 'var(--color-text-main)' }}
+        >
+          Nuestros Productos
+        </h2>
+        <div className="flex items-center justify-center gap-3">
+          <div
+            className="h-1 w-16 rounded-full"
+            style={{ backgroundColor: 'var(--color-accent)' }}
+          ></div>
+          <div
+            className="h-1 w-8 rounded-full"
+            style={{ backgroundColor: 'var(--color-primary)' }}
+          ></div>
+        </div>
+      </div>
+
+      <div className={`${styles.stickyBar} md:hidden`}>
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
