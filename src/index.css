@@ -15,8 +15,8 @@
     /* Texto sobre primary (slate-800) */
 
     /* Fondos */
-    --color-background-light: #FDF6F6;
-    /* Rosa muy claro - fondo página */
+    --color-background-light: #E8E2DB;
+    /* Arena/Tierra claro - fondo página (antes #FDF6F6 rosa) */
     --color-surface: #FFFFFF;
     /* Blanco - cards, header */
 
@@ -27,8 +27,8 @@
     /* Gris morado - descripciones */
 
     /* Acento */
-    --color-accent: #F4BFBF;
-    /* Coral suave - detalles decorativos */
+    --color-accent: #C9B8A8;
+    /* Tierra cálido - detalles decorativos (antes #F4BFBF rosa) */
 
     /* Bordes */
     --color-border: #e5e7eb;
