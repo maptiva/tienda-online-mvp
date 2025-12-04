@@ -7,12 +7,12 @@
 /* Variables para Tema CLARO (Pastel/Suave) */
 :root:not(.dark) {
     /* Colores principales */
-    --color-primary: #A7D8DE;
-    /* Pastel Blue */
-    --color-primary-darker: #8EC3C9;
-    /* Hover state */
-    --color-primary-text: #334155;
-    /* Texto sobre primary (slate-700) */
+    --color-primary: #5FAFB8;
+    /* Turquesa más oscuro (antes #A7D8DE) */
+    --color-primary-darker: #4A9BA4;
+    /* Hover state más oscuro */
+    --color-primary-text: #1e293b;
+    /* Texto sobre primary (slate-800) */
 
     /* Fondos */
     --color-background-light: #FDF6F6;

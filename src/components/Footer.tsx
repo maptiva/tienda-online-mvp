@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import LegalModal from './LegalModal'
 import { legalTexts, footerDisclaimer } from '../constants/legalTexts'
-import { CiLocationOn } from 'react-icons/ci'
-import { PiPhone } from 'react-icons/pi'
-import { BsClock } from 'react-icons/bs'
+import { IoLocation } from 'react-icons/io5' // Filled icon
+import { IoCall } from 'react-icons/io5' // Filled icon
+import { IoTime } from 'react-icons/io5' // Filled icon
 import { FaInstagram, FaFacebook } from 'react-icons/fa'
 
 interface FooterProps {
@@ -62,15 +62,15 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             </h3>
                             <div className='space-y-3' style={{ color: 'var(--color-text-main)' }}>
                                 <div className='flex items-start gap-2'>
-                                    <CiLocationOn size={20} className='flex-shrink-0 mt-1' style={{ color: 'var(--color-primary)' }} />
+                                    <IoLocation size={20} className='flex-shrink-0 mt-1' style={{ color: 'var(--color-primary)' }} />
                                     <p className='text-sm'>{displayAddress}</p>
                                 </div>
                                 <div className='flex items-center gap-2'>
-                                    <PiPhone size={20} className='flex-shrink-0' style={{ color: 'var(--color-primary)' }} />
+                                    <IoCall size={20} className='flex-shrink-0' style={{ color: 'var(--color-primary)' }} />
                                     <p className='text-sm'>{displayPhone}</p>
                                 </div>
                                 <div className='flex items-center gap-2'>
-                                    <BsClock size={20} className='flex-shrink-0' style={{ color: 'var(--color-primary)' }} />
+                                    <IoTime size={20} className='flex-shrink-0' style={{ color: 'var(--color-primary)' }} />
                                     <p className='text-sm'>{displayHours}</p>
                                 </div>
                             </div>
@@ -115,7 +115,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             <p className='text-sm mb-3' style={{ color: 'var(--color-text-main)' }}>
                                 Desarrollado por{' '}
                                 <a
-                                    href='https://www.maptiva.com.ar'
+                                    href='https://maptiva.github.io/maptiva/'
                                     target='_blank'
                                     rel='noopener noreferrer'
                                     className='font-semibold hover:underline transition-colors'
@@ -192,6 +192,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
             {/* Modal Legal */}
             {modalContent && (
                 <LegalModal
+                    isOpen={!!modalContent}
                     title={modalContent.title}
                     content={modalContent.content}
                     onClose={closeModal}
