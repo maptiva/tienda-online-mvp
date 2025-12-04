@@ -29,17 +29,17 @@ const Header = ({ storeData, onCartClick }) => {
       }}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-28">
 
           {/* Izquierda: Logo + Nombre */}
-          <Link to={`/${storeName}`} className="flex items-center gap-3">
+          <Link to={`/${storeName}`} className="flex items-center gap-3 flex-1 min-w-0 mr-4">
             <img
               src={displayLogo}
-              className="h-14 w-14 object-contain"
+              className="h-24 w-24 object-contain flex-shrink-0"
               alt={displayStoreName}
             />
             <span
-              className="text-2xl font-bold truncate"
+              className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight"
               style={{ color: 'var(--color-text-main)' }}
             >
               {displayStoreName}

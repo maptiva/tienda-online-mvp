@@ -67,7 +67,7 @@ const CategoriaList: React.FC<CategoriaListProps> = ({ userId }) => {
 
   return (
     <nav
-      className="sticky z-40 py-1.5 top-[80px]"
+      className="sticky z-40 py-1.5 top-[112px]"
       style={{
         backgroundColor: 'var(--color-surface)',
         borderBottom: `1px solid var(--color-border)`,

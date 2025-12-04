@@ -13,15 +13,15 @@ const SearchBar = ({ searchTerm, setSearchTerm, placeholder = "Buscar productos.
     >
       <span
         className="absolute left-3 top-1/2 -translate-y-1/2 text-xl"
-        style={{ color: 'var(--color-text-light)' }}
+        style={{ color: '#64748b' }} // Gris medio para el icono en ambos temas
       >
         <FiSearch />
       </span>
       <input
         className="w-full pl-10 pr-4 py-2.5 rounded-full outline-none transition-all text-sm"
         style={{
-          backgroundColor: theme === 'light' ? 'var(--color-background-light)' : 'var(--color-background)',
-          color: 'var(--color-text-main)',
+          backgroundColor: '#ffffff', // Blanco en ambos temas
+          color: '#1e293b', // Texto oscuro en ambos temas
           border: `1px solid var(--color-border)`,
         }}
         type="text"
@@ -30,7 +30,7 @@ const SearchBar = ({ searchTerm, setSearchTerm, placeholder = "Buscar productos.
         onChange={(e) => setSearchTerm(e.target.value)}
         onFocus={(e) => {
           e.target.style.borderColor = 'var(--color-primary)';
-          e.target.style.boxShadow = `0 0 0 3px ${theme === 'light' ? 'rgba(167, 216, 222, 0.2)' : 'rgba(56, 189, 248, 0.2)'}`;
+          e.target.style.boxShadow = `0 0 0 3px ${theme === 'light' ? 'rgba(95, 175, 184, 0.2)' : 'rgba(56, 189, 248, 0.2)'}`;
         }}
         onBlur={(e) => {
           e.target.style.borderColor = 'var(--color-border)';
