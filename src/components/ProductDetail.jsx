@@ -13,7 +13,6 @@ const ProductDetail = () => {
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
 
-
   if (loading) {
     return <p className={styles.loading}>Cargando producto...</p>;
   }
@@ -47,19 +46,65 @@ const ProductDetail = () => {
         />
       </div>
       <div className={styles.detailsContainer}>
-        <h1 className={theme === 'light' ? '!text-slate-700' : ''}>{product.name}</h1>
-        <p className={styles.price}>${product.price ? product.price.toFixed(2) : '0.00'}</p>
-        <h3 className={`text-xl font-bold mt-6 mb-3 ${theme === 'light' ? '' : 'text-white'}`}>Descripción:</h3>
-        <p className={`${styles.description} ${theme === 'light' ? '!text-slate-700' : ''}`}>{product.description}</p>
-        {/* Aquí podrías agregar los selectores de tallas y colores */}
+        <h1 style={{ color: 'var(--color-text-main)' }}>{product.name}</h1>
+
+        <p
+          className='font-bold text-3xl my-4'
+          style={{
+            color: theme === 'light' ? 'var(--color-primary-darker)' : 'var(--color-primary)'
+          }}
+        >
+          ${product.price ? product.price.toFixed(2) : '0.00'}
+        </p>
+
+        <h3
+          className='text-xl font-bold mt-6 mb-3'
+          style={{ color: 'var(--color-text-main)' }}
+        >
+          Descripción:
+        </h3>
+        <p
+          className={styles.description}
+          style={{ color: 'var(--color-text-light)' }}
+        >
+          {product.description}
+        </p>
+
         <div className={styles.actions}>
           <input
             type="number"
+            className='text-center rounded-lg py-2 px-4 focus:outline-none transition-all duration-300 font-semibold'
+            style={{
+              backgroundColor: '#ffffff',
+              color: '#1e293b',
+              border: `1px solid var(--color-border)`
+            }}
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             min="1"
+            onFocus={(e) => {
+              e.target.style.borderColor = 'var(--color-primary)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = 'var(--color-border)';
+            }}
           />
-          <button onClick={handleAddToCart}>Agregar al Pedido</button>
+          <button
+            onClick={handleAddToCart}
+            className='font-bold py-2 px-6 rounded-lg transition-all duration-300'
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-primary-text)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = 'var(--color-primary-darker)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'var(--color-primary)';
+            }}
+          >
+            Agregar al Pedido
+          </button>
         </div>
       </div>
     </div>

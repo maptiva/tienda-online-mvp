@@ -29,25 +29,25 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
       return;
     }
 
-    let message = "Hola, me gustaría hacer el siguiente pedido:\n\n";
-    message += `*Nombre:* ${name}\n`;
-    message += `*Teléfono:* ${phone}\n`;
+    let message = "Hola, me gustaría hacer el siguiente pedido:\\n\\n";
+    message += `*Nombre:* ${name}\\n`;
+    message += `*Teléfono:* ${phone}\\n`;
     if (address) {
-      message += `*Dirección:* ${address}\n`;
+      message += `*Dirección:* ${address}\\n`;
     }
-    message += `\n*Pedido:*\n`;
+    message += `\\n*Pedido:*\\n`;
 
     cart.forEach(item => {
-      message += `- ${item.quantity}x ${item.product.name} - $${(item.product.price * item.quantity).toFixed(2)}\n`;
+      message += `- ${item.quantity}x ${item.product.name} - $${(item.product.price * item.quantity).toFixed(2)}\\n`;
     });
 
     const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    message += `\n*Total:* $${total.toFixed(2)}`;
+    message += `\\n*Total:* $${total.toFixed(2)}`;
 
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    onClose(); // Close the modal after sending the order
-    clearCart(); // Empty the cart
+    onClose();
+    clearCart();
   };
 
   const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -60,12 +60,26 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
 
         <div className={styles.form}>
           <h3>Completa tus datos para el pedido</h3>
-          <input type="text" placeholder="Nombre y Apellido" value={name} onChange={e => setName(e.target.value)} />
-          <input type="text" placeholder="Teléfono de Contacto" value={phone} onChange={e => setPhone(e.target.value)} />
-          <input type="text" placeholder="Dirección de Envío (Opcional)" value={address} onChange={e => setAddress(e.target.value)} />
+          <input
+            type="text"
+            placeholder="Nombre y Apellido"
+            value={name}
+            onChange={e => setName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Teléfono de Contacto"
+            value={phone}
+            onChange={e => setPhone(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Dirección de Envío (Opcional)"
+            value={address}
+            onChange={e => setAddress(e.target.value)}
+          />
         </div>
 
-        {/* Show product list or empty cart message */}
         {cart.length > 0 ? (
           <div className={styles.cartItems}>
             {cart.map(item => (

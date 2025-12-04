@@ -12,8 +12,7 @@
 }
 
 .modal {
-    background: #1e293b;
-    /* slate-800 */
+    background: var(--color-surface);
     padding: 20px;
     border-radius: 12px;
     width: 90%;
@@ -22,8 +21,8 @@
     overflow-y: auto;
     position: relative;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
 }
 
 .closeButton {
@@ -52,15 +51,17 @@
 .form {
     margin-bottom: 20px;
     padding: 15px;
-    border: 1px solid #334155;
+    border: 1px solid #475569;
+    /* Gris oscuro (slate-600) */
     border-radius: 8px;
-    background-color: #0f172a;
-    /* slate-900 */
+    background-color: #f1f5f9;
+    /* Gris claro (slate-100) */
 }
 
 .form h3 {
     margin-top: 0;
-    color: #cbd5e1;
+    color: #1e293b;
+    /* Texto oscuro */
     font-size: 1.1rem;
     margin-bottom: 15px;
 }
@@ -69,16 +70,19 @@
     width: calc(100% - 24px);
     padding: 12px;
     margin-bottom: 12px;
-    border: 1px solid #334155;
-    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
     font-size: 1rem;
-    background-color: #1e293b;
-    color: white;
+    background-color: #ffffff;
+    /* Blanco en ambos temas */
+    color: #1e293b;
+    /* Texto oscuro en ambos temas */
+    transition: border-color 0.3s;
 }
 
 .form input:focus {
     outline: none;
-    border-color: #f97316;
+    border-color: var(--color-primary);
 }
 
 .cartItems {
@@ -122,8 +126,11 @@
 }
 
 .productDetails span:last-child {
-    color: #94a3b8;
-    font-size: 0.9rem;
+    color: var(--color-primary);
+    /* Precio en turquesa */
+    font-size: 1rem;
+    /* Mismo tamaño que el título (default) */
+    font-weight: bold;
 }
 
 .deleteButton {
@@ -161,7 +168,8 @@
     margin-top: 20px;
     padding-top: 15px;
     border-top: 2px solid #334155;
-    color: #f97316;
+    color: var(--color-primary);
+    /* Total en turquesa */
 }
 
 .whatsappButton {
@@ -185,64 +193,66 @@
 
 /* Light Theme Styles */
 .light {
-    background: #f1f5f9; /* slate-100 */
-    color: #1e293b; /* slate-800 */
-    border-color: #cbd5e1; /* slate-300 */
+    background: #f1f5f9;
+    /* slate-100 */
+    color: #1e293b;
+    /* slate-800 */
+    border-color: #cbd5e1;
+    /* slate-300 */
 }
 
 .light .closeButton {
-    color: #475569; /* slate-600 */
+    color: #475569;
+    /* slate-600 */
 }
 
 .light .closeButton:hover {
-    color: #1e293b; /* slate-800 */
+    color: #1e293b;
+    /* slate-800 */
 }
 
 .light h2 {
-    color: #1e293b; /* slate-800 */
+    color: #1e293b;
+    /* slate-800 */
 }
 
 .light .form {
-    border-color: #475569; /* slate-600 */
-    background-color: #475569; /* slate-600 */
+    border-color: var(--color-border);
+    background-color: var(--color-background-light);
 }
 
 .light .form h3 {
-    color: #f1f5f9; /* slate-100 */
-}
-
-.light .form input {
-    border-color: #cbd5e1; /* slate-300 */
-    background-color: white;
-    color: #1e293b; /* slate-800 */
-}
-
-.light .form input::placeholder {
-    color: #94a3b8; /* slate-400 */
+    color: var(--color-text-main);
 }
 
 .light .cartItems,
 .light .productItem,
 .light .total {
-    border-color: #cbd5e1; /* slate-300 */
+    border-color: #cbd5e1;
+    /* slate-300 */
 }
 
 .light .productImage {
-    border-color: #cbd5e1; /* slate-300 */
+    border-color: #cbd5e1;
+    /* slate-300 */
 }
 
 .light .productDetails span:first-child {
-    color: #1e293b; /* slate-800 */
+    color: #1e293b;
+    /* slate-800 */
 }
 
 .light .productDetails span:last-child {
-    color: #475569; /* slate-600 */
+    /* Eliminamos el override para usar var(--color-primary) en ambos temas */
+    color: var(--color-primary);
 }
 
 .light .emptyCartMessage {
-    color: #475569; /* slate-600 */
+    color: #475569;
+    /* slate-600 */
 }
 
 .light .emptyCartMessage h3 {
-    color: #1e293b; /* slate-800 */
+    color: #1e293b;
+    /* slate-800 */
 }
