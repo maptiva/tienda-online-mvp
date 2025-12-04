@@ -30,6 +30,7 @@
   font-size: 1.8rem;
   color: #f1f5f9;
   /* slate-100 */
+  margin-bottom: 2rem;
 }
 
 .productosContainer {
@@ -43,14 +44,14 @@
   z-index: 40;
   padding-bottom: 1rem;
   padding-top: 0.5rem;
-  /* Ajuste para móvil: Header (88px) + Categorías (~60px) */
-  top: 150px;
+  /* Ajuste para móvil: mantener espacio con categorías */
+  top: 168px;
 }
 
 @media (min-width: 768px) {
   .stickyBar {
-    /* Ajuste para escritorio: Header (88px) + Categorías (~60px) */
-    top: 150px;
+    /* Desktop: SearchBar oculta, no aplica */
+    display: none;
   }
 }
 

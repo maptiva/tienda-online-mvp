@@ -22,17 +22,17 @@ const Header = ({ storeData, onCartClick }) => {
     <header
       className={`sticky top-0 z-50 transition-colors duration-300 ${theme === 'light' ? 'bg-gray-500' : 'bg-slate-800'}`}
     >
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-5">
         <div className="flex items-center justify-between gap-4">
 
           {/* Izquierda: Logo + Nombre */}
           <Link to={`/${storeName}`} className="flex items-center gap-3">
             <img
               src={displayLogo}
-              className="h-12 w-12 md:h-16 md:w-16 object-contain"
+              className="h-16 w-16 md:h-24 md:w-24 object-contain"
               alt={displayStoreName}
             />
-            <h1 className="text-white text-lg md:text-2xl font-bold truncate">
+            <h1 className="text-white text-xl md:text-3xl font-bold truncate leading-normal">
               {displayStoreName}
             </h1>
           </Link>

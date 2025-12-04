@@ -76,7 +76,7 @@ const ProductList = () => {
   return (
     <div className={styles.container}>
       <h2 className={`text-3xl font-bold mb-0 text-center pt-0 transition-colors duration-300 ${theme === 'light' ? '!text-slate-700' : '!text-white'}`}>Nuestros Productos</h2>
-      <div className={styles.stickyBar}>
+      <div className={`${styles.stickyBar} md:hidden`}>
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
