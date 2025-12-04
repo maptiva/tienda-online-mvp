@@ -20,61 +20,62 @@ const Header = ({ storeData, onCartClick }) => {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-colors duration-300 ${theme === 'light' ? 'bg-gray-500' : 'bg-slate-800'}`}
+      className="sticky top-0 z-50 backdrop-blur-sm transition-colors duration-300"
+      style={{
+        backgroundColor: theme === 'light'
+          ? 'rgba(255, 255, 255, 0.8)'  // surface con transparencia
+          : 'rgba(30, 41, 59, 0.8)',     // surface dark con transparencia
+        borderBottom: `1px solid ${theme === 'light' ? '#e5e7eb' : '#334155'}`
+      }}
     >
-      <div className="container mx-auto px-4 py-5">
-        <div className="flex items-center justify-between gap-4">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
 
           {/* Izquierda: Logo + Nombre */}
           <Link to={`/${storeName}`} className="flex items-center gap-3">
             <img
               src={displayLogo}
-              className="h-16 w-16 md:h-24 md:w-24 object-contain"
+              className="h-14 w-14 object-contain"
               alt={displayStoreName}
             />
-            <h1 className="text-white text-xl md:text-3xl font-bold truncate leading-normal">
+            <span
+              className="text-2xl font-bold truncate"
+              style={{ color: 'var(--color-text-main)' }}
+            >
               {displayStoreName}
-            </h1>
+            </span>
           </Link>
 
-          {/* Derecha: SearchBar (desktop) + Carrito + Tema */}
-          <div className="flex items-center gap-3 md:gap-4">
-            {/* SearchBar - Solo desktop */}
-            <div className="hidden md:block">
-              <SearchBar
-                searchTerm=""
-                setSearchTerm={() => { }}
-                placeholder="Buscar productos..."
-              />
-            </div>
+          {/* Centro: SearchBar (solo desktop) */}
+          <div className="hidden md:block flex-1 max-w-xl mx-8">
+            <SearchBar
+              searchTerm=""
+              setSearchTerm={() => { }}
+              placeholder="Buscar productos..."
+            />
+          </div>
+
+          {/* Derecha: Carrito + Tema */}
+          <div className="flex items-center gap-6" style={{ color: 'var(--color-text-light)' }}>
 
             {/* Carrito */}
-            <div onClick={onCartClick} className="cursor-pointer">
+            <div onClick={onCartClick} className="cursor-pointer hover:opacity-80 transition-opacity">
               <div className="relative">
-                <MdOutlineShoppingCart
-                  size={25}
-                  className="text-white hover:text-[#ff6900] transition-all duration-300"
-                />
+                <MdOutlineShoppingCart size={24} />
                 {totalItems !== 0 && (
-                  <p className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                     {totalItems}
-                  </p>
+                  </span>
                 )}
               </div>
             </div>
 
             {/* Toggle Tema */}
-            <div onClick={toggleTheme} className="cursor-pointer">
+            <div onClick={toggleTheme} className="cursor-pointer hover:opacity-80 transition-opacity">
               {theme === 'dark' ? (
-                <HiOutlineSun
-                  size={25}
-                  className="text-white hover:text-[#ff6900] transition-all duration-300"
-                />
+                <HiOutlineSun size={24} />
               ) : (
-                <HiOutlineMoon
-                  size={25}
-                  className="text-white hover:text-[#ff6900] transition-all duration-300"
-                />
+                <HiOutlineMoon size={24} />
               )}
             </div>
           </div>

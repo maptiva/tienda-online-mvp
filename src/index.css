@@ -1,34 +1,96 @@
 @import "tailwindcss";
 
-/* Estilos Generales */
+/* =====================================================
+   NUEVO SISTEMA DE COLORES - TEMA CLARO Y OSCURO
+   ===================================================== */
+
+/* Variables para Tema CLARO (Pastel/Suave) */
+:root:not(.dark) {
+    /* Colores principales */
+    --color-primary: #A7D8DE;
+    /* Pastel Blue */
+    --color-primary-darker: #8EC3C9;
+    /* Hover state */
+    --color-primary-text: #334155;
+    /* Texto sobre primary (slate-700) */
+
+    /* Fondos */
+    --color-background-light: #FDF6F6;
+    /* Rosa muy claro - fondo página */
+    --color-surface: #FFFFFF;
+    /* Blanco - cards, header */
+
+    /* Textos */
+    --color-text-main: #544A59;
+    /* Morado apagado - títulos */
+    --color-text-light: #8E8193;
+    /* Gris morado - descripciones */
+
+    /* Acento */
+    --color-accent: #F4BFBF;
+    /* Coral suave - detalles decorativos */
+
+    /* Bordes */
+    --color-border: #e5e7eb;
+    /* gray-200 */
+}
+
+/* Variables para Tema DARK (Moderno/Profesional) */
+:root.dark {
+    /* Colores principales */
+    --color-primary: #38bdf8;
+    /* Sky blue 400 */
+    --color-primary-darker: #0ea5e9;
+    /* Sky 500 - hover */
+    --color-primary-text: #f8fafc;
+    /* Slate 50 - texto sobre primary */
+
+    /* Fondos */
+    --color-background: #0f172a;
+    /* Slate 900 - fondo página */
+    --color-surface: #1e293b;
+    /* Slate 800 - cards, header */
+
+    /* Textos */
+    --color-text-main: #f1f5f9;
+    /* Slate 100 - títulos */
+    --color-text-light: #94a3b8;
+    /* Slate 400 - descripciones */
+
+    /* Acento */
+    --color-accent: #f472b6;
+    /* Pink 400 - detalles decorativos */
+
+    /* Bordes */
+    --color-border: #334155;
+    /* Slate 700 */
+}
+
+/* =====================================================
+   ESTILOS GENERALES
+   ===================================================== */
+
 body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
     margin: 0;
-    background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
-    background-attachment: fixed;
-    color: #cbd5e1;
-    /* slate-300 */
     min-height: 100vh;
     transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* Light theme */
+/* Tema CLARO - Fondo */
 :root:not(.dark) body {
-    background: linear-gradient(to bottom right, #f1f5f9, #e2e8f0, #f1f5f9);
-    color: #1e293b;
-    /* slate-800 */
+    background: var(--color-background-light);
+    color: var(--color-text-main);
 }
 
+/* Tema DARK - Fondo */
+:root.dark body {
+    background: var(--color-background);
+    color: var(--color-text-main);
+}
+
+/* Títulos h2 */
 h2 {
-    color: #2c3e50;
-    border-bottom: 2px solid #ecf0f1;
-    padding-bottom: 5px;
-    margin-bottom: 5px;
-    transition: border-color 0.3s ease;
-}
-
-/* Light theme - darker border for h2 */
-:root:not(.dark) h2 {
-    border-bottom-color: #475569;
-    /* slate-600 */
+    color: var(--color-text-main);
+    transition: color 0.3s ease;
 }

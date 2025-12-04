@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Indigo Sellos - Nuestros Productos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#A7D8DE", // Pastel Blue
+                        "primary-darker": "#8EC3C9",
+                        "primary-text": "#334155", // slate-700 for better contrast on pastel bg
+                        "background-light": "#FDF6F6", // Lightest Pink
+                        "surface": "#FFFFFF",
+                        "text-main": "#544A59", // Muted Purple
+                        "text-light": "#8E8193",
+                        "accent": "#F4BFBF", // Soft Coral Pink
+                    },
+                    fontFamily: {
+                        display: ["Roboto", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem", // 8px
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light font-display text-text-main">
+<div class="min-h-screen">
+<header class="bg-surface/80 backdrop-blur-sm sticky top-0 z-40 shadow-sm">
+<div class="container mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-20">
+<div class="flex items-center">
+<img alt="Indigo Sellos logo" class="h-14 w-14 mr-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9mjXhtABXSs7Auq76U3CqzW1OSDSx5AQHF_v_XxR-wf0dNM8spv-z6cFED1GNamSp62iD8UNNzdHlANLTLGeWItCP3pSpv41hFOpsnk6h9QlPZnSc0Ct0kqyTz1H6_xjPoT-bzw-JAWxuWBey9Kp2Eyy4dJK5bceYH4iKY0UExdopm-F5ugc_yND6n_wFNS70-gbDL02qydpCHOsvC6H9bjBUDM6WfcwxZ1BccxzOI3N_zkvigfltSAK_0FcgNxlb5D9e2jsvqHE"/>
+<span class="text-2xl font-bold text-text-main">Indigo Sellos</span>
+</div>
+<div class="flex-1 max-w-xl mx-8">
+<div class="relative">
+<span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-light">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 rounded-full border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" placeholder="Buscar productos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-6 text-text-light">
+<a class="hover:text-primary-darker" href="#"><span class="material-icons-outlined">shopping_cart</span></a>
+<a class="hover:text-primary-darker" href="#"><span class="material-icons-outlined">account_circle</span></a>
+</div>
+</div>
+</div>
+</header>
+<nav class="bg-surface py-3 border-b border-gray-200">
+<div class="container mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-center space-x-2 overflow-x-auto pb-2 -mb-2">
+<a class="px-4 py-2 rounded-full bg-primary text-primary-text font-medium text-sm whitespace-nowrap" href="#">Todos</a>
+<a class="px-4 py-2 rounded-full bg-background-light text-text-main hover:bg-gray-200 font-medium text-sm whitespace-nowrap" href="#">Navideños</a>
+<a class="px-4 py-2 rounded-full bg-background-light text-text-main hover:bg-gray-200 font-medium text-sm whitespace-nowrap" href="#">Personalizados</a>
+<a class="px-4 py-2 rounded-full bg-background-light text-text-main hover:bg-gray-200 font-medium text-sm whitespace-nowrap" href="#">Emprendedores</a>
+<a class="px-4 py-2 rounded-full bg-background-light text-text-main hover:bg-gray-200 font-medium text-sm whitespace-nowrap" href="#">Docentes</a>
+<a class="px-4 py-2 rounded-full bg-background-light text-text-main hover:bg-gray-200 font-medium text-sm whitespace-nowrap" href="#">Botanicos</a>
+<a class="px-4 py-2 rounded-full bg-background-light text-text-main hover:bg-gray-200 font-medium text-sm whitespace-nowrap" href="#">Bullet Journal</a>
+<a class="px-4 py-2 rounded-full bg-background-light text-text-main hover:bg-gray-200 font-medium text-sm whitespace-nowrap" href="#">Frases</a>
+</div>
+</div>
+</nav>
+<main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<h1 class="text-3xl font-bold text-center mb-4 text-text-main">Nuestros Productos</h1>
+<div class="w-20 h-1 bg-accent mx-auto mb-10"></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+<div class="bg-surface rounded-lg shadow-md overflow-hidden flex flex-col group">
+<div class="overflow-hidden">
+<img alt="Stamp with phrase 'No te rindas, lo vas a lograr'" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbJeYJMVsR3a9fqE_SUcIC2QFHPCmAfJLEPWh6mj6JM-2LAoF7f37iF-IzcAfuXEZK4L-JmZXHauRdLUdoJ6e553H4hkwThrUFqRpWzmXcsObmGCo3iB-SMgzCCJPdcx3U9sO7BHmQdvvGs0SE0X8XCwnCdhMdColKhgvvmPV0AH6-3duMhpgyxqWdAs8b_1jjNRgJE2i0lCl6sM3BmHnQ-fZQjKQ3moMRcoM3S8C169kPzrKdBMY_1tJgtXjJuQ6aHLpuRgoa7GY"/>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-bold text-text-main mb-2">No te rindas, lo vas a lograr</h3>
+<p class="text-sm text-text-light flex-grow">Sello Docente en base de madera 3x3 cm. Sello motivacional con la frase "No te rindas, lo vas a lograr", diseñad...</p>
+<p class="text-xl font-bold text-primary-darker my-4">$4500.00</p>
+<div class="flex items-center space-x-3 mt-auto">
+<input class="w-16 text-center rounded border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" type="number" value="1"/>
+<button class="flex-1 bg-primary text-primary-text font-bold py-2 px-4 rounded hover:bg-primary-darker transition-colors duration-300">Agregar</button>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-lg shadow-md overflow-hidden flex flex-col group">
+<div class="overflow-hidden">
+<img alt="Stamp with phrase 'No te rindas, lo vas a lograr' and rainbow" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaLdYsyw1qjKKwAreXkQR1V68pX6kzOuXOYb-uUiM2ySYxel8qnEcSo80e7ekrT-ZJldopZHsWrl1xtLeGdUaTs8QtYwVhsP5VzOFItTahLwIgrc2SDbjYS_tZ9CoIv76Oiasx6DEtLWrwH2Q8r_XzdZPtuj0WxZMENuqVM2WXTuWUE6lkGVl3dm1pVajJdI9bcgfgiHlMrcqhGLvfEOeP24oSavlN3JTQR38JIjYhsldya7rhw1wAzkHvZ-EmliBaOY7NDhbILV8"/>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-bold text-text-main mb-2">No te rindas, lo vas a lograr</h3>
+<p class="text-sm text-text-light flex-grow">Sello Docente en base de madera 3x3 cm. Sello motivacional con la frase "No te rindas, lo vas a Lograr", diseñad...</p>
+<p class="text-xl font-bold text-primary-darker my-4">$4500.00</p>
+<div class="flex items-center space-x-3 mt-auto">
+<input class="w-16 text-center rounded border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" type="number" value="1"/>
+<button class="flex-1 bg-primary text-primary-text font-bold py-2 px-4 rounded hover:bg-primary-darker transition-colors duration-300">Agregar</button>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-lg shadow-md overflow-hidden flex flex-col group">
+<div class="overflow-hidden">
+<img alt="Christmas stamp with phrase 'Felices Fiestas'" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3Dsb9IFZZ5WNdlplxtHq5GActoPh3Q8urQv1ufhM4n3z097GEnY_aj_NfH6NFMsg6ux261Z6tNGz9reYh2IlSBmKru_wTXM3BdOC0iRxBabGn7_7ag8GCl6YRC4AD-LCadxVA4rgHO8DxB9poIWqQHLRm9vKu7gU424WlQIQBFRv66FAoO--7-k6n3KyLIfeF2LIr1SbAgtlZMbvhaZ7elMjx6SRkyaUL83GQIyqdb119l9XO8dTkrDG8u2kyJHxIX2WV40Ld_ao"/>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-bold text-text-main mb-2">Felices Fiestas</h3>
+<p class="text-sm text-text-light flex-grow">Sello Navideño en base de madera 4 cm. Sello con la frase "Felices Fiestas", ideal para decorar tarjetas, paquetes y...</p>
+<p class="text-xl font-bold text-primary-darker my-4">$4800.00</p>
+<div class="flex items-center space-x-3 mt-auto">
+<input class="w-16 text-center rounded border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" type="number" value="1"/>
+<button class="flex-1 bg-primary text-primary-text font-bold py-2 px-4 rounded hover:bg-primary-darker transition-colors duration-300">Agregar</button>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-lg shadow-md overflow-hidden flex flex-col group">
+<div class="overflow-hidden">
+<img alt="Stamp with phrase 'Te deseo un año genial'" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAehoCJiZ9d0tXYW51hdKEHe1IxVBdHp7FXZWXKDnP29Ex1KtZBx0fZJY520M2N3JpmQicvenfhy-RZVm_qD-B6hm02IMdprf0Hp5SPqWPG7md3_DVP6ZiRf1XYh9GByi9zJo8S0GWKZQQJGesFeh2UEhMO-CpKobVCwrbBL5iu7ezbas0zCxbjshguCQXC_DItfZjh3iSznzHSxR_S5Z-ukhpeLF0XF8bH-sIsP6YDEYOVcKT0MsO-E68B3OD9OIDfBNjBNp4Bzmg"/>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-bold text-text-main mb-2">Te deseo un año genial</h3>
+<p class="text-sm text-text-light flex-grow">Sello Navideño en base de madera 4 cm. Pensado para transmitir buenos deseos y comenzar nuevos ciclos con...</p>
+<p class="text-xl font-bold text-primary-darker my-4">$4800.00</p>
+<div class="flex items-center space-x-3 mt-auto">
+<input class="w-16 text-center rounded border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" type="number" value="1"/>
+<button class="flex-1 bg-primary text-primary-text font-bold py-2 px-4 rounded hover:bg-primary-darker transition-colors duration-300">Agregar</button>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-lg shadow-md overflow-hidden flex flex-col group">
+<div class="overflow-hidden">
+<img alt="Stamp with a nutcracker drawing" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByie-YN9IEx2yX4u8_jKBF24MC14nKM_XhA9nqYQQ-uunXDWZGx5e1bUxWTKhI-RKlw_-850mur3IBgXwXBrcGtDSXzStxmSiaED0f8J1TBYe8LBGK4CusfAERtoDfxPcDTYysUANxCnwYn70-JZT_UHxSS3PRy-JZoa9gDh0M6mQUdtbnA8acgw-BYxewmnusFy_xw4vLXKoVq-LqPPsm7KVhcLv8qgGIlcB5Mv8nI_rpIen6pZh2auhOOgPIPm6ztvZe2DCDkBQ"/>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-bold text-text-main mb-2">Cascanueces</h3>
+<p class="text-sm text-text-light flex-grow">Sello Navideño con diseño de cascanueces, perfecto para tus tarjetas y regalos festivos.</p>
+<p class="text-xl font-bold text-primary-darker my-4">$4600.00</p>
+<div class="flex items-center space-x-3 mt-auto">
+<input class="w-16 text-center rounded border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" type="number" value="1"/>
+<button class="flex-1 bg-primary text-primary-text font-bold py-2 px-4 rounded hover:bg-primary-darker transition-colors duration-300">Agregar</button>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-lg shadow-md overflow-hidden flex flex-col group">
+<div class="overflow-hidden">
+<img alt="Stamp with a hot cocoa mug" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdt-RIYKZjfgFJqtgKFe1k564A4aA6w3tem-FmbTm1MGluDsWF5Adq_C_ROX-NFsR7X576rCzOcyWrFudP1Rpg4V7cbdKP5Uw5MMacaFX1AB6AVc3Ud-UXi_hXbgqYBUMgRnfSD-jYIGimqI45-_VV_xO9fRcjy_8sXnbSyMbruIZdQhq70TFxRc8xUmDCBt4H5TaKu3dhgFD2HZygZ5VouuXuGsn0bXQbVtnv_R7oEkO5DaN_o6MaabysOMrPWb0gE3Lliho9x4k"/>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-bold text-text-main mb-2">Taza de Cacao</h3>
+<p class="text-sm text-text-light flex-grow">Un sello acogedor con una taza de chocolate caliente, ideal para notas de invierno y scrapbooking.</p>
+<p class="text-xl font-bold text-primary-darker my-4">$4500.00</p>
+<div class="flex items-center space-x-3 mt-auto">
+<input class="w-16 text-center rounded border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" type="number" value="1"/>
+<button class="flex-1 bg-primary text-primary-text font-bold py-2 px-4 rounded hover:bg-primary-darker transition-colors duration-300">Agregar</button>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-lg shadow-md overflow-hidden flex flex-col group">
+<div class="overflow-hidden">
+<img alt="Christmas stamp with a christmas tree" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSi5DFlk8i2FLRc1sI8lWRCql26J-kr7gQ-ZYnEVUPj7LrSVjnPf6p4pEcT46LZieNumOVG5sRHEEB90-pd_WZ_PUeP7lC_ZUq7-ajluC0NxYk4sOINNP0LJVFhdX2ARn5DN0PPQYqE69zj4CiP3A3l7fNRgpHdOZh0nmVy1HoSQYtXvFam8fWlZQzrX2y_nCnZnfUKOoFnCDSRPK7qOCpTasBja9ZWF57osbJd8-WDBKW_fnlOfzvjwk3J7Z60x3ijkZk8qkOIQY"/>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-bold text-text-main mb-2">Árbol de Navidad</h3>
+<p class="text-sm text-text-light flex-grow">Clásico sello de árbol de Navidad para dar un toque festivo a cualquier proyecto de papelería.</p>
+<p class="text-xl font-bold text-primary-darker my-4">$4800.00</p>
+<div class="flex items-center space-x-3 mt-auto">
+<input class="w-16 text-center rounded border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" type="number" value="1"/>
+<button class="flex-1 bg-primary text-primary-text font-bold py-2 px-4 rounded hover:bg-primary-darker transition-colors duration-300">Agregar</button>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-lg shadow-md overflow-hidden flex flex-col group">
+<div class="overflow-hidden">
+<img alt="Stamp with phrase 'Genial, sigue así'" class="w-full h-56 object-cover transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfQioNRff1oQAP0D2wFL5_ZJCexFzdGhJboFmyd1qz36B4JZ3Dkfq9fIATSzeEbNIB0N0i_QCXT5g98AwEHsnMgmK4jyFEcyxZdDbNv2P4QueRMaIHSbCscoFUpEyh4hjxpOUZ1qyFPCLp9t94WuHYPpUNS-HAcczT0gphYWRwNJNOKS6GA0E3U8oHweiIFTatk6QiQ_vx7r84ZG2R_u2am847a_QpiNyMNO7nl1IkP4qqsIyNG8qbQojL5HK8jhIrtrRvyH5x5TE"/>
+</div>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-bold text-text-main mb-2">Genial, sigue así</h3>
+<p class="text-sm text-text-light flex-grow">Sello motivacional perfecto para profesores y padres que quieren animar a los niños. </p>
+<p class="text-xl font-bold text-primary-darker my-4">$4500.00</p>
+<div class="flex items-center space-x-3 mt-auto">
+<input class="w-16 text-center rounded border-gray-200 bg-background-light text-text-main focus:ring-primary focus:border-primary" type="number" value="1"/>
+<button class="flex-1 bg-primary text-primary-text font-bold py-2 px-4 rounded hover:bg-primary-darker transition-colors duration-300">Agregar</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-6 right-6">
+<button class="bg-[#25D366] text-white rounded-full p-4 shadow-lg hover:bg-[#128C7E] transition-colors">
+<svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.474.765-.92 3.355 3.456-1.017.729.435z"></path>
+</svg>
+</button>
+</div>
+</div>
+
+</body></html>

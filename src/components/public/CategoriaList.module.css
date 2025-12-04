@@ -37,14 +37,16 @@
 }
 
 .categoryItem:hover {
-  border-color: #f97316;
-  /* orange-500 */
-  box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
+  border-color: #0d9488;
+  /* teal-600 */
+  box-shadow: 0 0 15px rgba(13, 148, 136, 0.2);
 }
 
 .active {
-  background-color: #f97316;
-  /* orange-500 */
-  border-color: #f97316;
-  box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+  background-color: #0d9488;
+  /* teal-600 */
+  border-color: #0d9488;
+  box-shadow: 0 0 15px rgba(13, 148, 136, 0.4);
+  color: #1f2937;
+  /* gray-800 - texto oscuro */
 }
