@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./CategoriaList.module.css";
 import { supabase } from "../../services/supabase";
+import { useCategoryState } from "../../store/useCategoryStore";
 
 interface Category {
   id: number;
@@ -9,17 +10,12 @@ interface Category {
 }
 
 interface CategoriaListProps {
-  activeCategory: (category: Category | null) => void;
-  selectedCategory: Category | null;
   userId: string; // ID del dueño de la tienda
 }
 
-const CategoriaList: React.FC<CategoriaListProps> = ({
-  activeCategory,
-  selectedCategory,
-  userId,
-}) => {
+const CategoriaList: React.FC<CategoriaListProps> = ({ userId }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const { categoryActive, activeCategory, clearCategoryActive } = useCategoryState();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -41,28 +37,23 @@ const CategoriaList: React.FC<CategoriaListProps> = ({
     fetchCategories();
   }, [userId]);
 
-  const handleCategoryClick = (id: number | null) => {
-    if (id === null) {
-      activeCategory(null);
-      return;
-    }
-
-    const category = categories.find((cat) => cat.id === id);
-    if (category) {
+  const handleCategoryClick = (category: Category | null) => {
+    if (category === null) {
+      clearCategoryActive();
+    } else {
       activeCategory(category);
     }
   };
 
   return (
     <nav
-      className="sticky z-40 py-2 top-[80px]"
+      className="sticky z-40 py-1.5 top-[80px]"
       style={{
         backgroundColor: 'var(--color-surface)',
         borderBottom: `1px solid var(--color-border)`,
         willChange: 'top'
       }}
     >
-      {/* Sin container para evitar truncamiento */}
       <div
         className={styles.categoryContainer}
         onMouseDown={(e) => {
@@ -91,7 +82,7 @@ const CategoriaList: React.FC<CategoriaListProps> = ({
       >
         {/* Botón "Todos" */}
         <div
-          className={`${styles.categoryItem} ${!selectedCategory ? styles.active : ""}`}
+          className={`${styles.categoryItem} ${!categoryActive ? styles.active : ""}`}
           onClick={() => handleCategoryClick(null)}
         >
           Todos
@@ -101,8 +92,8 @@ const CategoriaList: React.FC<CategoriaListProps> = ({
         {categories.map((category) => (
           <div
             key={category.id}
-            className={`${styles.categoryItem} ${selectedCategory?.id === category.id ? styles.active : ""}`}
-            onClick={() => handleCategoryClick(category.id)}
+            className={`${styles.categoryItem} ${categoryActive?.id === category.id ? styles.active : ""}`}
+            onClick={() => handleCategoryClick(category)}
           >
             {category.name}
           </div>
