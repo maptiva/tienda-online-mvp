@@ -83,13 +83,9 @@ const ProductList = () => {
         >
           Nuestros Productos
         </h2>
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center">
           <div
-            className="h-1 w-16 rounded-full"
-            style={{ backgroundColor: 'var(--color-accent)' }}
-          ></div>
-          <div
-            className="h-1 w-8 rounded-full"
+            className="h-1 w-24 rounded-full"
             style={{ backgroundColor: 'var(--color-primary)' }}
           ></div>
         </div>
