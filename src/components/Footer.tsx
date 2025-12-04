@@ -49,7 +49,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                         {/* Columna Izquierda: Información de Contacto */}
                         <div>
                             <h3 className='text-white font-bold text-lg mb-4'>
-                                INFORMACIÓN DE CONTACTO
+                                INFORMACIÓN DE TIENDA
                             </h3>
                             <div className='space-y-3 text-white'>
                                 <div className='flex items-start gap-2'>
@@ -100,9 +100,9 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                         </div>
 
                         {/* Columna Derecha: Acerca de Clicando */}
-                        <div>
+                        <div className='md:text-right'>
                             <h3 className='text-white font-bold text-lg mb-4'>
-                                ACERCA DE CLICANDO
+                                ACERCA DE CLICANDO.COM.AR
                             </h3>
                             <p className='text-white text-sm mb-3'>
                                 Desarrollado por{' '}
@@ -117,7 +117,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             </p>
 
                             {/* Links Legales */}
-                            <div className='flex flex-wrap gap-2 text-white/80 text-sm mb-4'>
+                            <div className='flex flex-wrap gap-2 text-white/80 text-sm mb-4 md:justify-end'>
                                 <button
                                     onClick={() => openModal('terms')}
                                     className='hover:text-orange-500 hover:underline transition-colors'
@@ -141,14 +141,15 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             </div>
 
                             {/* Botón Tiendas Clicando */}
-                            <a
-                                href='https://www.clicando.com.ar'
-                                target='_blank'
-                                rel='noopener noreferrer'
-                                className='inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm'
-                            >
-                                Ver Tiendas Clicando
-                            </a>
+                            <div className='inline-block'>
+                                <button
+                                    disabled
+                                    className='bg-orange-500 text-white font-bold py-2 px-4 rounded-lg text-sm opacity-70 cursor-not-allowed'
+                                >
+                                    Ver Tiendas Clicando
+                                </button>
+                                <p className='text-white/60 text-sm mt-1 italic'>Próximamente</p>
+                            </div>
                         </div>
                     </div>
 
@@ -157,7 +158,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                         <p className='text-white/90 text-sm mb-2'>
                             {footerDisclaimer}
                         </p>
-                        <p className='text-white/80 text-xs'>
+                        <p className='text-white/90 text-sm'>
                             © 2025 {displayName}. Todos los derechos reservados
                         </p>
                     </div>
