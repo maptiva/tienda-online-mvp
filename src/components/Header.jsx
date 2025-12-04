@@ -56,7 +56,10 @@ const Header = ({ storeData, onCartClick }) => {
           </div>
 
           {/* Derecha: Carrito + Tema */}
-          <div className="flex items-center gap-6" style={{ color: 'var(--color-text-light)' }}>
+          <div
+            className="flex items-center gap-6"
+            style={{ color: theme === 'dark' ? '#f1f5f9' : 'var(--color-text-light)' }}
+          >
 
             {/* Carrito */}
             <div onClick={onCartClick} className="cursor-pointer hover:opacity-80 transition-opacity">
