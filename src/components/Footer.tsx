@@ -40,28 +40,37 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
 
     return (
         <>
-            <footer className={`py-8 mt-auto transition-colors duration-300 ${theme === 'light' ? 'bg-gray-500' : 'bg-slate-800'}`}>
+            <footer
+                className="py-8 mt-auto transition-colors duration-300"
+                style={{
+                    backgroundColor: 'var(--color-surface)',
+                    borderTop: `1px solid var(--color-border)`
+                }}
+            >
                 <div className='container mx-auto px-4'>
 
                     {/* Sección Principal: 2 columnas en desktop, stack en móvil */}
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-6'>
 
-                        {/* Columna Izquierda: Información de Contacto */}
+                        {/* Columna Izquierda: Información de Tienda */}
                         <div>
-                            <h3 className='text-white font-bold text-lg mb-4'>
+                            <h3
+                                className='font-bold text-lg mb-4'
+                                style={{ color: 'var(--color-text-main)' }}
+                            >
                                 INFORMACIÓN DE TIENDA
                             </h3>
-                            <div className='space-y-3 text-white'>
+                            <div className='space-y-3' style={{ color: 'var(--color-text-main)' }}>
                                 <div className='flex items-start gap-2'>
-                                    <CiLocationOn size={20} className='flex-shrink-0 mt-1' color='#ff6900' />
+                                    <CiLocationOn size={20} className='flex-shrink-0 mt-1' style={{ color: 'var(--color-primary)' }} />
                                     <p className='text-sm'>{displayAddress}</p>
                                 </div>
                                 <div className='flex items-center gap-2'>
-                                    <PiPhone size={20} className='flex-shrink-0' color='#ff6900' />
+                                    <PiPhone size={20} className='flex-shrink-0' style={{ color: 'var(--color-primary)' }} />
                                     <p className='text-sm'>{displayPhone}</p>
                                 </div>
                                 <div className='flex items-center gap-2'>
-                                    <BsClock size={20} className='flex-shrink-0' color='#ff6900' />
+                                    <BsClock size={20} className='flex-shrink-0' style={{ color: 'var(--color-primary)' }} />
                                     <p className='text-sm'>{displayHours}</p>
                                 </div>
                             </div>
@@ -74,12 +83,10 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                             href={displayInstagram}
                                             target='_blank'
                                             rel='noopener noreferrer'
-                                            className='cursor-pointer'
+                                            className='transition-opacity hover:opacity-70'
+                                            style={{ color: 'var(--color-primary)' }}
                                         >
-                                            <FaInstagram
-                                                size={25}
-                                                className='text-white hover:text-[#ff6900] transition-all duration-300'
-                                            />
+                                            <FaInstagram size={24} />
                                         </a>
                                     )}
                                     {displayFacebook && (
@@ -87,12 +94,10 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                             href={displayFacebook}
                                             target='_blank'
                                             rel='noopener noreferrer'
-                                            className='cursor-pointer'
+                                            className='transition-opacity hover:opacity-70'
+                                            style={{ color: 'var(--color-primary)' }}
                                         >
-                                            <FaFacebook
-                                                size={25}
-                                                className='text-white hover:text-[#ff6900] transition-all duration-300'
-                                            />
+                                            <FaFacebook size={24} />
                                         </a>
                                     )}
                                 </div>
@@ -101,40 +106,53 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
 
                         {/* Columna Derecha: Acerca de Clicando */}
                         <div className='md:text-right'>
-                            <h3 className='text-white font-bold text-lg mb-4'>
+                            <h3
+                                className='font-bold text-lg mb-4'
+                                style={{ color: 'var(--color-text-main)' }}
+                            >
                                 ACERCA DE CLICANDO.COM.AR
                             </h3>
-                            <p className='text-white text-sm mb-3'>
+                            <p className='text-sm mb-3' style={{ color: 'var(--color-text-main)' }}>
                                 Desarrollado por{' '}
                                 <a
-                                    href='https://maptiva.github.io/maptiva/'
+                                    href='https://www.maptiva.com.ar'
                                     target='_blank'
                                     rel='noopener noreferrer'
-                                    className='text-orange-500 font-semibold hover:underline'
+                                    className='font-semibold hover:underline transition-colors'
+                                    style={{ color: 'var(--color-primary)' }}
                                 >
                                     Maptiva
                                 </a>
                             </p>
 
                             {/* Links Legales */}
-                            <div className='flex flex-wrap gap-2 text-white/80 text-sm mb-4 md:justify-end'>
+                            <div className='flex flex-wrap gap-2 text-sm mb-4 md:justify-end' style={{ color: 'var(--color-text-light)' }}>
                                 <button
                                     onClick={() => openModal('terms')}
-                                    className='hover:text-orange-500 hover:underline transition-colors'
+                                    className='hover:underline transition-colors'
+                                    style={{ color: 'var(--color-text-light)' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-light)'}
                                 >
                                     Términos
                                 </button>
                                 <span>|</span>
                                 <button
                                     onClick={() => openModal('privacy')}
-                                    className='hover:text-orange-500 hover:underline transition-colors'
+                                    className='hover:underline transition-colors'
+                                    style={{ color: 'var(--color-text-light)' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-light)'}
                                 >
                                     Privacidad
                                 </button>
                                 <span>|</span>
                                 <button
                                     onClick={() => openModal('legal')}
-                                    className='hover:text-orange-500 hover:underline transition-colors'
+                                    className='hover:underline transition-colors'
+                                    style={{ color: 'var(--color-text-light)' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-light)'}
                                 >
                                     Aviso Legal
                                 </button>
@@ -144,38 +162,43 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             <div className='inline-block'>
                                 <button
                                     disabled
-                                    className='bg-orange-500 text-white font-bold py-2 px-4 rounded-lg text-sm opacity-70 cursor-not-allowed'
+                                    className='font-bold py-2 px-4 rounded-lg text-sm opacity-70 cursor-not-allowed'
+                                    style={{
+                                        backgroundColor: 'var(--color-primary)',
+                                        color: 'var(--color-primary-text)'
+                                    }}
                                 >
                                     Ver Tiendas Clicando
                                 </button>
-                                <p className='text-white/60 text-sm mt-1 italic'>Próximamente</p>
+                                <p className='text-sm mt-1 italic' style={{ color: 'var(--color-text-light)', opacity: 0.6 }}>
+                                    Próximamente
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     {/* Disclaimer y Copyright */}
-                    <div className='border-t border-white/20 pt-4 text-center'>
-                        <p className='text-white/90 text-sm mb-2'>
+                    <div className='text-center pt-6' style={{ borderTop: `1px solid var(--color-border)` }}>
+                        <p className='text-sm mb-2' style={{ color: 'var(--color-text-light)', opacity: 0.9 }}>
                             {footerDisclaimer}
                         </p>
-                        <p className='text-white/90 text-sm'>
+                        <p className='text-sm' style={{ color: 'var(--color-text-light)', opacity: 0.9 }}>
                             © 2025 {displayName}. Todos los derechos reservados
                         </p>
                     </div>
                 </div>
             </footer>
 
-            {/* Modal */}
+            {/* Modal Legal */}
             {modalContent && (
                 <LegalModal
-                    isOpen={!!modalContent}
-                    onClose={closeModal}
                     title={modalContent.title}
                     content={modalContent.content}
+                    onClose={closeModal}
                 />
             )}
         </>
-    )
-}
+    );
+};
 
-export default Footer
+export default Footer;
