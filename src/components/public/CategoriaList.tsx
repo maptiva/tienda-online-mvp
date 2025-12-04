@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./CategoriaList.module.css";
 import { supabase } from "../../services/supabase";
 
@@ -62,52 +62,51 @@ const CategoriaList: React.FC<CategoriaListProps> = ({
         willChange: 'top'
       }}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Sin container para evitar truncamiento */}
+      <div
+        className={styles.categoryContainer}
+        onMouseDown={(e) => {
+          const slider = e.currentTarget;
+          const startX = e.pageX - slider.offsetLeft;
+          const scrollLeft = slider.scrollLeft;
+          let isDown = true;
+
+          const handleMouseMove = (e: MouseEvent) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+          };
+
+          const handleMouseUp = () => {
+            isDown = false;
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+          };
+
+          document.addEventListener("mousemove", handleMouseMove);
+          document.addEventListener("mouseup", handleMouseUp);
+        }}
+      >
+        {/* Botón "Todos" */}
         <div
-          className={styles.categoryContainer}
-          onMouseDown={(e) => {
-            const slider = e.currentTarget;
-            const startX = e.pageX - slider.offsetLeft;
-            const scrollLeft = slider.scrollLeft;
-            let isDown = true;
-
-            const handleMouseMove = (e: MouseEvent) => {
-              if (!isDown) return;
-              e.preventDefault();
-              const x = e.pageX - slider.offsetLeft;
-              const walk = (x - startX) * 2;
-              slider.scrollLeft = scrollLeft - walk;
-            };
-
-            const handleMouseUp = () => {
-              isDown = false;
-              document.removeEventListener("mousemove", handleMouseMove);
-              document.removeEventListener("mouseup", handleMouseUp);
-            };
-
-            document.addEventListener("mousemove", handleMouseMove);
-            document.addEventListener("mouseup", handleMouseUp);
-          }}
+          className={`${styles.categoryItem} ${!selectedCategory ? styles.active : ""}`}
+          onClick={() => handleCategoryClick(null)}
         >
-          {/* Botón "Todos" */}
-          <div
-            className={`${styles.categoryItem} ${!selectedCategory ? styles.active : ""}`}
-            onClick={() => handleCategoryClick(null)}
-          >
-            Todos
-          </div>
-
-          {/* Categorías dinámicas */}
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className={`${styles.categoryItem} ${selectedCategory?.id === category.id ? styles.active : ""}`}
-              onClick={() => handleCategoryClick(category.id)}
-            >
-              {category.name}
-            </div>
-          ))}
+          Todos
         </div>
+
+        {/* Categorías dinámicas */}
+        {categories.map((category) => (
+          <div
+            key={category.id}
+            className={`${styles.categoryItem} ${selectedCategory?.id === category.id ? styles.active : ""}`}
+            onClick={() => handleCategoryClick(category.id)}
+          >
+            {category.name}
+          </div>
+        ))}
       </div>
     </nav>
   );
