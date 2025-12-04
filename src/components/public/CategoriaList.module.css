@@ -2,15 +2,16 @@
   display: flex;
   overflow-x: auto;
   flex-wrap: nowrap;
-  padding-bottom: 10px;
+  padding: 0.75rem 0;
   width: 100%;
-  justify-content: flex-start;
+  justify-content: center;
+  /* Centrado por defecto */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  /* Firefox */
   cursor: grab;
   user-select: none;
-  /* Prevenir selección de texto al arrastrar */
+  gap: 0.5rem;
+  /* Espacio entre pills */
 }
 
 .categoryContainer:active {
@@ -22,31 +23,57 @@
   display: none;
 }
 
+/* Pills redondeadas - más pequeñas */
 .categoryItem {
-  background-color: rgba(30, 41, 59, 0.5);
-  /* slate-800/50 */
-  backdrop-filter: blur(4px);
-  border-radius: 0.75rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 1rem;
+  /* Reducido de 0.75rem 1.25rem */
+  border-radius: 9999px;
+  /* rounded-full */
   cursor: pointer;
-  margin: 0.75rem 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.875rem;
+  /* text-sm */
+  font-weight: 500;
+  /* font-medium */
+  white-space: nowrap;
   flex-shrink: 0;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.categoryItem:hover {
-  border-color: #0d9488;
-  /* teal-600 */
-  box-shadow: 0 0 15px rgba(13, 148, 136, 0.2);
+/* Tema CLARO - Categoría inactiva */
+:root:not(.dark) .categoryItem {
+  background-color: var(--color-background-light);
+  color: var(--color-text-main);
+  border-color: var(--color-border);
 }
 
-.active {
-  background-color: #0d9488;
-  /* teal-600 */
-  border-color: #0d9488;
-  box-shadow: 0 0 15px rgba(13, 148, 136, 0.4);
-  color: #1f2937;
-  /* gray-800 - texto oscuro */
+:root:not(.dark) .categoryItem:hover {
+  background-color: #e5e7eb;
+  /* gray-200 */
+}
+
+/* Tema CLARO - Categoría activa */
+:root:not(.dark) .categoryItem.active {
+  background-color: var(--color-primary);
+  color: var(--color-primary-text);
+  border-color: var(--color-primary);
+}
+
+/* Tema DARK - Categoría inactiva */
+:root.dark .categoryItem {
+  background-color: var(--color-background);
+  color: var(--color-text-main);
+  border-color: var(--color-border);
+}
+
+:root.dark .categoryItem:hover {
+  background-color: var(--color-border);
+  /* slate-700 */
+}
+
+/* Tema DARK - Categoría activa */
+:root.dark .categoryItem.active {
+  background-color: var(--color-primary);
+  color: var(--color-primary-text);
+  border-color: var(--color-primary);
 }

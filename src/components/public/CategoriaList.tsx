@@ -1,140 +1,114 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "../../services/supabase";
-import { useCategory } from "../../hooks/categoria/useCategory";
-import { useCategoryState } from "../../store/useCategoryStore";
+import React, { useEffect, useState, useRef } from "react";
 import styles from "./CategoriaList.module.css";
+import { supabase } from "../../services/supabase";
 
 interface Category {
   id: number;
   name: string;
-  user_id: string;
+  description: string | null;
 }
 
-const CategoriaList = ({ userId }: { userId: string }) => {
+interface CategoriaListProps {
+  activeCategory: (category: Category | null) => void;
+  selectedCategory: Category | null;
+}
+
+const CategoriaList: React.FC<CategoriaListProps> = ({
+  activeCategory,
+  selectedCategory,
+}) => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const { categoryActive, limpiarCategoryActive } = useCategory();
-  const { activeCategory, getCategories } = useCategoryState();
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 150) {
-        setIsScrolled(true);
-      }
-
-      if (window.scrollY < 50) {
-        setIsScrolled(false);
-      }
-    };
-
-    // Usar requestAnimationFrame para suavizar la detección
-    let ticking = false;
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) return;
 
-      try {
-        const { data, error } = await supabase
-          .from("categories")
-          .select("*")
-          .eq("user_id", userId);
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .eq("user_id", userId)
+        .order("name");
 
-        if (error) throw error;
-        const fetchedCategories = (data as Category[]) || [];
-        setCategories(fetchedCategories);
-        // Actualizar el store global para que el filtrado funcione
-        getCategories(fetchedCategories);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
+      if (error) {
+        console.error("Error al cargar categorías:", error);
+      } else {
+        setCategories(data || []);
       }
     };
 
     fetchCategories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, []);
 
-  const activarCategoria = (id: number) => {
-    console.log("Activando categoría:", id);
-    if (id === 0) {
-      limpiarCategoryActive();
+  const handleCategoryClick = (id: number | null) => {
+    if (id === null) {
+      activeCategory(null);
       return;
     }
 
-    // Buscar la categoría en el array local
     const category = categories.find((cat) => cat.id === id);
     if (category) {
-      console.log("Categoría encontrada:", category);
       activeCategory(category);
     }
   };
 
   return (
-    <div
-      className="sticky z-40 py-0.5 top-[104px] md:top-[136px]"
-      style={{ willChange: "top" }}
+    <nav
+      className="sticky z-40 py-3 top-[80px]"
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderBottom: `1px solid var(--color-border)`,
+        willChange: 'top'
+      }}
     >
-      <div
-        className={styles.categoryContainer}
-        onMouseDown={(e) => {
-          const slider = e.currentTarget;
-          const startX = e.pageX - slider.offsetLeft;
-          const scrollLeft = slider.scrollLeft;
-          let isDown = true;
-
-          const handleMouseMove = (e: MouseEvent) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - slider.offsetLeft;
-            const walk = (x - startX) * 2; // Velocidad del scroll
-            slider.scrollLeft = scrollLeft - walk;
-          };
-
-          const handleMouseUp = () => {
-            isDown = false;
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-          };
-
-          document.addEventListener('mousemove', handleMouseMove);
-          document.addEventListener('mouseup', handleMouseUp);
-        }}
-      >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          onClick={(e) => activarCategoria(0)}
-          key={0}
-          className={`${styles.categoryItem} ${!categoryActive ? styles.active : ""
-            }`}
+          className={styles.categoryContainer}
+          onMouseDown={(e) => {
+            const slider = e.currentTarget;
+            const startX = e.pageX - slider.offsetLeft;
+            const scrollLeft = slider.scrollLeft;
+            let isDown = true;
+
+            const handleMouseMove = (e: MouseEvent) => {
+              if (!isDown) return;
+              e.preventDefault();
+              const x = e.pageX - slider.offsetLeft;
+              const walk = (x - startX) * 2;
+              slider.scrollLeft = scrollLeft - walk;
+            };
+
+            const handleMouseUp = () => {
+              isDown = false;
+              document.removeEventListener("mousemove", handleMouseMove);
+              document.removeEventListener("mouseup", handleMouseUp);
+            };
+
+            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("mouseup", handleMouseUp);
+          }}
         >
-          <h3 className="text-lg font-semibold text-white m-0">Todos</h3>
-        </div>
-        {categories.map((elem) => (
+          {/* Botón "Todos" */}
           <div
-            onClick={(e) => activarCategoria(elem.id)}
-            key={elem.id}
-            className={`${styles.categoryItem} ${categoryActive?.id === elem.id ? styles.active : ""
-              }`}
+            className={`${styles.categoryItem} ${!selectedCategory ? styles.active : ""}`}
+            onClick={() => handleCategoryClick(null)}
           >
-            <h3 className="text-lg font-semibold text-white m-0">
-              {elem.name}
-            </h3>
+            Todos
           </div>
-        ))}
+
+          {/* Categorías dinámicas */}
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className={`${styles.categoryItem} ${selectedCategory?.id === category.id ? styles.active : ""}`}
+              onClick={() => handleCategoryClick(category.id)}
+            >
+              {category.name}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </nav>
   );
 };
 
