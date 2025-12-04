@@ -11,17 +11,18 @@ interface Category {
 interface CategoriaListProps {
   activeCategory: (category: Category | null) => void;
   selectedCategory: Category | null;
+  userId: string; // ID del dueño de la tienda
 }
 
 const CategoriaList: React.FC<CategoriaListProps> = ({
   activeCategory,
   selectedCategory,
+  userId,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) return;
 
       const { data, error } = await supabase
@@ -38,7 +39,7 @@ const CategoriaList: React.FC<CategoriaListProps> = ({
     };
 
     fetchCategories();
-  }, []);
+  }, [userId]);
 
   const handleCategoryClick = (id: number | null) => {
     if (id === null) {
