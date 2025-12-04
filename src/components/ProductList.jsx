@@ -1,20 +1,20 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { useProducts } from '../hooks/useProducts';
-import SearchBar from './SearchBar'; // Importar SearchBar
+import SearchBar from './SearchBar';
 import styles from './ProductList.module.css';
 import { MdErrorOutline } from 'react-icons/md';
 import { useCategory } from '../hooks/categoria/useCategory';
-import { useCategoryState } from '../store/useCategoryStore';
 import { useTheme } from '../context/ThemeContext';
+import { useSearchState } from '../store/useSearchStore';
 
 const ProductList = () => {
   const { store } = useOutletContext();
   const { categoryActive } = useCategory();
   const { theme } = useTheme();
   const { products, loading, error } = useProducts(store?.user_id);
-  const [searchTerm, setSearchTerm] = useState('');
+  const { searchTerm, setSearchTerm } = useSearchState();
 
   console.log('Current theme:', theme); // Debug
 
@@ -75,8 +75,8 @@ const ProductList = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={`text-3xl font-bold mb-0 text-center pt-0 transition-colors duration-300 ${theme === 'light' ? '!text-slate-700' : '!text-white'}`}>Nuestros Productos</h2>
-      <div className={`${styles.stickyBar} md:hidden`}>
+      <h2 className={`text - 3xl font - bold mb - 0 text - center pt - 0 transition - colors duration - 300 ${theme === 'light' ? '!text-slate-700' : '!text-white'} `}>Nuestros Productos</h2>
+      <div className={`${styles.stickyBar} md: hidden`}>
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}

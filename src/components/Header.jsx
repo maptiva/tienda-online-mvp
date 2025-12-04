@@ -6,11 +6,13 @@ import { MdOutlineShoppingCart } from 'react-icons/md';
 import { HiOutlineSun, HiOutlineMoon } from 'react-icons/hi';
 import { useTheme } from '../context/ThemeContext';
 import SearchBar from './SearchBar';
+import { useSearchState } from '../store/useSearchStore';
 
 const Header = ({ storeData, onCartClick }) => {
   const { cart } = useCart();
   const { storeName } = useParams();
   const { theme, toggleTheme } = useTheme();
+  const { searchTerm, setSearchTerm } = useSearchState();
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -20,12 +22,10 @@ const Header = ({ storeData, onCartClick }) => {
 
   return (
     <header
-      className="sticky top-0 z-50 backdrop-blur-sm transition-colors duration-300"
+      className="sticky top-0 z-50 transition-colors duration-300"
       style={{
-        backgroundColor: theme === 'light'
-          ? 'rgba(255, 255, 255, 0.8)'  // surface con transparencia
-          : 'rgba(30, 41, 59, 0.8)',     // surface dark con transparencia
-        borderBottom: `1px solid ${theme === 'light' ? '#e5e7eb' : '#334155'}`
+        backgroundColor: 'var(--color-surface)', // Opaco, sin transparencia
+        borderBottom: `1px solid var(--color-border)`
       }}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,8 +49,8 @@ const Header = ({ storeData, onCartClick }) => {
           {/* Centro: SearchBar (solo desktop) */}
           <div className="hidden md:block flex-1 max-w-xl mx-8">
             <SearchBar
-              searchTerm=""
-              setSearchTerm={() => { }}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
               placeholder="Buscar productos..."
             />
           </div>
