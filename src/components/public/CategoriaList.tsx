@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styles from "./CategoriaList.module.css";
 import { supabase } from "../../services/supabase";
 import { useCategoryState } from "../../store/useCategoryStore";
@@ -10,12 +10,13 @@ interface Category {
 }
 
 interface CategoriaListProps {
-  userId: string; // ID del dueño de la tienda
+  userId: string;
 }
 
 const CategoriaList: React.FC<CategoriaListProps> = ({ userId }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const { categoryActive, activeCategory, clearCategoryActive } = useCategoryState();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -37,6 +38,25 @@ const CategoriaList: React.FC<CategoriaListProps> = ({ userId }) => {
     fetchCategories();
   }, [userId]);
 
+  // Detectar overflow y ajustar alineación dinámicamente
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (!containerRef.current) return;
+      const hasOverflow = containerRef.current.scrollWidth > containerRef.current.clientWidth;
+      containerRef.current.style.justifyContent = hasOverflow ? 'flex-start' : 'center';
+    };
+
+    // Ejecutar después de que se rendericen las categorías
+    const timer = setTimeout(checkOverflow, 100);
+    checkOverflow();
+
+    window.addEventListener('resize', checkOverflow);
+    return () => {
+      window.removeEventListener('resize', checkOverflow);
+      clearTimeout(timer);
+    };
+  }, [categories]);
+
   const handleCategoryClick = (category: Category | null) => {
     if (category === null) {
       clearCategoryActive();
@@ -55,6 +75,7 @@ const CategoriaList: React.FC<CategoriaListProps> = ({ userId }) => {
       }}
     >
       <div
+        ref={containerRef}
         className={styles.categoryContainer}
         onMouseDown={(e) => {
           const slider = e.currentTarget;
