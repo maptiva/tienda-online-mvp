@@ -50,7 +50,7 @@ function LandingPage() {
                         className="text-xl"
                         style={{ color: 'var(--color-text-light)' }}
                     >
-                        Plataforma SaaS Multi-Tenant
+                        Tu Tienda Online Simple y Rápida
                     </p>
                 </div>
 
