@@ -3,6 +3,7 @@ import './App.css';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
 import { CartProvider } from './context/CartContext';
+import ScrollToTop from './components/ScrollToTop';
 
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
@@ -23,6 +24,7 @@ function App() {
 
   return (
     <CartProvider>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
