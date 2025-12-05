@@ -37,14 +37,14 @@ function LandingPage() {
                 {/* Logo/Icon */}
                 <div className="mb-8">
                     <FaStore
-                        className="text-6xl mx-auto mb-4"
+                        className="text-8xl mx-auto mb-4"
                         style={{ color: 'var(--color-primary)' }}
                     />
                     <h1
                         className="text-5xl font-bold mb-4"
                         style={{ color: 'var(--color-text-main)' }}
                     >
-                        clicando
+                        Clicando
                     </h1>
                     <p
                         className="text-xl"
