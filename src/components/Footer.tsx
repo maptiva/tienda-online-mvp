@@ -58,7 +58,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                 className='font-bold text-lg mb-4'
                                 style={{ color: 'var(--color-text-main)' }}
                             >
-                                INFORMACIÓN DE TIENDA
+                                INFORMACIÓN DEL COMERCIO
                             </h3>
                             <div className='space-y-3' style={{ color: 'var(--color-text-main)' }}>
                                 <div className='flex items-start gap-2'>
