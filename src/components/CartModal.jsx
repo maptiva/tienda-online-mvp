@@ -29,20 +29,29 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
       return;
     }
 
-    let message = "Hola, me gustaría hacer el siguiente pedido:\\n\\n";
-    message += `*Nombre:* ${name}\\n`;
-    message += `*Teléfono:* ${phone}\\n`;
+    let message = `Hola, me gustaría hacer el siguiente pedido:
+
+*Nombre:* ${name}
+*Teléfono:* ${phone}`;
+
     if (address) {
-      message += `*Dirección:* ${address}\\n`;
+      message += `
+*Dirección:* ${address}`;
     }
-    message += `\\n*Pedido:*\\n`;
+
+    message += `
+
+*Pedido:*`;
 
     cart.forEach(item => {
-      message += `- ${item.quantity}x ${item.product.name} - $${(item.product.price * item.quantity).toFixed(2)}\\n`;
+      message += `
+- ${item.quantity}x ${item.product.name} - $${(item.product.price * item.quantity).toFixed(2)}`;
     });
 
     const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    message += `\\n*Total:* $${total.toFixed(2)}`;
+    message += `
+
+*Total:* $${total.toFixed(2)}`;
 
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
