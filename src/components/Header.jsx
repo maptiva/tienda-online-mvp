@@ -21,13 +21,7 @@ const Header = ({ storeData, onCartClick }) => {
   const displayStoreName = storeData?.store_name || 'Tienda Online';
 
   return (
-    <header
-      className="sticky top-0 z-50 transition-colors duration-300"
-      style={{
-        backgroundColor: 'var(--color-surface)', // Opaco, sin transparencia
-        borderBottom: `1px solid var(--color-border)`
-      }}
-    >
+    <header className="sticky top-0 z-50 bg-surface text-text-light transition-colors duration-300 border-b border-border">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-28">
 
@@ -36,12 +30,9 @@ const Header = ({ storeData, onCartClick }) => {
             <img
               src={displayLogo}
               className="h-24 w-24 object-contain flex-shrink-0"
-              alt={displayStoreName}
+              alt={`Logo de ${displayStoreName}`}
             />
-            <span
-              className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight"
-              style={{ color: 'var(--color-text-main)' }}
-            >
+            <span className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-text-main">
               {displayStoreName}
             </span>
           </Link>
@@ -56,31 +47,34 @@ const Header = ({ storeData, onCartClick }) => {
           </div>
 
           {/* Derecha: Carrito + Tema */}
-          <div
-            className="flex items-center gap-6"
-            style={{ color: theme === 'dark' ? '#f1f5f9' : 'var(--color-text-light)' }}
-          >
+          <div className="flex items-center gap-6">
 
             {/* Carrito */}
-            <div onClick={onCartClick} className="cursor-pointer hover:opacity-80 transition-opacity">
-              <div className="relative">
-                <MdOutlineShoppingCart size={24} />
-                {totalItems !== 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {totalItems}
-                  </span>
-                )}
-              </div>
-            </div>
+            <button
+              onClick={onCartClick}
+              className="relative text-text-light hover:opacity-80 transition-opacity"
+              aria-label={`Ver carrito de compras con ${totalItems} items`}
+            >
+              <MdOutlineShoppingCart size={24} />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
 
             {/* Toggle Tema */}
-            <div onClick={toggleTheme} className="cursor-pointer hover:opacity-80 transition-opacity">
+            <button
+              onClick={toggleTheme}
+              className="text-text-light hover:opacity-80 transition-opacity"
+              aria-label={`Cambiar a tema ${theme === 'dark' ? 'claro' : 'oscuro'}`}
+            >
               {theme === 'dark' ? (
                 <HiOutlineSun size={24} />
               ) : (
                 <HiOutlineMoon size={24} />
               )}
-            </div>
+            </button>
           </div>
         </div>
       </div>

@@ -25,9 +25,7 @@ CREATE POLICY "Users can update own store"
   USING (auth.uid() = user_id);
 
 -- Permitir lectura pública de tiendas (para mostrar en frontend público)
-CREATE POLICY "Public can view stores by name"
-  ON stores FOR SELECT
-  USING (true);
+-- Esta política se refinará en el script 06
 
 -- ==================
 -- RLS para CATEGORIES
