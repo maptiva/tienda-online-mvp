@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../services/supabase';
 import { Link } from 'react-router-dom';
 import { FaStore, FaTimes, FaSearch } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
@@ -9,10 +9,17 @@ import styles from './StoreDirectory.module.css';
 const StoreCard = ({ store }) => {
     const { theme } = useTheme();
 
+    const CardWrapper = store.coming_soon ? 'div' : Link;
+    const cardProps = store.coming_soon
+        ? {}
+        : { to: `/${store.store_slug}` };
+
     return (
-        <a
-            href={`/${store.store_slug}`}
-            className={`${styles.card} ${theme === 'dark' ? styles.darkCard : ''}`}
+        <CardWrapper
+            {...cardProps}
+            className={`${styles.card} ${
+                theme === 'dark' ? styles.darkCard : ''
+            } ${store.coming_soon ? styles.comingSoonCard : ''}`}
         >
             <div className={styles.cardHeader}>
                 {store.logo_url ? (
@@ -29,15 +36,22 @@ const StoreCard = ({ store }) => {
                 {store.is_demo && (
                     <span className={styles.demoBadge}>DEMO</span>
                 )}
+                {store.coming_soon && !store.is_demo && (
+                    <span className={styles.comingSoonBadge}>PRÓXIMAMENTE</span>
+                )}
             </div>
             <div className={styles.cardBody}>
                 <h3 className={styles.storeName}>{store.store_name}</h3>
                 {store.category && (
                     <span className={styles.category}>{store.category}</span>
                 )}
-                <span className={styles.visitLink}>Visitar Tienda →</span>
+                {store.coming_soon ? (
+                    <span className={styles.disabledLink}>No disponible</span>
+                ) : (
+                    <span className={styles.visitLink}>Visitar Tienda →</span>
+                )}
             </div>
-        </a>
+        </CardWrapper>
     );
 };
 
@@ -59,8 +73,9 @@ const StoreDirectory = ({ isOpen, onClose }) => {
         try {
             const { data, error } = await supabase
                 .from('stores')
-                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon')
+                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active')
                 .or('is_active.eq.true,coming_soon.eq.true')
+                .order('is_demo', { ascending: false })
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -121,7 +136,7 @@ const StoreDirectory = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className={styles.footer}>
-                    <p>¿Querés tu propia tienda? <Link to="/" onClick={onClose}>Creala gratis en Clicando</Link></p>
+                    <p>¿Querés tu propia tienda? <Link to="/" onClick={onClose}>Te esperamos en Clicando</Link></p>
                 </div>
             </div>
         </div>
