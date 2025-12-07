@@ -10,7 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './router/ProtectedRoute';
 import ProductForm from './components/ProductForm';
 import { Error404 } from './pages/Error404';
-import CategoriaPage from './pages/dashboard/CategoriaPage.tsx';
+import CategoriaPage from './pages/dashboard/CategoriaPage.jsx';
 import PublicLayout from './components/PublicLayout';
 import AdminLayout from './components/AdminLayout';
 import StoreSettings from './pages/StoreSettings';

@@ -54,9 +54,7 @@ const CategoriaPage = () => {
                 />
             </div>
 
-            <div onClick={handleAddCategory}>
-                <button className='text-white rounded-lg bg-green-500 mt-3 hover:opacity-80 cursor-pointer p-2'>Agregar Categoria</button>
-            </div>
+            <button onClick={handleAddCategory} className='text-white rounded-lg bg-green-500 mt-3 hover:opacity-80 cursor-pointer p-2'>Agregar Categoria</button>
 
             {/* Contador de resultados */}
             {categories && (
