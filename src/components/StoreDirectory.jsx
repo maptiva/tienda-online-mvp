@@ -1,0 +1,131 @@
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../supabaseClient';
+import { Link } from 'react-router-dom';
+import { FaStore, FaTimes, FaSearch } from 'react-icons/fa';
+import { useTheme } from '../context/ThemeContext';
+import styles from './StoreDirectory.module.css';
+
+// Componente individual de tarjeta de tienda
+const StoreCard = ({ store }) => {
+    const { theme } = useTheme();
+
+    return (
+        <a
+            href={`/${store.store_slug}`}
+            className={`${styles.card} ${theme === 'dark' ? styles.darkCard : ''}`}
+        >
+            <div className={styles.cardHeader}>
+                {store.logo_url ? (
+                    <img
+                        src={store.logo_url}
+                        alt={store.store_name}
+                        className={styles.logo}
+                    />
+                ) : (
+                    <div className={styles.logoPlaceholder}>
+                        <FaStore />
+                    </div>
+                )}
+                {store.is_demo && (
+                    <span className={styles.demoBadge}>DEMO</span>
+                )}
+            </div>
+            <div className={styles.cardBody}>
+                <h3 className={styles.storeName}>{store.store_name}</h3>
+                {store.category && (
+                    <span className={styles.category}>{store.category}</span>
+                )}
+                <span className={styles.visitLink}>Visitar Tienda →</span>
+            </div>
+        </a>
+    );
+};
+
+// Componente principal del Directorio (Modal)
+const StoreDirectory = ({ isOpen, onClose }) => {
+    const [stores, setStores] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const { theme } = useTheme();
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchStores();
+        }
+    }, [isOpen]);
+
+    const fetchStores = async () => {
+        setLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('stores')
+                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon')
+                .or('is_active.eq.true,coming_soon.eq.true')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setStores(data || []);
+        } catch (error) {
+            console.error('Error fetching stores:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredStores = stores.filter(store =>
+        store.store_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (!isOpen) return null;
+
+    return (
+        <div className={styles.overlay} onClick={onClose}>
+            <div
+                className={`${styles.modal} ${theme === 'dark' ? styles.darkModal : ''}`}
+                onClick={e => e.stopPropagation()}
+            >
+                <button className={styles.closeButton} onClick={onClose}>
+                    <FaTimes />
+                </button>
+
+                <div className={styles.header}>
+                    <h2>Tiendas Clicando</h2>
+                    <p>Descubre otros emprendedores que confían en nosotros</p>
+                </div>
+
+                <div className={styles.searchContainer}>
+                    <FaSearch className={styles.searchIcon} />
+                    <input
+                        type="text"
+                        placeholder="Buscar tienda..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className={styles.searchInput}
+                    />
+                </div>
+
+                <div className={styles.content}>
+                    {loading ? (
+                        <div className={styles.loading}>Cargando tiendas...</div>
+                    ) : filteredStores.length > 0 ? (
+                        <div className={styles.grid}>
+                            {filteredStores.map(store => (
+                                <StoreCard key={store.id} store={store} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className={styles.empty}>
+                            <p>No se encontraron tiendas con ese nombre.</p>
+                        </div>
+                    )}
+                </div>
+
+                <div className={styles.footer}>
+                    <p>¿Querés tu propia tienda? <Link to="/" onClick={onClose}>Creala gratis en Clicando</Link></p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default StoreDirectory;
