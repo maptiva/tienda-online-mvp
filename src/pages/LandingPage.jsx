@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaStore, FaShoppingCart, FaWhatsapp, FaCog } from 'react-icons/fa';
+import { FaShoppingCart, FaWhatsapp, FaCog } from 'react-icons/fa';
 import { HiOutlineSun, HiOutlineMoon } from 'react-icons/hi';
 import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../services/supabase';
 import StoreDirectory from '../components/StoreDirectory';
+import logoClicandoPng from '../assets/logo-clicando.png';
 
 function LandingPage() {
     const { theme, toggleTheme } = useTheme();
@@ -41,7 +42,7 @@ function LandingPage() {
             {/* Theme Toggle */}
             <button
                 onClick={toggleTheme}
-                className="absolute top-4 right-4 p-3 rounded-full transition-all duration-300 hover:opacity-80"
+                className="fixed top-4 right-4 z-50 p-3 rounded-full shadow-lg transition-all duration-300 hover:opacity-80"
                 style={{
                     backgroundColor: 'var(--color-surface)',
                     color: 'var(--color-text-main)',
@@ -58,9 +59,10 @@ function LandingPage() {
             <div className="max-w-4xl w-full text-center">
                 {/* Logo/Icon */}
                 <div className="mb-8">
-                    <FaStore
-                        className="text-8xl mx-auto mb-4"
-                        style={{ color: 'var(--color-primary)' }}
+                    <img
+                        src={logoClicandoPng}
+                        alt="Clicando Logo"
+                        className="w-40 h-40 mx-auto mb-4"
                     />
                     <h1
                         className="text-5xl font-bold mb-4"
