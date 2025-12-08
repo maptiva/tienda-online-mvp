@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import placeholder from '../assets/placeholder.jpg';
 import { useTheme } from '../context/ThemeContext';
+import placeholder from '../assets/placeholder.jpg';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -14,7 +14,7 @@ const ProductCard = ({ product }) => {
     return null;
   }
 
-  const imageUrl = product.image_url || placeholder;
+  const imageUrl = product.image_url;
 
   const handleAddToCart = () => {
     const numQuantity = parseInt(quantity, 10);
@@ -37,10 +37,9 @@ const ProductCard = ({ product }) => {
       <Link to={`/${storeName}/product/${product.id}`} className='block'>
         <div className="w-full aspect-square overflow-hidden">
           <img
-            src={imageUrl}
+            src={imageUrl || placeholder}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-            onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
         </div>
       </Link>
