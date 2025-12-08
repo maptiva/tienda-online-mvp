@@ -73,13 +73,42 @@ const StoreDirectory = ({ isOpen, onClose }) => {
         try {
             const { data, error } = await supabase
                 .from('stores')
-                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active')
-                .or('is_active.eq.true,coming_soon.eq.true')
-                .order('is_demo', { ascending: false })
-                .order('created_at', { ascending: false });
+                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, created_at')
+                .or('is_active.eq.true,coming_soon.eq.true');
 
             if (error) throw error;
-            setStores(data || []);
+
+            // Custom sorting logic
+            const getStoreRank = (store) => {
+                if (store.is_active && !store.is_demo && !store.coming_soon) {
+                    return 1; // Active and not demo/coming soon
+                }
+                if (store.is_demo) {
+                    return 2; // Demo
+                }
+                if (store.coming_soon) {
+                    return 3; // Coming soon
+                }
+                return 4; // Others
+            };
+
+            const sortedData = (data || []).sort((a, b) => {
+                const rankA = getStoreRank(a);
+                const rankB = getStoreRank(b);
+
+                if (rankA !== rankB) {
+                    return rankA - rankB;
+                }
+
+                // Secondary sort by creation date (newest first)
+                if (a.created_at && b.created_at) {
+                    return new Date(b.created_at) - new Date(a.created_at);
+                }
+
+                return 0;
+            });
+
+            setStores(sortedData);
         } catch (error) {
             console.error('Error fetching stores:', error);
         } finally {
