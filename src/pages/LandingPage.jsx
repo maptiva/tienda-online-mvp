@@ -54,7 +54,7 @@ function LandingPage() {
                     }
                     return 0;
                 });
-                
+
                 setFeaturedStores(sortedData.slice(0, 4));
             }
         };
@@ -226,7 +226,7 @@ function LandingPage() {
                                             <img
                                                 src={store.logo_url}
                                                 alt={store.store_name}
-                                                className="w-20 h-20 mx-auto rounded-full object-contain bg-white p-1 shadow-sm mb-3"
+                                                className="w-20 h-20 mx-auto rounded-full object-contain bg-white shadow-sm mb-3"
                                             />
                                         ) : (
                                             <div className="w-20 h-20 mx-auto rounded-full bg-slate-200 flex items-center justify-center mb-3">
