@@ -22,6 +22,10 @@ function ProductForm() {
   const STORAGE_KEY = `product-form-draft-${productId || 'new'}`;
 
 
+  const [galleryFiles, setGalleryFiles] = useState([]);
+  const [galleryPreviews, setGalleryPreviews] = useState([]);
+  const [existingGalleryImages, setExistingGalleryImages] = useState([]);
+
   useEffect(() => {
     // Intentar recuperar datos guardados de localStorage
     const savedData = localStorage.getItem(STORAGE_KEY);
@@ -77,6 +81,10 @@ function ProductForm() {
 
           setFormData(data);
           setOriginalImageUrl(data.image_url);
+          // Cargar galería existente si existe
+          if (data.gallery_images && Array.isArray(data.gallery_images)) {
+            setExistingGalleryImages(data.gallery_images);
+          }
         } catch (err) {
           setError(`Error al cargar el producto: ${err.message}`);
           console.error('Error fetching product:', err);
@@ -88,20 +96,53 @@ function ProductForm() {
     } else {
       setLoading(false);
     }
-  }, [productId, user]); // Agregado user a las dependencias
+  }, [productId, user]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'image_url' && files && files[0]) {
       setImageFile(files[0]);
+    } else if (name === 'gallery_images' && files) {
+      // Manejar selección múltiple
+      const newFiles = Array.from(files);
+      const totalImages = existingGalleryImages.length + galleryFiles.length + newFiles.length;
+
+      if (totalImages > 4) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Límite alcanzado',
+          text: 'Solo puedes tener hasta 4 imágenes adicionales en la galería.',
+          confirmButtonColor: 'var(--color-primary)'
+        });
+        return;
+      }
+
+      setGalleryFiles(prev => [...prev, ...newFiles]);
+
+      // Generar previsualizaciones locales
+      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+      setGalleryPreviews(prev => [...prev, ...newPreviews]);
+
     } else {
       const newData = { ...formData, [name]: value };
       setFormData(newData);
-
-      // Auto-guardar en localStorage (solo para productos nuevos)
       if (!productId) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
       }
+    }
+  };
+
+  const removeGalleryImage = (index, isExisting) => {
+    if (isExisting) {
+      setExistingGalleryImages(prev => prev.filter((_, i) => i !== index));
+      // Nota: La eliminación física del storage se hará al guardar para evitar errores si cancela
+    } else {
+      setGalleryFiles(prev => prev.filter((_, i) => i !== index));
+      setGalleryPreviews(prev => {
+        // Liberar URL objeto
+        URL.revokeObjectURL(prev[index]);
+        return prev.filter((_, i) => i !== index);
+      });
     }
   };
 
@@ -112,23 +153,18 @@ function ProductForm() {
 
     let finalFormData = { ...formData };
     let newImageUrl = null;
+    let newGalleryUrls = [...existingGalleryImages];
 
+    // 1. Subir imagen principal si cambió
     if (imageFile) {
       try {
-        // Comprimir imagen a WebP antes de subir
         const compressedFile = await compressImage(imageFile);
-
-        // Usar extensión .webp para el archivo comprimido
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.webp`;
+        const fileName = `${Date.now()}-main-${Math.random().toString(36).substring(2, 9)}.webp`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('product-images')
           .upload(fileName, compressedFile);
 
-        if (uploadError) {
-          setError(`Error al subir la imagen: ${uploadError.message}`);
-          setLoading(false);
-          return;
-        }
+        if (uploadError) throw uploadError;
 
         const { data: publicUrlData } = supabase.storage
           .from('product-images')
@@ -136,39 +172,60 @@ function ProductForm() {
 
         newImageUrl = publicUrlData.publicUrl;
         finalFormData.image_url = newImageUrl;
-      } catch (compressionError) {
-        setError(`Error al procesar la imagen: ${compressionError.message}`);
+      } catch (err) {
+        setError(`Error al subir imagen principal: ${err.message}`);
         setLoading(false);
         return;
       }
     }
 
+    // 2. Subir imágenes de galería nuevas
+    if (galleryFiles.length > 0) {
+      try {
+        const uploadPromises = galleryFiles.map(async (file) => {
+          const compressedFile = await compressImage(file);
+          const fileName = `${Date.now()}-gallery-${Math.random().toString(36).substring(2, 9)}.webp`;
+          const { data, error } = await supabase.storage
+            .from('product-images')
+            .upload(fileName, compressedFile);
+
+          if (error) throw error;
+
+          const { data: publicData } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(data.path);
+
+          return publicData.publicUrl;
+        });
+
+        const uploadedUrls = await Promise.all(uploadPromises);
+        newGalleryUrls = [...newGalleryUrls, ...uploadedUrls];
+
+      } catch (err) {
+        setError(`Error al subir galería: ${err.message}`);
+        setLoading(false);
+        return;
+      }
+    }
+
+    finalFormData.gallery_images = newGalleryUrls;
+
+    // 3. Limpieza de imagen principal antigua
     if (productId && newImageUrl && originalImageUrl) {
-      // Extraer la ruta del archivo desde la URL completa de Supabase
-      // Ejemplo: https://xxx.supabase.co/storage/v1/object/public/product-images/1234567890-abc.webp
-      // Resultado: 1234567890-abc.webp
       const urlParts = originalImageUrl.split('/product-images/');
       if (urlParts.length > 1) {
         const oldImagePath = urlParts[1];
-        const { error: removeError } = await supabase.storage
-          .from('product-images')
-          .remove([oldImagePath]);
-        if (removeError) {
-          console.warn(`No se pudo eliminar la imagen antigua: ${removeError.message}`);
-        } else {
-          console.log(`✅ Imagen antigua eliminada: ${oldImagePath}`);
-        }
+        await supabase.storage.from('product-images').remove([oldImagePath]);
       }
     }
 
     try {
       const { id, ...updateData } = finalFormData;
+      // Convertir gallery_images a formato PostgreSQL array si es necesario (supabase js suele manejar array js bien)
 
-      // Agregar user_id al guardar
       const dataToSave = productId ? updateData : { ...finalFormData, user_id: user.id };
 
       let operation;
-
       if (productId) {
         operation = supabase.from('products').update(dataToSave).eq('id', id);
       } else {
@@ -178,26 +235,23 @@ function ProductForm() {
       const { error: dbError } = await operation;
       if (dbError) throw dbError;
 
-      // Limpiar localStorage al guardar exitosamente
       localStorage.removeItem(STORAGE_KEY);
 
-      // Mostrar mensaje de éxito
       await Swal.fire({
         icon: 'success',
         title: '¡Guardado!',
-        text: productId ? 'Producto actualizado correctamente' : 'Producto creado correctamente',
+        text: 'Producto guardado con éxito',
         timer: 2000,
         showConfirmButton: false
       });
 
       navigate('/admin');
     } catch (err) {
-      setError(`Error al guardar el producto: ${err.message}`);
+      setError(`Error al guardar: ${err.message}`);
       console.error('Database error:', err);
     } finally {
       setLoading(false);
     }
-
   };
 
   if (loading && !formData.name) {
@@ -228,12 +282,53 @@ function ProductForm() {
                     id={field.name}
                     name={field.name}
                     onChange={handleChange}
+                    accept="image/*"
                   />
                   {originalImageUrl && !imageFile && (
-                    <p className={styles.currentImageText}>
-                      Imagen actual: <a href={originalImageUrl} target="_blank" rel="noopener noreferrer">Ver Imagen</a>
-                    </p>
+                    <div className="mt-2 text-sm text-gray-600">
+                      Imagen actual: <a href={originalImageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Ver</a>
+                    </div>
                   )}
+
+                  {/* Sección de Galería Adicional */}
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <label className="block text-sm font-medium mb-2">Galería (Máx 4 extra)</label>
+                    <input
+                      type="file"
+                      name="gallery_images"
+                      onChange={handleChange}
+                      multiple
+                      accept="image/*"
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+
+                    {/* Grid de Previsualización */}
+                    <div className="grid grid-cols-4 gap-2 mt-3">
+                      {/* Imágenes Existentes */}
+                      {existingGalleryImages.map((url, idx) => (
+                        <div key={`existing-${idx}`} className="relative group aspect-square">
+                          <img src={url} alt="Galeria" className="w-full h-full object-cover rounded shadow-sm" />
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryImage(idx, true)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                          >✕</button>
+                        </div>
+                      ))}
+
+                      {/* Nuevas Imágenes */}
+                      {galleryPreviews.map((url, idx) => (
+                        <div key={`new-${idx}`} className="relative group aspect-square">
+                          <img src={url} alt="Nueva" className="w-full h-full object-cover rounded shadow-sm border-2 border-green-200" />
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryImage(idx, false)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                          >✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </>
               ) : field.type === 'select' ? (
                 <select
