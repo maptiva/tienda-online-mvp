@@ -12,6 +12,7 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   if (loading) {
     return <p className={styles.loading}>Cargando producto...</p>;
@@ -27,6 +28,11 @@ const ProductDetail = () => {
 
   const imageUrl = product.image_url || placeholder;
 
+  // Combinar imagen principal y galería
+  const allImages = [imageUrl, ...(product.gallery_images || [])].filter(Boolean);
+
+  const displayImage = selectedImage || imageUrl;
+
   const handleAddToCart = () => {
     const numQuantity = parseInt(quantity, 10);
     if (isNaN(numQuantity) || numQuantity < 1) {
@@ -39,11 +45,37 @@ const ProductDetail = () => {
   return (
     <div className={styles.container}>
       <div className={styles.imageContainer}>
-        <img
-          src={imageUrl}
-          alt={product.name}
-          onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
-        />
+        {/* Imagen Principal */}
+        <div className="w-full relative rounded-xl overflow-hidden mb-4 shadow-sm">
+          <img
+            src={displayImage}
+            alt={product.name}
+            className="w-full h-auto object-contain"
+            onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
+          />
+        </div>
+
+        {/* Galería de Miniaturas (Solo si hay más de 1 imagen) */}
+        {allImages.length > 1 && (
+          <div className="grid grid-cols-5 gap-2">
+            {allImages.map((img, idx) => (
+              <button
+                key={idx}
+                onClick={() => setSelectedImage(img)}
+                className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${displayImage === img
+                    ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20 transform scale-95'
+                    : 'border-transparent hover:border-gray-300'
+                  }`}
+              >
+                <img
+                  src={img}
+                  alt={`Vista ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <div className={styles.detailsContainer}>
         <h1 style={{ color: 'var(--color-text-main)' }}>{product.name}</h1>
