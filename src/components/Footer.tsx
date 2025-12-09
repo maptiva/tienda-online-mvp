@@ -6,6 +6,7 @@ import { IoLocation } from 'react-icons/io5' // Filled icon
 import { IoCall } from 'react-icons/io5' // Filled icon
 import { IoTime } from 'react-icons/io5' // Filled icon
 import { FaInstagram, FaFacebook } from 'react-icons/fa'
+import StoreDirectory from './StoreDirectory'
 
 interface FooterProps {
     storeName?: string;
@@ -22,6 +23,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
     const displayName = storeName || 'Tienda Online';
     const { theme } = useTheme();
     const [modalContent, setModalContent] = useState<{ title: string; content: string } | null>(null);
+    const [showDirectory, setShowDirectory] = useState(false);
 
     const openModal = (type: 'terms' | 'privacy' | 'legal') => {
         setModalContent(legalTexts[type]);
@@ -161,8 +163,8 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             {/* Botón Tiendas Clicando */}
                             <div className='inline-block'>
                                 <button
-                                    disabled
-                                    className='font-bold py-2 px-4 rounded-lg text-sm opacity-70 cursor-not-allowed'
+                                    onClick={() => setShowDirectory(true)}
+                                    className='font-bold py-2 px-4 rounded-lg text-sm transition-transform hover:scale-105'
                                     style={{
                                         backgroundColor: 'var(--color-primary)',
                                         color: 'var(--color-primary-text)'
@@ -170,9 +172,6 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                 >
                                     Ver Tiendas Clicando
                                 </button>
-                                <p className='text-sm mt-1 italic' style={{ color: 'var(--color-text-light)', opacity: 0.6 }}>
-                                    Próximamente
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -198,6 +197,11 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                     onClose={closeModal}
                 />
             )}
+            {/* Modal Directorio */}
+            <StoreDirectory
+                isOpen={showDirectory}
+                onClose={() => setShowDirectory(false)}
+            />
         </>
     );
 };
