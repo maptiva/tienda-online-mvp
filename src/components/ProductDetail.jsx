@@ -62,7 +62,7 @@ const ProductDetail = () => {
               <button
                 key={idx}
                 onClick={() => setSelectedImage(img)}
-                className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${displayImage === img
+                className={`flex justify-center items-center aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${displayImage === img
                     ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20 transform scale-95'
                     : 'border-transparent hover:border-gray-300'
                   }`}
