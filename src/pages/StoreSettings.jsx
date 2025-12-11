@@ -23,10 +23,22 @@ function StoreSettings() {
   const [logoFile, setLogoFile] = useState(null);
 
   useEffect(() => {
-    if (user) {
+    // Al cargar, intentar recuperar desde sessionStorage
+    const savedData = sessionStorage.getItem('storeSettingsForm');
+    if (savedData) {
+      setStoreData(JSON.parse(savedData));
+      setLoading(false);
+    } else if (user) {
       loadStoreData();
     }
   }, [user]);
+
+  useEffect(() => {
+    // Guardar en sessionStorage cada vez que storeData cambie
+    if (!loading) { // Asegurarse de no guardar el estado inicial vacío
+      sessionStorage.setItem('storeSettingsForm', JSON.stringify(storeData));
+    }
+  }, [storeData, loading]);
 
   const loadStoreData = async () => {
     try {
@@ -131,6 +143,10 @@ function StoreSettings() {
 
       if (result.error) throw result.error;
 
+      // Limpiar sessionStorage y actualizar estado local
+      sessionStorage.removeItem('storeSettingsForm');
+      setStoreData(prev => ({ ...prev, logo_url: logoUrl }));
+
       Swal.fire({
         icon: 'success',
         title: '¡Guardado!',
@@ -138,7 +154,6 @@ function StoreSettings() {
         timer: 2000
       });
 
-      loadStoreData();
     } catch (error) {
       console.error('Error saving store:', error);
       Swal.fire({
