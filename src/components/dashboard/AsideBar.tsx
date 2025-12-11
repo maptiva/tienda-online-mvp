@@ -38,7 +38,7 @@ export const AsideBar = () => {
 
 
                 <div className='mt-auto mb-2'>
-                    <button onClick={handleLogout} className="flex items-center gap-2 mt-10 text-red-600 w-full text-left">
+                    <button onClick={handleLogout} className="flex items-center gap-2 mt-10 text-red-600 w-full text-left cursor-pointer">
                         <BiLogOut />
                         Cerrar Sesión
                     </button>
