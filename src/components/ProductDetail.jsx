@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProductById } from '../hooks/useProductById';
 import styles from './ProductDetail.module.css';
-import placeholder from '../assets/placeholder.jpg';
-import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 
 const ProductDetail = () => {
@@ -26,7 +24,7 @@ const ProductDetail = () => {
     return <p>Producto no encontrado.</p>;
   }
 
-  const imageUrl = product.image_url || placeholder;
+  const imageUrl = product.image_url;
 
   // Combinar imagen principal y galería
   const allImages = [imageUrl, ...(product.gallery_images || [])].filter(Boolean);
@@ -46,13 +44,20 @@ const ProductDetail = () => {
     <div className={styles.container}>
       <div className={styles.imageContainer}>
         {/* Imagen Principal */}
-        <div className="w-full relative rounded-xl overflow-hidden mb-4 shadow-sm">
-          <img
-            src={displayImage}
-            alt={product.name}
-            className="w-full h-auto object-contain"
-            onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
-          />
+        <div className="w-full relative rounded-xl overflow-hidden mb-4 shadow-sm bg-gray-50 dark:bg-slate-700 min-h-[300px] flex items-center justify-center">
+          {displayImage ? (
+            <img
+              src={displayImage}
+              alt={product.name}
+              className="w-full h-auto object-contain max-h-[500px]"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center text-gray-400 p-10">
+              <span className="text-6xl mb-2">📷</span>
+              <span className="text-lg font-medium">Sin Imagen</span>
+            </div>
+          )}
         </div>
 
         {/* Galería de Miniaturas (Solo si hay más de 1 imagen) */}
@@ -63,8 +68,8 @@ const ProductDetail = () => {
                 key={idx}
                 onClick={() => setSelectedImage(img)}
                 className={`flex justify-center items-center aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${displayImage === img
-                    ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20 transform scale-95'
-                    : 'border-transparent hover:border-gray-300'
+                  ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20 transform scale-95'
+                  : 'border-transparent hover:border-gray-300'
                   }`}
               >
                 <img

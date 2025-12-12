@@ -1,24 +1,27 @@
 import { CgLaptop } from "react-icons/cg";
 import { supabase } from "../services/supabase";
 
-export const useProductDelete = async (id: string, imageUrl: string): Promise<boolean> => {
+export const deleteProduct = async (id: string, imageUrl: string): Promise<boolean> => {
     try {
-        // 1. Extraer el nombre del archivo de la URL de la imagen
-        const imageName = imageUrl.split('/').pop();
+        // Solo intentar eliminar la imagen si existe una URL válida
+        if (imageUrl && imageUrl.trim() !== '') {
+            // 1. Extraer el nombre del archivo de la URL de la imagen
+            const imageName = imageUrl.split('/').pop();
 
-        if (!imageName) {
-            console.error("No se pudo extraer el nombre de la imagen de la URL:", imageUrl);
-            return false;
-        }
+            if (!imageName) {
+                console.error("No se pudo extraer el nombre de la imagen de la URL:", imageUrl);
+                // Continuar con la eliminación del producto aunque falle la imagen
+            } else {
+                // 2. Eliminar la imagen del Storage
+                const { error: storageError } = await supabase.storage
+                    .from('product-images')
+                    .remove([imageName]);
 
-        // 2. Eliminar la imagen del Storage
-        const { error: storageError } = await supabase.storage
-            .from('product-images')
-            .remove([imageName]);
-
-        if (storageError) {
-            console.error('Error al eliminar la imagen del Storage:', storageError);
-            // Opcional: decidir si continuar si la imagen no se pudo borrar
+                if (storageError) {
+                    console.error('Error al eliminar la imagen del Storage:', storageError);
+                    // Continuar con la eliminación del producto aunque falle la imagen
+                }
+            }
         }
 
         // 3. Eliminar el registro del producto de la base de datos

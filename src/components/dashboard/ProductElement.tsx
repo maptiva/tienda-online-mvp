@@ -3,7 +3,7 @@ import { Product } from '../../interfaces/Producto'
 import { useNavigate } from 'react-router-dom'
 import { RiPencilLine } from 'react-icons/ri';
 import { MdOutlineDelete } from 'react-icons/md';
-import { useProductDelete } from '../../hooks/useProductDelete';
+import { deleteProduct } from '../../hooks/useProductDelete';
 import Swal from 'sweetalert2';
 
 interface Props {
@@ -25,7 +25,7 @@ export const ProductElement = ({ product }: Props) => {
         });
 
         if (isConfirmed) {
-            const eliminado = await useProductDelete(id, image_url)
+            const eliminado = await deleteProduct(id, image_url)
 
             if (eliminado) {
                 setEstado(false);
