@@ -17,9 +17,8 @@ const StoreCard = ({ store }) => {
     return (
         <CardWrapper
             {...cardProps}
-            className={`${styles.card} ${
-                theme === 'dark' ? styles.darkCard : ''
-            } ${store.coming_soon ? styles.comingSoonCard : ''}`}
+            className={`${styles.card} ${theme === 'dark' ? styles.darkCard : ''
+                } ${store.coming_soon ? styles.comingSoonCard : ''}`}
         >
             <div className={styles.cardHeader}>
                 {store.logo_url ? (
@@ -73,7 +72,7 @@ const StoreDirectory = ({ isOpen, onClose }) => {
         try {
             const { data, error } = await supabase
                 .from('stores')
-                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, created_at')
+                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, created_at, category')
                 .or('is_active.eq.true,coming_soon.eq.true');
 
             if (error) throw error;
@@ -116,9 +115,13 @@ const StoreDirectory = ({ isOpen, onClose }) => {
         }
     };
 
-    const filteredStores = stores.filter(store =>
-        store.store_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredStores = stores.filter(store => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+            store.store_name.toLowerCase().includes(searchLower) ||
+            (store.category && store.category.toLowerCase().includes(searchLower))
+        );
+    });
 
     if (!isOpen) return null;
 
