@@ -3,6 +3,7 @@ import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
 import { compressLogo } from '../utils/imageCompression';
+import StoreMap from '../components/StoreMap'; // Import StoreMap component
 
 function StoreSettings() {
   const { user } = useAuth();
@@ -17,17 +18,37 @@ function StoreSettings() {
     instagram_url: '',
     facebook_url: '',
     whatsapp_number: '',
-    whatsapp_message: 'Hola, estoy interesado en sus productos.'
+    whatsapp_number: '',
+    whatsapp_message: 'Hola, estoy interesado en sus productos.',
+    latitude: null, // New field
+    longitude: null, // New field
+    city: '', // New field for GIS
+    category: '', // New field for GIS
+    show_map: false // New field
   });
+
+  const [geocoding, setGeocoding] = useState(false); // State for map search loading
+  const [showMapPreview, setShowMapPreview] = useState(false); // State to show/hide map preview
 
   const [logoFile, setLogoFile] = useState(null);
 
   useEffect(() => {
     // Al cargar, intentar recuperar desde sessionStorage
     const savedData = sessionStorage.getItem('storeSettingsForm');
+
     if (savedData) {
-      setStoreData(JSON.parse(savedData));
-      setLoading(false);
+      const parsedData = JSON.parse(savedData);
+
+      // Critical Security Check: Ensure the cached data belongs to the current user
+      // If user_id is missing in cache or doesn't match, reload from DB
+      if (parsedData.user_id === user.id) {
+        setStoreData(parsedData);
+        setLoading(false);
+      } else {
+        // Cache mismatch - clear it and load fresh data
+        sessionStorage.removeItem('storeSettingsForm');
+        loadStoreData();
+      }
     } else if (user) {
       loadStoreData();
     }
@@ -35,10 +56,15 @@ function StoreSettings() {
 
   useEffect(() => {
     // Guardar en sessionStorage cada vez que storeData cambie
-    if (!loading) { // Asegurarse de no guardar el estado inicial vacío
-      sessionStorage.setItem('storeSettingsForm', JSON.stringify(storeData));
+    if (!loading) {
+      // Include user_id in the stored data for validation
+      const dataToStore = {
+        ...storeData,
+        user_id: user.id
+      };
+      sessionStorage.setItem('storeSettingsForm', JSON.stringify(dataToStore));
     }
-  }, [storeData, loading]);
+  }, [storeData, loading, user]); // Added user to dependency
 
   const loadStoreData = async () => {
     try {
@@ -48,17 +74,71 @@ function StoreSettings() {
         .eq('user_id', user.id)
         .single();
 
+
       if (error && error.code !== 'PGRST116') {
         throw error;
       }
 
       if (data) {
-        setStoreData(data);
+        setStoreData({
+          ...data,
+          // Ensure numeric types for coordinates and boolean for show_map
+          latitude: data.latitude ? parseFloat(data.latitude) : null,
+          longitude: data.longitude ? parseFloat(data.longitude) : null,
+          show_map: data.show_map || false,
+          city: data.city || '',
+          category: data.category || ''
+        });
+
+        // Show map preview if coordinates exist
+        if (data.latitude && data.longitude) {
+          setShowMapPreview(true);
+        }
       }
     } catch (error) {
       console.error('Error loading store data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to search coordinates from address (Geocoding)
+  const handleGeocode = async () => {
+    if (!storeData.address) {
+      Swal.fire('Error', 'Ingresa una dirección completa primero (Calle, Número, Ciudad)', 'warning');
+      return;
+    }
+
+    setGeocoding(true);
+    try {
+      // Use Nominatim API (OpenStreetMap) - Free
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(storeData.address)}&limit=1`
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        setStoreData(prev => ({
+          ...prev,
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lon)
+        }));
+        setShowMapPreview(true);
+        Swal.fire({
+          icon: 'success',
+          title: '¡Ubicación encontrada!',
+          text: 'Verifica el marcador en el mapa',
+          timer: 1500
+        });
+      } else {
+        Swal.fire('No encontrado', 'No pudimos encontrar esa dirección. Intenta ser más específico o ingresa Ciudad y País.', 'warning');
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      Swal.fire('Error', 'Problema al buscar la dirección', 'error');
+    } finally {
+      setGeocoding(false);
     }
   };
 
@@ -237,6 +317,111 @@ function StoreSettings() {
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             placeholder="Av. Ejemplo 1234, Ciudad"
           />
+        </div>
+
+        {/* City - New Field for GIS */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Ciudad / Localidad
+          </label>
+          <input
+            type="text"
+            name="city"
+            value={storeData.city || ''}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="Ej: Buenos Aires"
+          />
+        </div>
+
+        {/* Category - New Field for GIS */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Categoría del Comercio
+          </label>
+          <select
+            name="category"
+            value={storeData.category || ''}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Selecciona una categoría</option>
+            <option value="Almacén">Almacén / Comestibles</option>
+            <option value="Limpieza">Limpieza</option>
+            <option value="Indumentaria">Indumentaria / Ropa</option>
+            <option value="Juguetería">Jugueterías</option>
+            <option value="Rotisería">Rotiserías / Comidas</option>
+            <option value="Repostería">Repostería</option>
+            <option value="Veterinaria">Veterinarias / Pet Shop</option>
+            <option value="Tecnología">Tecnología / Accesorios</option>
+            <option value="Decoración">Decoración / Hogar</option>
+            <option value="Artesanías">Artesanías</option>
+            <option value="Farmacia">Farmacia / Perfumería</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+
+        {/* Geolocation Section */}
+        <div className="border-t border-gray-200 pt-6 mt-6">
+          <h3 className="text-lg font-semibold mb-4">📍 Ubicación en Mapa</h3>
+
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={handleGeocode}
+              disabled={geocoding || !storeData.address}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition-colors flex items-center gap-2"
+            >
+              {geocoding ? 'Buscando...' : '🔍 Buscar ubicación por dirección'}
+            </button>
+            <p className="text-xs text-gray-500 mt-2">
+              Ingresa tu domicilio arriba y pulsa este botón para ubicarte automáticamente.
+            </p>
+          </div>
+
+          {/* Map Preview */}
+          {showMapPreview && storeData.latitude && storeData.longitude && (
+            <div className="mb-4 animate-fade-in">
+              <p className="text-sm font-medium mb-2">Vista previa del mapa:</p>
+              <div className="h-[300px] w-full border border-gray-300 rounded-lg overflow-hidden">
+                <StoreMap
+                  latitude={storeData.latitude}
+                  longitude={storeData.longitude}
+                  storeName={storeData.store_name}
+                  address={storeData.address}
+                  draggable={true} // Allow dragging in settings
+                  onPositionChange={(newPos) => {
+                    setStoreData(prev => ({
+                      ...prev,
+                      latitude: newPos.lat,
+                      longitude: newPos.lng
+                    }));
+                  }}
+                />
+              </div>
+              <p className="text-xs text-blue-600 mt-1 font-medium">
+                💡 Tip: Puedes arrastrar el marcador rojo para corregir la ubicación exacta.
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Lat: {storeData.latitude.toFixed(6)}, Lng: {storeData.longitude.toFixed(6)}
+              </p>
+            </div>
+          )}
+
+          {/* Show Map Toggle */}
+          <div className="flex items-center mt-4">
+            <input
+              type="checkbox"
+              id="show_map"
+              name="show_map"
+              checked={storeData.show_map || false}
+              onChange={(e) => setStoreData(prev => ({ ...prev, show_map: e.target.checked }))}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+            />
+            <label htmlFor="show_map" className="ml-2 block text-sm text-gray-900 cursor-pointer select-none">
+              Mostrar el mapa de ubicación en el pie de página de mi tienda
+            </label>
+          </div>
         </div>
 
         {/* Business Hours */}

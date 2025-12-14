@@ -42,3 +42,9 @@ solucion*.txt
 *.txt
 CART.txt
 Plan_SaaS.txt
+
+# Supabase local development files
+supabase/.temp
+
+# Temporary images/screenshots
+captura*.png

@@ -6,7 +6,9 @@ import { IoLocation } from 'react-icons/io5' // Filled icon
 import { IoCall } from 'react-icons/io5' // Filled icon
 import { IoTime } from 'react-icons/io5' // Filled icon
 import { FaInstagram, FaFacebook } from 'react-icons/fa'
+import { IoMap } from 'react-icons/io5'
 import StoreDirectory from './StoreDirectory'
+import StoreMap from './StoreMap' // Import StoreMap
 
 interface FooterProps {
     storeName?: string;
@@ -16,6 +18,11 @@ interface FooterProps {
         business_hours?: string;
         instagram_url?: string;
         facebook_url?: string;
+        latitude?: number;
+        longitude?: number;
+        show_map?: boolean;
+        city?: string;
+        category?: string;
     };
 }
 
@@ -75,35 +82,67 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                     <IoTime size={20} className='flex-shrink-0' style={{ color: 'var(--color-primary)' }} />
                                     <p className='text-sm'>{displayHours}</p>
                                 </div>
-                            </div>
 
-                            {/* Redes Sociales */}
-                            {(displayInstagram || displayFacebook) && (
-                                <div className='flex gap-4 mt-4'>
-                                    {displayInstagram && (
-                                        <a
-                                            href={displayInstagram}
-                                            target='_blank'
-                                            rel='noopener noreferrer'
-                                            className='transition-opacity hover:opacity-70'
-                                            style={{ color: 'var(--color-primary)' }}
+                                {/* Sección Ubicación y Mapa */}
+                                {(storeData?.show_map && storeData?.latitude && storeData?.longitude) || storeData?.city ? (
+                                    <div className="mt-6">
+                                        <h4
+                                            className='font-bold text-base mb-3'
+                                            style={{ color: 'var(--color-text-main)', opacity: 0.9 }}
                                         >
-                                            <FaInstagram size={24} />
-                                        </a>
-                                    )}
-                                    {displayFacebook && (
-                                        <a
-                                            href={displayFacebook}
-                                            target='_blank'
-                                            rel='noopener noreferrer'
-                                            className='transition-opacity hover:opacity-70'
-                                            style={{ color: 'var(--color-primary)' }}
-                                        >
-                                            <FaFacebook size={24} />
-                                        </a>
-                                    )}
-                                </div>
-                            )}
+                                            UBICACIÓN
+                                        </h4>
+
+                                        {storeData?.city && (
+                                            <div className='flex items-center gap-2 mb-3'>
+                                                <IoMap size={20} className='flex-shrink-0' style={{ color: 'var(--color-primary)' }} />
+                                                <p className='text-sm' style={{ color: 'var(--color-text-main)' }}>{storeData.city}</p>
+                                            </div>
+                                        )}
+
+                                        {storeData?.show_map && storeData?.latitude && storeData?.longitude && (
+                                            <div className="rounded-lg overflow-hidden border border-gray-200 shadow-sm h-48 w-full max-w-sm mb-4">
+                                                <StoreMap
+                                                    latitude={storeData.latitude}
+                                                    longitude={storeData.longitude}
+                                                    storeName={displayName}
+                                                    address={displayAddress}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : null}
+
+
+
+                                {/* Redes Sociales */}
+                                {(displayInstagram || displayFacebook) && (
+                                    <div className='flex gap-4 mt-4'>
+                                        {displayInstagram && (
+                                            <a
+                                                href={displayInstagram}
+                                                target='_blank'
+                                                rel='noopener noreferrer'
+                                                className='transition-opacity hover:opacity-70'
+                                                style={{ color: 'var(--color-primary)' }}
+                                            >
+                                                <FaInstagram size={24} />
+                                            </a>
+                                        )}
+                                        {displayFacebook && (
+                                            <a
+                                                href={displayFacebook}
+                                                target='_blank'
+                                                rel='noopener noreferrer'
+                                                className='transition-opacity hover:opacity-70'
+                                                style={{ color: 'var(--color-primary)' }}
+                                            >
+                                                <FaFacebook size={24} />
+                                            </a>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Columna Derecha: Acerca de Clicando */}
