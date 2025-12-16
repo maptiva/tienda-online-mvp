@@ -248,7 +248,8 @@ function LandingPage() {
                             className="font-semibold py-2 px-6 rounded-full transition-colors border-2"
                             style={{
                                 borderColor: 'var(--color-primary)',
-                                color: 'var(--color-primary)'
+                                color: 'var(--color-primary)',
+                                cursor: 'pointer'
                             }}
                         >
                             Ver todas las tiendas
@@ -263,7 +264,8 @@ function LandingPage() {
                         className="inline-block font-bold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
                         style={{
                             backgroundColor: 'var(--color-primary)',
-                            color: 'var(--color-primary-text)'
+                            color: 'var(--color-primary-text)',
+                            cursor: 'pointer'
                         }}
                         onMouseEnter={(e) => {
                             e.target.style.backgroundColor = 'var(--color-primary-darker)';
