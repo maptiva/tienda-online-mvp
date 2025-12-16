@@ -6,6 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../services/supabase';
 import StoreDirectory from '../components/StoreDirectory';
 import logoClicandoPng from '../assets/logo-clicando.png';
+import SEO from '../components/shared/SEO';
 
 function LandingPage() {
     const { theme, toggleTheme } = useTheme();
@@ -61,6 +62,18 @@ function LandingPage() {
         fetchFeaturedStores();
     }, []);
 
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Clicando",
+        "url": "https://clicando.com.ar", // Replace with real domain if different
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://clicando.com.ar/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    };
+
     return (
         <div
             className="min-h-screen flex items-center justify-center px-4 py-8 transition-colors duration-300 relative"
@@ -70,6 +83,15 @@ function LandingPage() {
                     : 'linear-gradient(to bottom right, #E8E2DB, #F5F1ED, #E8E2DB)'
             }}
         >
+            <SEO
+                title="Clicando - Tu Tienda Online Simple y Rápida"
+                description="Crea tu tienda online en minutos con Clicando. Catálogo digital, integración con WhatsApp y diseño profesional. Ideal para emprendedores."
+                name="Clicando"
+                type="website"
+                image={logoClicandoPng} // Ideally this should be a full URL, but this works for basics
+                url="https://clicando.com.ar"
+                schema={jsonLd}
+            />
             {/* Theme Toggle */}
             <button
                 onClick={toggleTheme}

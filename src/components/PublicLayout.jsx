@@ -6,6 +6,7 @@ import WhatsAppButton from './WhatsAppButton';
 import CartModal from './CartModal';
 import CategoriaList from './public/CategoriaList';
 import { useStoreByName } from '../hooks/useStoreByName';
+import SEO from './shared/SEO';
 
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -33,8 +34,25 @@ const PublicLayout = () => {
     );
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": store.store_name,
+    "image": store.logo_url,
+    "telephone": store.whatsapp_number,
+    "url": window.location.href
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      <SEO
+        title={store.store_name}
+        description={`Bienvenido a ${store.store_name}. Explora nuestro catálogo de productos.`}
+        name={store.store_name}
+        image={store.logo_url}
+        url={window.location.href}
+        schema={jsonLd}
+      />
       <Header storeData={store} onCartClick={() => setIsCartOpen(true)} />
       {isProductListPage && <CategoriaList userId={store.user_id} />}
       <main className="!mt-0 flex-grow">

@@ -40,6 +40,7 @@ INSTRUCCIONES*.md
 prompt*.txt
 solucion*.txt
 *.txt
+!public/robots.txt
 CART.txt
 Plan_SaaS.txt
 

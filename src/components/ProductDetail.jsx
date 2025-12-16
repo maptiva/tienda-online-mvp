@@ -5,6 +5,7 @@ import styles from './ProductDetail.module.css';
 import placeholder from '../assets/placeholder.jpg';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
+import SEO from './shared/SEO';
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -42,8 +43,30 @@ const ProductDetail = () => {
     addToCart(product, numQuantity);
   };
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.image_url, // Or full array if available
+    "description": product.description,
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "ARS", // Assuming ARS based on context
+      "price": product.price,
+      "availability": "https://schema.org/InStock" // Need actual logic if stock tracking exists
+    }
+  };
+
   return (
     <div className={styles.container}>
+      <SEO
+        title={product.name}
+        description={product.description}
+        image={imageUrl}
+        type="product"
+        url={window.location.href}
+        schema={jsonLd}
+      />
       <div className={styles.imageContainer}>
         {/* Imagen Principal */}
         <div className="w-full relative rounded-xl overflow-hidden mb-4 shadow-sm">
@@ -63,8 +86,8 @@ const ProductDetail = () => {
                 key={idx}
                 onClick={() => setSelectedImage(img)}
                 className={`flex justify-center items-center aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${displayImage === img
-                    ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20 transform scale-95'
-                    : 'border-transparent hover:border-gray-300'
+                  ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20 transform scale-95'
+                  : 'border-transparent hover:border-gray-300'
                   }`}
               >
                 <img
