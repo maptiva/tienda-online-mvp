@@ -1,13 +1,25 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
+import { useProductStore } from '../store/useProductStore';
 
 export const useProductById = (productId) => {
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { findProduct } = useProductStore();
+  const cachedProduct = findProduct(productId);
+
+  const [product, setProduct] = useState(cachedProduct || null);
+  const [loading, setLoading] = useState(!cachedProduct);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!productId) return;
+
+    // Si ya lo tenemos en cache, actualizamos el estado (por si acaso cambió productId) y evitamos fetch
+    if (cachedProduct) {
+      setProduct(cachedProduct);
+      setLoading(false);
+      // Podríamos hacer un fetch silencioso aquí si quisiéramos revalidar
+      return;
+    }
 
     const fetchProduct = async () => {
       try {
@@ -16,7 +28,7 @@ export const useProductById = (productId) => {
           .from('products')
           .select('*')
           .eq('id', productId)
-          .single(); // .single() es importante para obtener un solo objeto en lugar de un array
+          .single();
 
         if (error) {
           throw error;
@@ -32,7 +44,7 @@ export const useProductById = (productId) => {
     };
 
     fetchProduct();
-  }, [productId]); // Se ejecuta cada vez que productId cambia
+  }, [productId, cachedProduct]);
 
   return { product, loading, error };
 };

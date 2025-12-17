@@ -32,7 +32,11 @@ const Header = ({ storeData, onCartClick }) => {
         <div className="flex items-center justify-between h-28">
 
           {/* Izquierda: Logo + Nombre */}
-          <Link to={`/${storeName}`} className="flex items-center gap-3 flex-1 min-w-0 mr-4">
+          <Link
+            to={`/${storeName}`}
+            className="flex items-center gap-3 flex-1 min-w-0 mr-4"
+            onClick={() => window.scrollTo(0, 0)}
+          >
             <img
               src={displayLogo}
               className="h-24 w-24 object-contain flex-shrink-0"
