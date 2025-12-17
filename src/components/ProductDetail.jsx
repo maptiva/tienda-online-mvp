@@ -16,15 +16,27 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   if (loading) {
-    return <p className={styles.loading}>Cargando producto...</p>;
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <p className={styles.loading}>Cargando producto...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <p className={styles.error}>Error al cargar el producto: {error}</p>;
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <p className={styles.error}>Error al cargar el producto: {error}</p>
+      </div>
+    );
   }
 
   if (!product) {
-    return <p>Producto no encontrado.</p>;
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <p>Producto no encontrado.</p>
+      </div>
+    );
   }
 
   const imageUrl = product.image_url || placeholder;
@@ -58,7 +70,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} min-h-[80vh]`}>
       <SEO
         title={product.name}
         description={product.description}
