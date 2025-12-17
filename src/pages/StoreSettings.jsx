@@ -18,7 +18,6 @@ function StoreSettings() {
     instagram_url: '',
     facebook_url: '',
     whatsapp_number: '',
-    whatsapp_number: '',
     whatsapp_message: 'Hola, estoy interesado en sus productos.',
     latitude: null, // New field
     longitude: null, // New field
