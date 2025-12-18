@@ -512,9 +512,11 @@ const ExploreMap = () => {
                 .leaflet-popup-content-wrapper {
                     border-radius: 16px;
                     padding: 4px;
+                    background: var(--color-surface);
+                    color: var(--color-text-main);
                 }
-                .leaflet-popup-tip-container {
-                    display: none;
+                .leaflet-popup-tip {
+                    background: var(--color-surface);
                 }
             `}</style>
         </div>
