@@ -207,8 +207,8 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                     to="/mapa"
                                     className='font-bold py-2 px-4 rounded-lg text-sm transition-transform hover:scale-105 inline-flex items-center gap-2'
                                     style={{
-                                        backgroundColor: '#2563eb', // Blue-600
-                                        color: '#ffffff'
+                                        backgroundColor: 'var(--color-primary)',
+                                        color: 'var(--color-primary-text)'
                                     }}
                                 >
                                     <IoMap size={16} /> Explorar Mapa

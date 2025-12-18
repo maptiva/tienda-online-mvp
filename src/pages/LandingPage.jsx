@@ -299,7 +299,11 @@ function LandingPage() {
                             </div>
                             <Link
                                 to="/mapa"
-                                className="whitespace-nowrap font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg bg-blue-600 text-white"
+                                className="whitespace-nowrap font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                                style={{
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'var(--color-primary-text)'
+                                }}
                             >
                                 Abrir Mapa Interactivo
                             </Link>
