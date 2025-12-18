@@ -139,7 +139,7 @@ const ExploreMap = () => {
     if (loading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa...</div>;
 
     const StoreList = ({ className = "" }) => (
-        <div className={`flex flex-col h-full ${className}`} style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className={`flex flex-col min-h-0 ${className}`} style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="p-4 border-b flex justify-between items-center sticky top-0 z-10" style={{ backgroundColor: 'var(--color-background-light)', borderBottomColor: 'var(--color-border)' }}>
                 <div className="flex flex-col">
                     <h2 className="font-bold text-lg" style={{ color: 'var(--color-text-main)' }}>{filteredStores.length} Comercios</h2>
@@ -155,7 +155,7 @@ const ExploreMap = () => {
                     </button>
                 )}
             </div>
-            <div className="divide-y overflow-y-auto pb-24">
+            <div className="flex-1 divide-y overflow-y-auto pb-24">
                 {filteredStores.map(store => {
                     const meta = categoryMeta[store.category] || categoryMeta['Default'];
                     return (
@@ -375,7 +375,7 @@ const ExploreMap = () => {
                     </div>
                 </div>
 
-                <StoreList />
+                <StoreList className="flex-1" />
             </aside>
 
             {/* Main Content Area */}
@@ -463,7 +463,7 @@ const ExploreMap = () => {
                 {/* Mobile Store List View */}
                 {viewMode === 'list' && (
                     <div className="absolute inset-0 z-[1100] md:hidden bg-white animate-fade-in">
-                        <StoreList />
+                        <StoreList className="h-full" />
                     </div>
                 )}
 
