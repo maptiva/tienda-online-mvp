@@ -162,29 +162,33 @@ const ExploreMap = () => {
                                         alt={store.store_name}
                                         className="w-14 h-14 rounded-full object-contain border border-gray-100 bg-white shadow-sm flex-shrink-0"
                                     />
-                                    {store.is_demo && (
-                                        <div className="absolute -top-1 -right-1 bg-yellow-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded-md border-2 border-white shadow-sm">
-                                            DEMO
-                                        </div>
-                                    )}
                                 </div>
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <h3 className="font-bold text-gray-900 truncate text-base">{store.store_name}</h3>
-                                        {store.coming_soon && (
-                                            <span className="bg-red-50 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-red-100">
-                                                PRÓXIMAMENTE
-                                            </span>
-                                        )}
+                                <div className="min-w-0 flex-1 flex flex-col min-h-[56px] justify-between">
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 truncate text-base leading-tight mb-0.5">{store.store_name}</h3>
+                                        <p className="text-xs text-gray-400 truncate">{store.address}</p>
                                     </div>
-                                    <p className="text-xs text-gray-400 truncate mb-2">{store.address}</p>
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-50 text-gray-500 border border-gray-100 flex items-center gap-1 uppercase tracking-tight">
-                                            {meta.emoji} {store.category || 'Tienda'}
-                                        </span>
-                                        <span className="text-[10px] text-blue-500 font-bold uppercase tracking-wider">
-                                            {store.city}
-                                        </span>
+                                    <div className="flex items-end justify-between mt-1">
+                                        <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-50 text-gray-500 border border-gray-100 flex items-center gap-1 uppercase tracking-tighter truncate">
+                                                {meta.emoji} {store.category || 'Tienda'}
+                                            </span>
+                                            <span className="text-[10px] text-blue-500 font-bold uppercase tracking-tighter truncate">
+                                                {store.city}
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-1 flex-shrink-0 ml-1">
+                                            {store.is_demo && (
+                                                <span className="bg-yellow-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">
+                                                    DEMO
+                                                </span>
+                                            )}
+                                            {store.coming_soon && (
+                                                <span className="bg-red-50 text-red-600 text-[9px] font-black px-1.5 py-0.5 rounded border border-red-100 shadow-sm">
+                                                    PRÓXIMAMENTE
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -384,7 +388,7 @@ const ExploreMap = () => {
 
                 {/* Mobile Store List View */}
                 {viewMode === 'list' && (
-                    <div className="absolute inset-0 z-[500] md:hidden bg-white animate-fade-in">
+                    <div className="absolute inset-0 z-[1100] md:hidden bg-white animate-fade-in">
                         <StoreList />
                     </div>
                 )}
