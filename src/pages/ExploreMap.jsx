@@ -455,7 +455,7 @@ const ExploreMap = () => {
                 <div className="h-full w-full grayscale-[0.1]">
                     <MapContainer
                         center={[-30.75, -57.98]}
-                        zoom={13}
+                        zoom={14}
                         zoomControl={false}
                         style={{ height: '100%', width: '100%' }}
                     >
