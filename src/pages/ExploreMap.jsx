@@ -54,15 +54,24 @@ const MapRecenter = ({ lat, lng }) => {
 };
 import Header from '../components/Header'; // Opcional, o un header simplificado
 
-// Iconos por categoría (Estilo Marcador de Color)
+// Mapeo detallado de rubros a colores e iconos
+const categoryMeta = {
+    'Comida': { color: 'orange', emoji: '🍔', marker: 'orange' },
+    'Gastronomía': { color: 'orange', emoji: '🍔', marker: 'orange' },
+    'Ropa': { color: 'violet', emoji: '👕', marker: 'violet' },
+    'Indumentaria': { color: 'violet', emoji: '👕', marker: 'violet' },
+    'Almacén': { color: 'green', emoji: '🛒', marker: 'green' },
+    'Supermercado': { color: 'green', emoji: '🛒', marker: 'green' },
+    'Bazar': { color: 'yellow', emoji: '🏠', marker: 'yellow' },
+    'Hogar': { color: 'yellow', emoji: '🏠', marker: 'yellow' },
+    'Servicios': { color: 'blue', emoji: '🛠️', marker: 'blue' },
+    'Electrónica': { color: 'blue', emoji: '💻', marker: 'blue' },
+    'Default': { color: 'gray', emoji: '🏪', marker: 'blue' }
+};
+
 const getCategoryIcon = (category) => {
-    const iconUrl = {
-        'Comida': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png',
-        'Ropa': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
-        'Almacén': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-        'Bazar': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
-        'Servicios': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'
-    }[category || ''] || 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png';
+    const meta = categoryMeta[category] || categoryMeta['Default'];
+    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${meta.marker}.png`;
 
     return new L.Icon({
         iconUrl,
@@ -139,7 +148,11 @@ const ExploreMap = () => {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                         <option value="">Rubros (Todos)</option>
-                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        {categories.map(cat => (
+                            <option key={cat} value={cat}>
+                                {(categoryMeta[cat] || categoryMeta['Default']).emoji} {cat}
+                            </option>
+                        ))}
                     </select>
 
                     <select
@@ -162,34 +175,49 @@ const ExploreMap = () => {
                     </div>
 
                     <div className="divide-y">
-                        {filteredStores.map(store => (
-                            <div
-                                key={store.id}
-                                className={`p-4 cursor-pointer hover:bg-blue-50 transition-colors ${selectedStore?.id === store.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
-                                onClick={() => setSelectedStore(store)}
-                            >
-                                <div className="flex gap-4">
-                                    <img
-                                        src={store.logo_url || 'https://via.placeholder.com/60'}
-                                        alt={store.store_name}
-                                        className="w-12 h-12 rounded-full object-contain border bg-white"
-                                    />
-                                    <div className="min-w-0">
-                                        <h3 className="font-bold text-gray-900 truncate">{store.store_name}</h3>
-                                        <p className="text-sm text-gray-500 truncate">{store.address}</p>
-                                        <p className="text-xs text-blue-600 mt-1 font-medium">{store.city || 'Ubicación no especificada'}</p>
+                        {filteredStores.map(store => {
+                            const meta = categoryMeta[store.category] || categoryMeta['Default'];
+                            return (
+                                <div
+                                    key={store.id}
+                                    className={`p-4 cursor-pointer hover:bg-blue-50 transition-colors ${selectedStore?.id === store.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
+                                    onClick={() => setSelectedStore(store)}
+                                >
+                                    <div className="flex gap-4">
+                                        <div className="relative">
+                                            <img
+                                                src={store.logo_url || 'https://via.placeholder.com/60'}
+                                                alt={store.store_name}
+                                                className="w-12 h-12 rounded-full object-contain border bg-white shadow-sm"
+                                            />
+                                            <span className="absolute -bottom-1 -right-1 bg-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-sm border">
+                                                {meta.emoji}
+                                            </span>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <h3 className="font-bold text-gray-900 truncate">{store.store_name}</h3>
+                                            <p className="text-sm text-gray-500 truncate">{store.address}</p>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                                                    {meta.emoji} {store.category || 'Tienda'}
+                                                </span>
+                                                <span className="text-xs text-blue-600 font-medium">
+                                                    {store.city}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-3 flex gap-2">
+                                        <Link
+                                            to={`/${store.store_slug}`}
+                                            className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700 shadow-sm"
+                                        >
+                                            Ver Catálogo
+                                        </Link>
                                     </div>
                                 </div>
-                                <div className="mt-3 flex gap-2">
-                                    <Link
-                                        to={`/${store.store_slug}`}
-                                        className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700"
-                                    >
-                                        Ver Catálogo
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </aside>
 
