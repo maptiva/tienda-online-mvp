@@ -148,8 +148,9 @@ const ExploreMap = () => {
                     return (
                         <div
                             key={store.id}
-                            className={`p-4 transition-colors ${store.coming_soon ? 'opacity-80 grayscale-[0.3]' : 'cursor-pointer hover:bg-blue-50'} ${selectedStore?.id === store.id ? 'bg-blue-50 border-l-4 border-blue-500 shadow-inner' : ''}`}
+                            className={`p-4 transition-colors ${store.coming_soon ? 'opacity-60 cursor-default' : 'cursor-pointer hover:bg-blue-50'} ${selectedStore?.id === store.id ? 'bg-blue-50 border-l-4 border-blue-500 shadow-inner' : ''}`}
                             onClick={() => {
+                                if (store.coming_soon) return; // No clickeable si es próximamente
                                 setSelectedStore(store);
                                 if (window.innerWidth < 768) setViewMode('map');
                             }}
