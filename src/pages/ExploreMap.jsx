@@ -186,17 +186,17 @@ const ExploreMap = () => {
                                     className={`p-4 cursor-pointer hover:bg-blue-50 transition-colors ${selectedStore?.id === store.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
                                     onClick={() => setSelectedStore(store)}
                                 >
-                                    <div className="flex gap-4">
+                                    <div className="flex items-start gap-4">
                                         <img
                                             src={store.logo_url || 'https://via.placeholder.com/60'}
                                             alt={store.store_name}
-                                            className="w-12 h-12 rounded-full object-contain border bg-white shadow-sm"
+                                            className="w-16 h-16 rounded-full object-contain border bg-white shadow-sm flex-shrink-0 mt-1.5"
                                         />
-                                        <div className="min-w-0">
-                                            <h3 className="font-bold text-gray-900 truncate">{store.store_name}</h3>
+                                        <div className="min-w-0 flex-1 py-0.5">
+                                            <h3 className="font-bold text-gray-900 truncate text-lg leading-tight">{store.store_name}</h3>
                                             <p className="text-sm text-gray-500 truncate">{store.address}</p>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 flex items-center gap-1">
                                                     {meta.emoji} {store.category || 'Tienda'}
                                                 </span>
                                                 <span className="text-xs text-blue-600 font-medium">
