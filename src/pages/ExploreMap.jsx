@@ -29,12 +29,23 @@ const StoreMarker = ({ store, isSelected, onSelect }) => {
                 <div className="text-center p-1">
                     <img src={store.logo_url} className="h-10 mx-auto mb-2" alt="" />
                     <p className="font-bold">{store.store_name}</p>
-                    <Link
-                        to={`/${store.store_slug}`}
-                        className="text-blue-600 text-xs font-bold block mt-2"
-                    >
-                        Visitar Tienda →
-                    </Link>
+
+                    {store.is_demo && (
+                        <span className="text-[10px] bg-yellow-400 text-black px-2 mt-1 rounded font-bold inline-block">DEMO</span>
+                    )}
+
+                    {store.coming_soon ? (
+                        <div className="text-gray-400 text-xs font-bold mt-2 py-1 px-3 bg-gray-100 rounded-lg border border-gray-200">
+                            PRÓXIMAMENTE
+                        </div>
+                    ) : (
+                        <Link
+                            to={`/${store.store_slug}`}
+                            className="text-blue-600 text-xs font-bold block mt-2 hover:underline"
+                        >
+                            Visitar Tienda →
+                        </Link>
+                    )}
                 </div>
             </Popup>
         </Marker>
@@ -113,44 +124,64 @@ const ExploreMap = () => {
         }
     }, [selectedCity]);
 
-    if (loading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa de tiendas...</div>;
+    if (loading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa...</div>;
 
     const StoreList = ({ className = "" }) => (
         <div className={`flex flex-col h-full bg-white ${className}`}>
             <div className="p-4 border-b bg-gray-50 flex justify-between items-center sticky top-0 z-10">
-                <h2 className="font-bold text-gray-700">{filteredStores.length} Comercios encontrados</h2>
+                <div className="flex flex-col">
+                    <h2 className="font-bold text-gray-800 text-lg">{filteredStores.length} Comercios</h2>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Toca para ver en el mapa</p>
+                </div>
                 {viewMode === 'list' && (
-                    <button onClick={() => setViewMode('map')} className="md:hidden p-2 text-gray-500">
-                        <FaTimes />
+                    <button
+                        onClick={() => setViewMode('map')}
+                        className="md:hidden flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg active:scale-95 transition-all"
+                    >
+                        <FaMap /> Volver
                     </button>
                 )}
             </div>
-            <div className="divide-y overflow-y-auto">
+            <div className="divide-y overflow-y-auto pb-24">
                 {filteredStores.map(store => {
                     const meta = categoryMeta[store.category] || categoryMeta['Default'];
                     return (
                         <div
                             key={store.id}
-                            className={`p-4 cursor-pointer hover:bg-blue-50 transition-colors ${selectedStore?.id === store.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
+                            className={`p-4 transition-colors ${store.coming_soon ? 'opacity-80 grayscale-[0.3]' : 'cursor-pointer hover:bg-blue-50'} ${selectedStore?.id === store.id ? 'bg-blue-50 border-l-4 border-blue-500 shadow-inner' : ''}`}
                             onClick={() => {
                                 setSelectedStore(store);
                                 if (window.innerWidth < 768) setViewMode('map');
                             }}
                         >
                             <div className="flex items-start gap-4">
-                                <img
-                                    src={store.logo_url || 'https://via.placeholder.com/60'}
-                                    alt={store.store_name}
-                                    className="w-14 h-14 rounded-full object-contain border bg-white shadow-sm flex-shrink-0"
-                                />
+                                <div className="relative">
+                                    <img
+                                        src={store.logo_url || 'https://via.placeholder.com/60'}
+                                        alt={store.store_name}
+                                        className="w-14 h-14 rounded-full object-contain border border-gray-100 bg-white shadow-sm flex-shrink-0"
+                                    />
+                                    {store.is_demo && (
+                                        <div className="absolute -top-1 -right-1 bg-yellow-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded-md border-2 border-white shadow-sm">
+                                            DEMO
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="min-w-0 flex-1">
-                                    <h3 className="font-bold text-gray-900 truncate text-base mb-1">{store.store_name}</h3>
-                                    <p className="text-xs text-gray-500 truncate mb-2">{store.address}</p>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <h3 className="font-bold text-gray-900 truncate text-base">{store.store_name}</h3>
+                                        {store.coming_soon && (
+                                            <span className="bg-red-50 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-red-100">
+                                                PRÓXIMAMENTE
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-gray-400 truncate mb-2">{store.address}</p>
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 flex items-center gap-1 uppercase tracking-tight">
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-50 text-gray-500 border border-gray-100 flex items-center gap-1 uppercase tracking-tight">
                                             {meta.emoji} {store.category || 'Tienda'}
                                         </span>
-                                        <span className="text-[10px] text-blue-600 font-bold uppercase">
+                                        <span className="text-[10px] text-blue-500 font-bold uppercase tracking-wider">
                                             {store.city}
                                         </span>
                                     </div>
@@ -160,8 +191,19 @@ const ExploreMap = () => {
                     );
                 })}
                 {filteredStores.length === 0 && (
-                    <div className="p-8 text-center text-gray-500">
-                        No se encontraron tiendas con esos filtros.
+                    <div className="p-12 text-center">
+                        <div className="text-4xl mb-4">🔍</div>
+                        <p className="text-gray-500 font-medium">No encontramos tiendas con esos filtros.</p>
+                        <button
+                            onClick={() => {
+                                setSelectedCategory('');
+                                setSelectedCity('');
+                                setSearchTerm('');
+                            }}
+                            className="mt-4 text-blue-600 text-sm font-bold underline"
+                        >
+                            Limpiar todos los filtros
+                        </button>
                     </div>
                 )}
             </div>
