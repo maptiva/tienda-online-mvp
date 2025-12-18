@@ -4,8 +4,43 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { FaArrowLeft } from 'react-icons/fa';
+
+// Componente para manejar cada marcador individualmente con su popup
+const StoreMarker = ({ store, isSelected, onSelect }) => {
+    const markerRef = useRef(null);
+
+    useEffect(() => {
+        if (isSelected && markerRef.current) {
+            markerRef.current.openPopup();
+        }
+    }, [isSelected]);
+
+    return (
+        <Marker
+            position={[store.latitude, store.longitude]}
+            icon={getCategoryIcon(store.category)}
+            ref={markerRef}
+            eventHandlers={{
+                click: onSelect
+            }}
+        >
+            <Popup>
+                <div className="text-center p-1">
+                    <img src={store.logo_url} className="h-10 mx-auto mb-2" alt="" />
+                    <p className="font-bold">{store.store_name}</p>
+                    <Link
+                        to={`/${store.store_slug}`}
+                        className="text-blue-600 text-xs font-bold block mt-2"
+                    >
+                        Visitar Tienda →
+                    </Link>
+                </div>
+            </Popup>
+        </Marker>
+    );
+};
 
 // Componente para recentrar el mapa suavemente
 const MapRecenter = ({ lat, lng }) => {
@@ -173,27 +208,12 @@ const ExploreMap = () => {
                             <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} />
                         )}
                         {filteredStores.map(store => (
-                            <Marker
+                            <StoreMarker
                                 key={store.id}
-                                position={[store.latitude, store.longitude]}
-                                icon={getCategoryIcon(store.category)}
-                                eventHandlers={{
-                                    click: () => setSelectedStore(store)
-                                }}
-                            >
-                                <Popup>
-                                    <div className="text-center p-1">
-                                        <img src={store.logo_url} className="h-10 mx-auto mb-2" alt="" />
-                                        <p className="font-bold">{store.store_name}</p>
-                                        <Link
-                                            to={`/${store.store_slug}`}
-                                            className="text-blue-600 text-xs font-bold block mt-2"
-                                        >
-                                            Visitar Tienda →
-                                        </Link>
-                                    </div>
-                                </Popup>
-                            </Marker>
+                                store={store}
+                                isSelected={selectedStore?.id === store.id}
+                                onSelect={() => setSelectedStore(store)}
+                            />
                         ))}
                     </MapContainer>
                 </main>
