@@ -14,12 +14,17 @@ function ForgotPassword() {
 
         try {
             // Construir URL de redirección absoluta. 
-            // Usamos window.location.origin para que funcione en Vercel, Local o cualquier subdominio.
-            const baseUrl = window.location.origin;
-            const basePath = import.meta.env.BASE_URL.replace(/\/$/, ""); // Quitar slash final si existe
+            let baseUrl = window.location.origin;
+
+            // Si estamos en Vercel o en el dominio de producción, preferir siempre el dominio principal para la marca
+            if (baseUrl.includes('vercel.app') || baseUrl.includes('clicando.com.ar')) {
+                baseUrl = 'https://clicando.com.ar';
+            }
+
+            const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
             const redirectUrl = `${baseUrl}${basePath}/reset-password`;
 
-            console.log('Sending reset email with redirect to:', redirectUrl);
+            console.log('Solicitando reset con redirección a:', redirectUrl);
 
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: redirectUrl,
