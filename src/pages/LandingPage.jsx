@@ -279,6 +279,34 @@ function LandingPage() {
                     </div>
                 )}
 
+                {/* Mapa Interactivo CTA */}
+                <div className="mb-16">
+                    <div
+                        className="p-8 rounded-2xl shadow-xl overflow-hidden relative group cursor-pointer transition-all duration-500 hover:shadow-2xl"
+                        style={{
+                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                            border: `2px solid var(--color-primary)`
+                        }}
+                    >
+                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="text-left">
+                                <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: 'var(--color-text-main)' }}>
+                                    🗺️ ¿Buscás algo cerca?
+                                </h2>
+                                <p className="text-gray-500 max-w-md">
+                                    Explorá nuestro mapa interactivo y descubrí todos los comercios adheridos en tu ciudad.
+                                </p>
+                            </div>
+                            <Link
+                                to="/mapa"
+                                className="whitespace-nowrap font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg bg-blue-600 text-white"
+                            >
+                                Abrir Mapa Interactivo
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
                 {/* CTA */}
                 <div className="space-y-4">
                     <Link

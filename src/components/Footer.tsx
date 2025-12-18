@@ -9,6 +9,7 @@ import { FaInstagram, FaFacebook } from 'react-icons/fa'
 import { IoMap } from 'react-icons/io5'
 import StoreDirectory from './StoreDirectory'
 import StoreMap from './StoreMap' // Import StoreMap
+import { Link } from 'react-router-dom'
 
 interface FooterProps {
     storeName?: string;
@@ -107,6 +108,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                                     longitude={storeData.longitude}
                                                     storeName={displayName}
                                                     address={displayAddress}
+                                                    onPositionChange={() => { }}
                                                 />
                                             </div>
                                         )}
@@ -200,7 +202,17 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             </div>
 
                             {/* Botón Tiendas Clicando */}
-                            <div className='inline-block'>
+                            <div className='flex flex-wrap gap-2 md:justify-end'>
+                                <Link
+                                    to="/mapa"
+                                    className='font-bold py-2 px-4 rounded-lg text-sm transition-transform hover:scale-105 inline-flex items-center gap-2'
+                                    style={{
+                                        backgroundColor: '#2563eb', // Blue-600
+                                        color: '#ffffff'
+                                    }}
+                                >
+                                    <IoMap size={16} /> Explorar Mapa
+                                </Link>
                                 <button
                                     onClick={() => setShowDirectory(true)}
                                     className='font-bold py-2 px-4 rounded-lg text-sm transition-transform hover:scale-105'
@@ -209,7 +221,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                         color: 'var(--color-primary-text)'
                                     }}
                                 >
-                                    Ver Tiendas Clicando
+                                    Lista de Tiendas
                                 </button>
                             </div>
                         </div>

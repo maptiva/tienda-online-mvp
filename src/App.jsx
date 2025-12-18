@@ -17,6 +17,7 @@ import StoreSettings from './pages/StoreSettings';
 import LandingPage from './pages/LandingPage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import ExploreMap from './pages/ExploreMap';
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/mapa" element={<ExploreMap />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />

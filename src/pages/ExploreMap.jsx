@@ -1,0 +1,181 @@
+import React, { useState } from 'react';
+import { useStores } from '../hooks/useStores';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { FaArrowLeft } from 'react-icons/fa';
+
+// Componente para recentrar el mapa suavemente
+const MapRecenter = ({ lat, lng }) => {
+    const map = useMap();
+    useEffect(() => {
+        if (lat && lng) {
+            map.flyTo([lat, lng], 15, { duration: 1.5 });
+        }
+    }, [lat, lng, map]);
+    return null;
+};
+import Header from '../components/Header'; // Opcional, o un header simplificado
+
+// Fix para íconos de Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+const ExploreMap = () => {
+    const navigate = useNavigate();
+    const { stores, loading, error } = useStores();
+    const [selectedStore, setSelectedStore] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedCity, setSelectedCity] = useState('');
+
+    // Extraer opciones únicas para los filtros dinámicamente
+    const categories = [...new Set(stores.map(s => s.category).filter(Boolean))].sort();
+    const cities = [...new Set(stores.map(s => s.city).filter(Boolean))].sort();
+
+    const filteredStores = stores.filter(store => {
+        const matchesSearch = store.store_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            store.address?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = !selectedCategory || store.category === selectedCategory;
+        const matchesCity = !selectedCity || store.city === selectedCity;
+
+        return matchesSearch && matchesCategory && matchesCity;
+    });
+
+    if (loading) return <div className="h-screen flex items-center justify-center">Cargando mapa de tiendas...</div>;
+
+    return (
+        <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
+            {/* Header / Search bar superior (Estilo MODO) */}
+            <div className="bg-white border-b p-4 flex items-center justify-between shadow-sm z-10">
+                <div className="flex items-center gap-4 flex-1">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600"
+                        title="Volver"
+                    >
+                        <FaArrowLeft size={18} />
+                    </button>
+                    <Link to="/" className="text-2xl font-bold text-blue-600 mr-4">Clicando</Link>
+                    <div className="relative max-w-sm w-full">
+                        <input
+                            type="text"
+                            placeholder="Buscar tiendas..."
+                            className="w-full pl-4 pr-10 py-2 border rounded-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                <div className="flex gap-2">
+                    <select
+                        className="p-2 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                        <option value="">Rubros (Todos)</option>
+                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    </select>
+
+                    <select
+                        className="p-2 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={selectedCity}
+                        onChange={(e) => setSelectedCity(e.target.value)}
+                    >
+                        <option value="">Ciudades (Todas)</option>
+                        {cities.map(city => <option key={city} value={city}>{city}</option>)}
+                    </select>
+                </div>
+            </div>
+
+            <div className="flex flex-1 overflow-hidden relative">
+
+                {/* Sidebar Izquierda (Lista de tiendas) */}
+                <aside className="w-full md:w-[350px] lg:w-[400px] bg-white border-r overflow-y-auto z-10 shadow-lg">
+                    <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+                        <h2 className="font-bold text-gray-700">{filteredStores.length} Comercios encontrados</h2>
+                    </div>
+
+                    <div className="divide-y">
+                        {filteredStores.map(store => (
+                            <div
+                                key={store.id}
+                                className={`p-4 cursor-pointer hover:bg-blue-50 transition-colors ${selectedStore?.id === store.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}
+                                onClick={() => setSelectedStore(store)}
+                            >
+                                <div className="flex gap-4">
+                                    <img
+                                        src={store.logo_url || 'https://via.placeholder.com/60'}
+                                        alt={store.store_name}
+                                        className="w-12 h-12 rounded-full object-contain border bg-white"
+                                    />
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold text-gray-900 truncate">{store.store_name}</h3>
+                                        <p className="text-sm text-gray-500 truncate">{store.address}</p>
+                                        <p className="text-xs text-blue-600 mt-1 font-medium">{store.city || 'Ubicación no especificada'}</p>
+                                    </div>
+                                </div>
+                                <div className="mt-3 flex gap-2">
+                                    <Link
+                                        to={`/${store.store_slug}`}
+                                        className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-700"
+                                    >
+                                        Ver Catálogo
+                                    </Link>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </aside>
+
+                {/* Mapa (Derecha) */}
+                <main className="flex-1 relative z-0">
+                    <MapContainer
+                        center={[-34.6037, -58.3816]} // Default Buenos Aires
+                        zoom={12}
+                        style={{ height: '100%', width: '100%' }}
+                    >
+                        <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        {selectedStore && (
+                            <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} />
+                        )}
+                        {filteredStores.map(store => (
+                            <Marker
+                                key={store.id}
+                                position={[store.latitude, store.longitude]}
+                                eventHandlers={{
+                                    click: () => setSelectedStore(store)
+                                }}
+                            >
+                                <Popup>
+                                    <div className="text-center p-1">
+                                        <img src={store.logo_url} className="h-10 mx-auto mb-2" alt="" />
+                                        <p className="font-bold">{store.store_name}</p>
+                                        <Link
+                                            to={`/${store.store_slug}`}
+                                            className="text-blue-600 text-xs font-bold block mt-2"
+                                        >
+                                            Visitar Tienda →
+                                        </Link>
+                                    </div>
+                                </Popup>
+                            </Marker>
+                        ))}
+                    </MapContainer>
+                </main>
+            </div>
+        </div>
+    );
+};
+
+export default ExploreMap;
