@@ -13,12 +13,13 @@ function ForgotPassword() {
         setLoading(true);
 
         try {
-            // Construir URL correcta con base path
-            const baseUrl = window.location.origin; // http://localhost:5173
-            const basePath = import.meta.env.BASE_URL; // /tienda-online-mvp/
-            const redirectUrl = `${baseUrl}${basePath}reset-password`;
+            // Construir URL de redirección absoluta. 
+            // Usamos window.location.origin para que funcione en Vercel, Local o cualquier subdominio.
+            const baseUrl = window.location.origin;
+            const basePath = import.meta.env.BASE_URL.replace(/\/$/, ""); // Quitar slash final si existe
+            const redirectUrl = `${baseUrl}${basePath}/reset-password`;
 
-            console.log('Redirect URL:', redirectUrl); // Para debug
+            console.log('Sending reset email with redirect to:', redirectUrl);
 
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: redirectUrl,

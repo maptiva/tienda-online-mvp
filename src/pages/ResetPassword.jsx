@@ -13,17 +13,26 @@ function ResetPassword() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Verificar que hay una sesión de recuperación activa
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        const checkSession = async () => {
+            // Damos un pequeño respiro para que Supabase procese el hash de la URL
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            const { data: { session } } = await supabase.auth.getSession();
+
             if (!session) {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const errorDesc = hashParams.get('error_description');
+
                 Swal.fire({
                     icon: 'error',
-                    title: 'Link inválido',
-                    text: 'El link de recuperación es inválido o ha expirado'
+                    title: 'Enlace expirado',
+                    text: errorDesc?.replace(/\+/g, ' ') || 'El link de recuperación ha expirado. Por favor, solicita uno nuevo.'
                 });
                 navigate('/login');
             }
-        });
+        };
+
+        checkSession();
     }, [navigate]);
 
     const handleSubmit = async (e) => {

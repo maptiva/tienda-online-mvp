@@ -12,53 +12,49 @@ export const useProducts = (userId = null) => {
   const { productsCache, setProducts } = useProductStore();
   const cachedProducts = targetId ? productsCache[targetId] : null;
 
-  // Si ya tenemos datos en cache, NO mostramos loading (false). Si no, sí (true).
-  const [loading, setLoading] = useState(!cachedProducts);
+  // Estado de carga inicial: solo cargando si NO hay cache Y tenemos un ID objetivo
+  const [loading, setLoading] = useState(!cachedProducts && !!targetId);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Si no tenemos targetId (ej: logout y sin userId), no hacemos nada
-    if (!targetId) return;
+    // Si no tenemos targetId, no mostramos spinner
+    if (!targetId) {
+      setLoading(false);
+      return;
+    }
 
     const fetchProducts = async () => {
       try {
-        // Si no hay cache, activamos loading. Si hay, dejámoslo en false (UI instantánea)
+        // Solo activamos loading visual si realmente no hay nada que mostrar (ni cache)
         if (!cachedProducts) {
           setLoading(true);
         }
 
-        let query = supabase
+        const { data, error: fetchError } = await supabase
           .from('products')
           .select('*, categories(name)')
+          .eq('user_id', targetId)
           .order('id', { ascending: true });
 
-        query = query.eq('user_id', targetId);
+        if (fetchError) throw fetchError;
 
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        // Guardamos en el Store Global (Cache)
+        // Actualizamos el cache global (Store)
         setProducts(targetId, data || []);
+        setError(null);
       } catch (err) {
+        console.error("Error fetching products:", err);
         setError(err.message);
-        console.error("Error fetching products from Supabase:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    // Estrategia: "Cache-first".
-    // Si ya tenemos datos, no hacemos fetch de nuevo para evitar parpadeos.
-    // (Podríamos hacer fetch en background si quisiéramos actualizar, pero para scroll UX es mejor esto)
-    if (!cachedProducts) {
-      fetchProducts();
-    } else {
-      // Opcional: Podríamos re-validar en background aquí si quisiéramos datos frescos siempre.
-      // Por ahora, para evitar el salto de scroll, confiamos en el cache.
-    }
+    // Estrategia: "Sentido común"
+    // Siempre intentamos traer datos frescos en segundo plano para que el Admin 
+    // vea sus cambios, pero el usuario ve el cache instantáneamente.
+    fetchProducts();
 
-  }, [targetId, cachedProducts, setProducts]);
+  }, [targetId, setProducts]); // Quitamos cachedProducts de dependencias para evitar loops
 
   // Devolvemos lo del cache si existe, o array vacío
   return { products: cachedProducts || [], loading, error };
