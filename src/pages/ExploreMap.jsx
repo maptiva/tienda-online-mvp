@@ -19,13 +19,25 @@ const MapRecenter = ({ lat, lng }) => {
 };
 import Header from '../components/Header'; // Opcional, o un header simplificado
 
-// Fix para íconos de Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Iconos por categoría (Estilo Marcador de Color)
+const getCategoryIcon = (category) => {
+    const iconUrl = {
+        'Comida': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png',
+        'Ropa': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
+        'Almacén': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+        'Bazar': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
+        'Servicios': 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'
+    }[category || ''] || 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png';
+
+    return new L.Icon({
+        iconUrl,
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+};
 
 const ExploreMap = () => {
     const navigate = useNavigate();
@@ -47,6 +59,17 @@ const ExploreMap = () => {
 
         return matchesSearch && matchesCategory && matchesCity;
     });
+
+    // Efecto para centrar el mapa cuando se selecciona una ciudad
+    useEffect(() => {
+        if (selectedCity && filteredStores.length > 0) {
+            // Buscamos la primera tienda de esa ciudad para centrar
+            const cityStore = filteredStores.find(s => s.city === selectedCity);
+            if (cityStore) {
+                setSelectedStore(cityStore);
+            }
+        }
+    }, [selectedCity, filteredStores]);
 
     if (loading) return <div className="h-screen flex items-center justify-center">Cargando mapa de tiendas...</div>;
 
@@ -138,8 +161,8 @@ const ExploreMap = () => {
                 {/* Mapa (Derecha) */}
                 <main className="flex-1 relative z-0">
                     <MapContainer
-                        center={[-34.6037, -58.3816]} // Default Buenos Aires
-                        zoom={12}
+                        center={[-30.75, -57.98]} // Chajarí, Entre Ríos
+                        zoom={13}
                         style={{ height: '100%', width: '100%' }}
                     >
                         <TileLayer
@@ -153,6 +176,7 @@ const ExploreMap = () => {
                             <Marker
                                 key={store.id}
                                 position={[store.latitude, store.longitude]}
+                                icon={getCategoryIcon(store.category)}
                                 eventHandlers={{
                                     click: () => setSelectedStore(store)
                                 }}
