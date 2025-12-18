@@ -6,6 +6,7 @@ import L from 'leaflet';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaFilter, FaList, FaMap, FaSearch, FaTimes } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
+import logoClicandoPng from '../assets/logo-clicando.png';
 
 // Componente para manejar cada marcador individualmente con su popup
 const StoreMarker = ({ store, isSelected, onSelect }) => {
@@ -118,6 +119,14 @@ const ExploreMap = () => {
         const matchesCategory = !selectedCategory || store.category === selectedCategory;
         const matchesCity = !selectedCity || store.city === selectedCity;
         return matchesSearch && matchesCategory && matchesCity;
+    }).sort((a, b) => {
+        // Orden solicitado: 1. ACTIVAS, 2. DEMOS, 3. PROXIMAMENTE
+        const getWeight = (s) => {
+            if (s.coming_soon) return 3;
+            if (s.is_demo) return 2;
+            return 1; // Activas
+        };
+        return getWeight(a) - getWeight(b);
     });
 
     useEffect(() => {
@@ -307,11 +316,14 @@ const ExploreMap = () => {
 
             {/* Desktop Sidebar */}
             <aside className="hidden md:flex flex-col w-[350px] lg:w-[400px] border-r shadow-2xl z-20" style={{ backgroundColor: 'var(--color-surface)', borderRightColor: 'var(--color-border)' }}>
-                <div className="p-4 border-b flex items-center gap-4" style={{ backgroundColor: 'var(--color-surface)', borderBottomColor: 'var(--color-border)' }}>
+                <div className="p-4 border-b flex items-center gap-3" style={{ backgroundColor: 'var(--color-surface)', borderBottomColor: 'var(--color-border)' }}>
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors" style={{ color: 'var(--color-text-light)' }}>
                         <FaArrowLeft />
                     </button>
-                    <Link to="/" className="text-2xl font-black tracking-tighter" style={{ color: 'var(--color-primary)' }}>CLICANDO</Link>
+                    <div className="flex items-center gap-2">
+                        <img src={logoClicandoPng} alt="Logo" className="w-8 h-8 rounded-lg shadow-sm" />
+                        <Link to="/" className="text-2xl font-black tracking-tighter" style={{ color: 'var(--color-primary)' }}>Clicando</Link>
+                    </div>
                 </div>
 
                 <div className="p-4 space-y-3" style={{ backgroundColor: 'var(--color-surface)' }}>
@@ -320,12 +332,14 @@ const ExploreMap = () => {
                         <input
                             type="text"
                             placeholder="Buscar tiendas o rubros..."
-                            className="w-full pl-10 pr-4 py-3 border-2 rounded-xl outline-none transition-all text-sm"
+                            className="w-full pl-10 pr-4 py-3 border-2 rounded-xl outline-none transition-all text-sm focus:ring-2 focus:ring-[var(--color-primary)]/20"
                             style={{
-                                backgroundColor: 'var(--color-background-light)',
+                                backgroundColor: 'var(--color-surface)',
                                 borderColor: 'var(--color-border)',
                                 color: 'var(--color-text-main)'
                             }}
+                            onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                            onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -386,12 +400,14 @@ const ExploreMap = () => {
                             <input
                                 type="text"
                                 placeholder="Buscar en Clicando..."
-                                className="w-full pl-11 pr-4 py-3.5 shadow-xl rounded-2xl border outline-none text-sm font-medium"
+                                className="w-full pl-11 pr-4 py-3.5 shadow-xl rounded-2xl border outline-none text-sm font-medium transition-all"
                                 style={{
                                     backgroundColor: 'var(--color-surface)',
                                     borderColor: 'var(--color-border)',
                                     color: 'var(--color-text-main)'
                                 }}
+                                onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                                onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
