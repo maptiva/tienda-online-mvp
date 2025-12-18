@@ -13,7 +13,7 @@ export const useStores = () => {
 
         const { data, error } = await supabase
           .from('stores')
-          .select('id, store_name, logo_url, latitude, longitude, address, city, category, store_slug')
+          .select('id, store_name, logo_url, latitude, longitude, address, city, category, store_slug, is_demo, coming_soon, is_active')
           .not('latitude', 'is', null)
           .not('longitude', 'is', null);
 
