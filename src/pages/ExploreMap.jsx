@@ -62,6 +62,9 @@ const categoryMeta = {
     'Indumentaria': { color: 'violet', emoji: '👕', marker: 'violet' },
     'Almacén': { color: 'green', emoji: '🛒', marker: 'green' },
     'Supermercado': { color: 'green', emoji: '🛒', marker: 'green' },
+    'Veterinaria': { color: 'red', emoji: '🐾', marker: 'red' },
+    'Petshop': { color: 'red', emoji: '🐾', marker: 'red' },
+    'Juguetería': { color: 'gold', emoji: '🧸', marker: 'gold' },
     'Bazar': { color: 'yellow', emoji: '🏠', marker: 'yellow' },
     'Hogar': { color: 'yellow', emoji: '🏠', marker: 'yellow' },
     'Servicios': { color: 'blue', emoji: '🛠️', marker: 'blue' },
@@ -184,16 +187,11 @@ const ExploreMap = () => {
                                     onClick={() => setSelectedStore(store)}
                                 >
                                     <div className="flex gap-4">
-                                        <div className="relative">
-                                            <img
-                                                src={store.logo_url || 'https://via.placeholder.com/60'}
-                                                alt={store.store_name}
-                                                className="w-12 h-12 rounded-full object-contain border bg-white shadow-sm"
-                                            />
-                                            <span className="absolute -bottom-1 -right-1 bg-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-sm border">
-                                                {meta.emoji}
-                                            </span>
-                                        </div>
+                                        <img
+                                            src={store.logo_url || 'https://via.placeholder.com/60'}
+                                            alt={store.store_name}
+                                            className="w-12 h-12 rounded-full object-contain border bg-white shadow-sm"
+                                        />
                                         <div className="min-w-0">
                                             <h3 className="font-bold text-gray-900 truncate">{store.store_name}</h3>
                                             <p className="text-sm text-gray-500 truncate">{store.address}</p>
