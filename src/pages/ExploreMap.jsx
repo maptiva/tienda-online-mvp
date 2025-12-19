@@ -435,29 +435,30 @@ const ExploreMap = () => {
                 {/* Switcher & GPS Buttons (Mobile Only) */}
                 {!showFilters && (
                     <>
-                        {/* GPS Button - Re-positioned to bottom-right for ergonomics */}
-                        <div className="absolute bottom-14 right-4 z-[1200] md:hidden" style={{ bottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}>
-                            <button
-                                onClick={() => {
-                                    if (navigator.geolocation) {
-                                        navigator.geolocation.getCurrentPosition((position) => {
-                                            const { latitude, longitude } = position.coords;
-                                            setSelectedStore({ latitude, longitude, isUserLocation: true });
-                                        });
-                                    }
-                                }}
-                                className="p-4 rounded-full shadow-2xl active:scale-95 transition-transform border"
-                                style={{
-                                    backgroundColor: 'var(--color-text-main)',
-                                    color: 'var(--color-surface)',
-                                    borderColor: 'var(--color-border)'
-                                }}
-                                title="Mi ubicación"
-                            >
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="1" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="23"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line></svg>
-                            </button>
-                        </div>
-
+                        {/* GPS Button - Hidden when list view is active */}
+                        {viewMode === 'map' && (
+                            <div className="absolute bottom-14 right-4 z-[1200] md:hidden" style={{ bottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}>
+                                <button
+                                    onClick={() => {
+                                        if (navigator.geolocation) {
+                                            navigator.geolocation.getCurrentPosition((position) => {
+                                                const { latitude, longitude } = position.coords;
+                                                setSelectedStore({ latitude, longitude, isUserLocation: true });
+                                            });
+                                        }
+                                    }}
+                                    className="p-4 rounded-full shadow-2xl active:scale-95 transition-transform border"
+                                    style={{
+                                        backgroundColor: 'var(--color-text-main)',
+                                        color: 'var(--color-surface)',
+                                        borderColor: 'var(--color-border)'
+                                    }}
+                                    title="Mi ubicación"
+                                >
+                                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="1" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="23"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line></svg>
+                                </button>
+                            </div>
+                        )}
                         {/* Switcher Button - Back to bottom-center */}
                         <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-[1200] md:hidden" style={{ bottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}>
                             <button
