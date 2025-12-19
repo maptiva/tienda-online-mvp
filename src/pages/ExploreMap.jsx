@@ -436,7 +436,7 @@ const ExploreMap = () => {
                 {!showFilters && (
                     <>
                         {/* GPS Button - Re-positioned to bottom-right for ergonomics */}
-                        <div className="absolute bottom-20 right-4 z-[1200] md:hidden" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
+                        <div className="absolute bottom-14 right-4 z-[1200] md:hidden" style={{ bottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}>
                             <button
                                 onClick={() => {
                                     if (navigator.geolocation) {
