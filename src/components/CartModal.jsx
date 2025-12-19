@@ -111,8 +111,15 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
           </div>
         )}
 
-        <div className={styles.total}>
-          Total: ${total.toFixed(2)}
+        <div className={styles.totalSection}>
+          {cart.length > 0 && (
+            <button className={styles.clearAllButton} onClick={clearCart}>
+              Vaciar carrito
+            </button>
+          )}
+          <div className={styles.total}>
+            Total: ${total.toFixed(2)}
+          </div>
         </div>
 
         <button className={styles.whatsappButton} onClick={handleWhatsAppOrder}>Confirmar Pedido por WhatsApp</button>
