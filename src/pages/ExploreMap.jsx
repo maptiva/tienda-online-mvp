@@ -254,12 +254,14 @@ const ExploreMap = () => {
                             <div>
                                 <label className="block text-sm font-bold mb-2" style={{ color: 'var(--color-text-main)' }}>Rubro</label>
                                 <select
-                                    className="w-full p-4 border rounded-2xl outline-none"
+                                    className="w-full p-4 border-2 rounded-2xl outline-none transition-all focus:ring-2 focus:ring-[var(--color-primary)]/20"
                                     style={{
-                                        backgroundColor: 'var(--color-background-light)',
+                                        backgroundColor: 'var(--color-surface)',
                                         borderColor: 'var(--color-border)',
                                         color: 'var(--color-text-main)'
                                     }}
+                                    onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                                    onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                                     value={selectedCategory}
                                     onChange={(e) => {
                                         setSelectedCategory(e.target.value);
@@ -278,12 +280,14 @@ const ExploreMap = () => {
                             <div>
                                 <label className="block text-sm font-bold mb-2" style={{ color: 'var(--color-text-main)' }}>Ciudad</label>
                                 <select
-                                    className="w-full p-4 border rounded-2xl outline-none"
+                                    className="w-full p-4 border-2 rounded-2xl outline-none transition-all focus:ring-2 focus:ring-[var(--color-primary)]/20"
                                     style={{
-                                        backgroundColor: 'var(--color-background-light)',
+                                        backgroundColor: 'var(--color-surface)',
                                         borderColor: 'var(--color-border)',
                                         color: 'var(--color-text-main)'
                                     }}
+                                    onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                                    onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                                     value={selectedCity}
                                     onChange={(e) => {
                                         setSelectedCity(e.target.value);
@@ -426,39 +430,50 @@ const ExploreMap = () => {
                     </div>
                 </div>
 
-                {/* Bottom-Right Controls (Mobile Only) */}
-                <div className="absolute bottom-24 right-4 z-[400] flex flex-col gap-2 md:hidden">
-                    <button
-                        onClick={() => {
-                            if (navigator.geolocation) {
-                                navigator.geolocation.getCurrentPosition((position) => {
-                                    const { latitude, longitude } = position.coords;
-                                    setSelectedStore({ latitude, longitude, isUserLocation: true });
-                                });
-                            }
-                        }}
-                        className="p-4 shadow-2xl rounded-2xl border active:scale-95 transition-transform"
-                        style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text-main)' }}
-                        title="Mi ubicación"
-                    >
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="1" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="23"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line></svg>
-                    </button>
-                </div>
+                {/* Bottom-Right Controls (Mobile Only) - REMOVED, moved near switcher */}
 
-                {/* Switcher Button (Mobile Only) */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1200] md:hidden">
-                    <button
-                        onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
-                        className="px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm active:scale-95 transition-transform"
-                        style={{ backgroundColor: 'var(--color-text-main)', color: 'var(--color-surface)' }}
-                    >
-                        {viewMode === 'map' ? (
-                            <><FaList /> Ver Lista</>
-                        ) : (
-                            <><FaMap /> Ver Mapa</>
-                        )}
-                    </button>
-                </div>
+                {/* Switcher & GPS Buttons (Mobile Only) */}
+                {!showFilters && (
+                    <>
+                        {/* GPS Button - Re-positioned to bottom-right for ergonomics */}
+                        <div className="absolute bottom-6 right-4 z-[1200] md:hidden">
+                            <button
+                                onClick={() => {
+                                    if (navigator.geolocation) {
+                                        navigator.geolocation.getCurrentPosition((position) => {
+                                            const { latitude, longitude } = position.coords;
+                                            setSelectedStore({ latitude, longitude, isUserLocation: true });
+                                        });
+                                    }
+                                }}
+                                className="p-4 rounded-full shadow-2xl active:scale-95 transition-transform border"
+                                style={{
+                                    backgroundColor: 'var(--color-text-main)',
+                                    color: 'var(--color-surface)',
+                                    borderColor: 'var(--color-border)'
+                                }}
+                                title="Mi ubicación"
+                            >
+                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="1" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="23"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line></svg>
+                            </button>
+                        </div>
+
+                        {/* Switcher Button - Back to bottom-center */}
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1200] md:hidden">
+                            <button
+                                onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
+                                className="px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm active:scale-95 transition-transform"
+                                style={{ backgroundColor: 'var(--color-text-main)', color: 'var(--color-surface)' }}
+                            >
+                                {viewMode === 'map' ? (
+                                    <><FaList /> Ver Lista</>
+                                ) : (
+                                    <><FaMap /> Ver Mapa</>
+                                )}
+                            </button>
+                        </div>
+                    </>
+                )}
 
                 {/* Mobile Store List View */}
                 {viewMode === 'list' && (
