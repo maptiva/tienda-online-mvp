@@ -459,7 +459,7 @@ const ExploreMap = () => {
                         </div>
 
                         {/* Switcher Button - Back to bottom-center */}
-                        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-[1200] md:hidden" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
+                        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-[1200] md:hidden" style={{ bottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}>
                             <button
                                 onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
                                 className="px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm active:scale-95 transition-transform"
