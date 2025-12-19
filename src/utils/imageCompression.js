@@ -20,19 +20,7 @@ export async function compressImage(file, customOptions = {}) {
     const options = { ...defaultOptions, ...customOptions };
 
     try {
-        console.log('📸 Comprimiendo imagen:', {
-            nombre: file.name,
-            tamañoOriginal: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-            tipo: file.type
-        });
-
         const compressedFile = await imageCompression(file, options);
-
-        console.log('✅ Compresión exitosa:', {
-            tamañoComprimido: `${(compressedFile.size / 1024).toFixed(2)} KB`,
-            ahorro: `${((file.size - compressedFile.size) / file.size * 100).toFixed(1)}%`,
-            formato: compressedFile.type
-        });
 
         return compressedFile;
     } catch (error) {

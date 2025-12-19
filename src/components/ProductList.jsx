@@ -16,7 +16,6 @@ const ProductList = () => {
   const { products, loading, error } = useProducts(store?.user_id);
   const { searchTerm, setSearchTerm } = useSearchState();
 
-  console.log('Current theme:', theme); // Debug
 
 
   // Usamos useMemo para no recalcular el filtro en cada render, solo si los productos o el término de búsqueda cambian
