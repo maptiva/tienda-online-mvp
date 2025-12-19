@@ -237,7 +237,7 @@ const ExploreMap = () => {
     );
 
     return (
-        <div className="h-screen h-[100dvh] flex flex-col md:flex-row overflow-hidden font-sans" style={{ backgroundColor: 'var(--color-background-light)' }}>
+        <div className="h-screen flex flex-col md:flex-row overflow-hidden font-sans" style={{ backgroundColor: 'var(--color-background-light)', height: '100svh' }}>
 
             {/* Overlay Filters Modal (Mobile) */}
             {showFilters && (
@@ -436,7 +436,7 @@ const ExploreMap = () => {
                 {!showFilters && (
                     <>
                         {/* GPS Button - Re-positioned to bottom-right for ergonomics */}
-                        <div className="absolute bottom-10 right-4 z-[1200] md:hidden">
+                        <div className="absolute bottom-20 right-4 z-[1200] md:hidden" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
                             <button
                                 onClick={() => {
                                     if (navigator.geolocation) {
@@ -459,7 +459,7 @@ const ExploreMap = () => {
                         </div>
 
                         {/* Switcher Button - Back to bottom-center */}
-                        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[1200] md:hidden">
+                        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-[1200] md:hidden" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
                             <button
                                 onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
                                 className="px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm active:scale-95 transition-transform"
