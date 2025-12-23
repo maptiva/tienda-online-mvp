@@ -157,15 +157,30 @@ const Clients = () => {
                                     </td>
                                     <td className="px-8 py-6 text-center">
                                         {(() => {
-                                            // Determinar si el cliente tiene alguna suscripción activa en sus tiendas
-                                            const hasActiveSub = client.stores?.some(s =>
-                                                s.subscriptions?.some(sub => sub.status === 'ACTIVE')
+                                            const payments = client.payments || [];
+                                            if (payments.length === 0) return (
+                                                <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter bg-red-50 text-red-500 border border-red-100">
+                                                    ● Pago Pendiente
+                                                </span>
                                             );
 
+                                            const latestPayment = payments[0];
+                                            const pDate = new Date(latestPayment.created_at);
+                                            const today = new Date();
+
+                                            const isThisMonth = pDate.getMonth() === today.getMonth() && pDate.getFullYear() === today.getFullYear();
+
+                                            // Lógica de Gracia: si es antes del 11 y pagó el mes pasado
+                                            const lastMonth = today.getMonth() === 0 ? 11 : today.getMonth() - 1;
+                                            const lastMonthYear = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+                                            const isLastMonth = pDate.getMonth() === lastMonth && pDate.getFullYear() === lastMonthYear;
+
+                                            const isUpToDate = isThisMonth || (today.getDate() <= 10 && isLastMonth);
+
                                             return (
-                                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${hasActiveSub ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-500 border border-red-100'
+                                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${isUpToDate ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-500 border border-red-100'
                                                     }`}>
-                                                    {hasActiveSub ? '● Pago al Día' : '● Pago Pendiente'}
+                                                    {isUpToDate ? '● Pago al Día' : '● Pago Pendiente'}
                                                 </span>
                                             );
                                         })()}

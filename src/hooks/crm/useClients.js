@@ -41,10 +41,22 @@ export const useClients = () => {
                 throw storesError;
             }
 
+            // Luego traer todos los pagos para calcular estados comerciales
+            const { data: paymentsData, error: paymentsError } = await supabase
+                .from('payments')
+                .select('client_id, created_at, notes, amount')
+                .order('created_at', { ascending: false });
+
+            if (paymentsError) {
+                console.error('❌ Error trayendo pagos:', paymentsError);
+                throw paymentsError;
+            }
+
             // Hacer el JOIN manualmente en JavaScript
             const clientsWithStores = clientsData.map(client => ({
                 ...client,
-                stores: storesData.filter(store => store.client_id === client.id)
+                stores: storesData.filter(store => store.client_id === client.id),
+                payments: paymentsData.filter(p => p.client_id === client.id)
             }));
 
             setClients(clientsWithStores);
