@@ -11,10 +11,20 @@ import { useSearchState } from '../store/useSearchStore';
 
 const ProductList = () => {
   const { store } = useOutletContext();
-  const { categoryActive } = useCategory();
+  const { categoryActive, limpiarCategoryActive } = useCategory();
   const { theme } = useTheme();
   const { products, loading, error } = useProducts(store?.user_id);
   const { searchTerm, setSearchTerm } = useSearchState();
+
+  // Resetear filtros (Categoría -> Todos, Búsqueda -> '') al cambiar de tienda
+  React.useEffect(() => {
+    if (store?.user_id) {
+      // Solo limpiar si hay algo activo para evitar renders innecesarios
+      if (categoryActive) limpiarCategoryActive();
+      if (searchTerm) setSearchTerm('');
+    }
+    // Solo dependemos del ID de la tienda para el reseteo
+  }, [store?.user_id]);
 
 
 

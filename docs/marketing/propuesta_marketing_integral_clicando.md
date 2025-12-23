@@ -64,3 +64,91 @@ Tengas una tienda o seas un cliente buscando calidad cerca suyo, **Clicando es t
 2. **La del WhatsApp:** Que se vea el modal del carrito justo antes de enviar el mensaje.
 3. **La de Google:** Si buscas "Clicando Chajarí" o similar, captura el resultado.
 4. **La de Tienda:** Una captura de un producto con su descripción y precio claros.
+
+---
+
+## 📱 Estrategia de Mensajería Directa (WhatsApp e Instagram Stories)
+
+Aquí tienes plantillas para "picarle el bichito" a los comercios o recordarles los beneficios a los clientes.
+
+### 📈 1. Mensajes de Crecimiento & FOMO (Fear Of Missing Out)
+*Ideal para WhatsApp Status o Stories con fondo dinámico.*
+
+- **Opción A (Impacto):** "¿Aún no tenés tu tienda Clicando? 😱 ¡No te quedes atrás! El mapa comercial de la ciudad sigue creciendo y tu competencia ya puede estar ahí. 🚀"
+- **Opción B (Comunidad):** "¡Seguimos sumando! 🏗️ Más comercios se unen a la red de Clicando para agilizar sus ventas. ¿Querés que te encuentren en segundos? Súmate hoy."
+
+### 🛠️ 2. Foco en Funcionalidades: "WhatsApp Power"
+*Para enviar a prospectos o clientes que consultan.*
+
+- **Copy:** "¿Sabías que con Clicando los pedidos te llegan ordenaditos? ✅ 
+Tus clientes arman el carrito en tu catálogo digital y... ¡PUM! Te llega el mensaje de WhatsApp detallado con:
+📦 Producto
+💰 Precio
+🏠 Dirección de entrega
+**Chau desorden, hola ventas.**"
+
+### 🎨 3. Dibujando los Beneficios (Para Instagram Reels o Carrusel)
+
+- **Visual:** "El camino de una venta"
+    1. **Paso 1:** El cliente te busca en Google o el Mapa de Clicando. 🔍
+    2. **Paso 2:** Navega tu catálogo (lindo, rápido y fácil). 📱
+    3. **Paso 3:** Confirma el carrito. 🛒
+    4. **Paso 4:** Te llega el pedido DIRECTO a tu WhatsApp. 💬
+- **Cierre:** "Sin comisiones, sin intermediarios. Tu negocio, tus reglas."
+
+### 📍 4. Mensajes de "Sentido de Pertenencia"
+- **Copy:** "Clicando: El puente digital de [Tu Ciudad]. Potenciamos lo local, conectamos con lo real. 🤝✨"
+
+---
+
+## ⚡ Mensajes Listos para Usar (Copy-Paste)
+
+### 💬 Opción 1: Difusión WhatsApp (Explicativo y Amigable)
+*Usa este mensaje para enviarle a conocidos o comercios que quieras invitar.*
+
+"¡Hola! 👋 ¿Cómo va? Quería contarte algo que te puede servir un montón para tu negocio. 🚀
+
+Estoy impulsando **Clicando**, una plataforma pensada para que los comercios de acá tengan su propio **Catálogo Digital** integrado directamente con **WhatsApp**. 📲✨
+
+Es muy simple:
+📍 Te ubicamos en el **Mapa Interactivo** de la ciudad.
+🛒 Tus clientes navegan tus productos sin vueltas.
+💬 Los pedidos te llegan **listos y detallados** a tu WhatsApp. ¡Sin comisiones raras!
+🔍 Además, te ayudamos a que te encuentren más rápido en **Google**.
+
+[📸 *INSERTAR CAPTURA DEL MAPA CON PINS*]
+
+¿Te gustaría que te cuente cómo sumar tu tienda? ¡Es un toque! 
+Miralo acá: [LINK A TU WEB/DEMO] 🌍"
+
+---
+
+### 📸 Opción 2: Instagram Story / Post (Visual y Directo)
+*Acompaña cada párrafo con una imagen/video de la funcionalidad.*
+
+**Placa 1:** "¿Cansado de que te pidan el precio por privado 20 veces? 🤯"
+**Placa 2:** "Con Clicando tenés tu catálogo 24/7. El cliente elige, confirma y... [📸 *INSERTAR CAPTURA DE CARRITO*]"
+**Placa 3:** "¡Te llega el pedido directo al WhatsApp! 💬 Organizado y listo para despachar. ✅"
+**Placa 4:** "Súmate a la red comercial que no para de crecer. 🚀 Link en la bio."
+
+---
+
+### 🤝 Opción 3: El Pitch "Beneficio Total" (Para cerrar ventas)
+
+"¿Por qué Clicando? 🤔
+❌ Olvidate de las comisiones por venta.
+❌ Olvidate de pasar PDFs pesados que nadie mira.
+✅ **Eficiencia:** Pedidos claros, sin errores.
+✅ **Presencia:** Aparecé en Google y en el mapa local.
+✅ **Simplicidad:** Lo manejás vos desde el celu.
+
+[📸 *INSERTAR CAPTURA DE TIENDA DESDE EL CELULAR*]
+
+¡Escribime y activamos tu tienda hoy mismo! 📩🚀"
+
+---
+
+## 🔄 Próximos pasos de iteración
+- [ ] Definir el "Comercio de la Semana" para destacar en un post.
+- [ ] Grabar un mini-tutorial de "Cómo comprar en 3 clics".
+- [ ] Crear placas con testimonios (si ya tenemos comercios activos).
