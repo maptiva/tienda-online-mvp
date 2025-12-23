@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import './App.css';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
@@ -18,6 +18,12 @@ import LandingPage from './pages/LandingPage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ExploreMap from './pages/ExploreMap';
+
+// CRM & Security
+import SuperAdminRoute from './router/SuperAdminRoute';
+import CRMDashboard from './pages/admin/crm/Dashboard';
+import Clients from './pages/admin/crm/Clients';
+import Payments from './pages/admin/crm/Payments';
 
 
 function App() {
@@ -46,6 +52,13 @@ function App() {
           <Route path="settings" element={<StoreSettings />} />
           <Route path="new" element={<ProductForm />} />
           <Route path="edit/:productId" element={<ProductForm />} />
+
+          {/* CRM Routes - PROTECTED BY SUPER ADMIN ROUTE */}
+          <Route path="crm" element={<SuperAdminRoute><Outlet /></SuperAdminRoute>}>
+            <Route index element={<CRMDashboard />} />
+            <Route path="clients" element={<Clients />} />
+            <Route path="payments" element={<Payments />} />
+          </Route>
         </Route>
 
         <Route path='*' element={<Error404 />} />

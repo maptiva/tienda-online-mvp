@@ -3,10 +3,12 @@ import { BiLogOut } from 'react-icons/bi'
 import { MdShoppingCart } from 'react-icons/md'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { isSuperAdmin } from '../../utils/authRoles'
 
 export const AsideBar = () => {
     const navigate = useNavigate();
-    const { signOut } = useAuth();
+    const { signOut, user } = useAuth();
+    const isMaster = isSuperAdmin(user);
 
     const handleLogout = async () => {
         try {
@@ -35,6 +37,39 @@ export const AsideBar = () => {
                     <span role="img" aria-label="settings" style={{ marginRight: '8px' }}>⚙️</span>
                     Configuración
                 </NavLink>
+
+                {/* Súper Admin Portal (Visible solo para Alejandro) */}
+                {isMaster && (
+                    <div className="mt-8 pt-4 border-t border-gray-200 animate-fade-in">
+                        <p className="text-[10px] uppercase font-bold text-gray-400 mb-3 px-2 tracking-widest">
+                            👑 Portal Maestro
+                        </p>
+                        <div className="flex flex-col gap-2">
+                            <NavLink
+                                to={'/admin/crm'}
+                                end
+                                className={({ isActive }) => `flex items-center gap-2 p-2 rounded-lg transition-all ${isActive ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'}`}
+                            >
+                                <span className="text-lg">📊</span>
+                                <span className="text-sm font-medium">Dashboard CRM</span>
+                            </NavLink>
+                            <NavLink
+                                to={'/admin/crm/clients'}
+                                className={({ isActive }) => `flex items-center gap-2 p-2 rounded-lg transition-all ${isActive ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'}`}
+                            >
+                                <span className="text-lg">👥</span>
+                                <span className="text-sm font-medium">Gestión Clientes</span>
+                            </NavLink>
+                            <NavLink
+                                to={'/admin/crm/payments'}
+                                className={({ isActive }) => `flex items-center gap-2 p-2 rounded-lg transition-all ${isActive ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'}`}
+                            >
+                                <span className="text-lg">💰</span>
+                                <span className="text-sm font-medium">Pagos</span>
+                            </NavLink>
+                        </div>
+                    </div>
+                )}
 
 
                 <div className='mt-auto mb-2'>
