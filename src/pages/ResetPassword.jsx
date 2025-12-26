@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import Swal from 'sweetalert2';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 import styles from './Login.module.css';
+import logoClicando from '../assets/logo-clicando.png';
 
 function ResetPassword() {
     const [password, setPassword] = useState('');
@@ -89,71 +90,88 @@ function ResetPassword() {
 
     return (
         <div className={styles.loginContainer}>
-            <div className={styles.loginBox}>
-                <h1>Nueva Contraseña</h1>
-                <p style={{ marginBottom: '1.5rem', color: '#666', fontSize: '0.9rem' }}>
-                    Ingresa tu nueva contraseña
-                </p>
+            {/* Panel de Branding - Izquierda */}
+            <div className={styles.brandingPanel}>
+                <Link to="/" className={styles.backButton}>
+                    <FaArrowLeft /> Volver a Clicando
+                </Link>
+                <div className={styles.brandingContent}>
+                    <img src={logoClicando} alt="Clicando" className={styles.logo} />
+                    <h2 className={styles.tagline}>Tu catálogo digital con WhatsApp</h2>
+                    <p className={styles.subtitle}>Conecta con tus clientes de forma simple y efectiva</p>
+                </div>
+            </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="password">Nueva Contraseña</label>
-                        <div style={{ position: 'relative' }}>
+            {/* Panel de Formulario - Derecha */}
+            <div className={styles.formPanel}>
+                <div className={styles.formContainer}>
+                    <h1 className={styles.welcomeTitle}>Nueva Contraseña</h1>
+                    <p className={styles.welcomeSubtitle}>
+                        Ingresa tu nueva contraseña para tu cuenta
+                    </p>
+
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="password" className={styles.label}>Nueva Contraseña</label>
+                            <div className={styles.passwordWrapper}>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    id="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className={styles.input}
+                                    placeholder="Mínimo 6 caracteres"
+                                    required
+                                    minLength={6}
+                                    disabled={loading}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className={styles.togglePassword}
+                                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                    disabled={loading}
+                                >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="confirmPassword" className={styles.label}>Confirmar Contraseña</label>
                             <input
                                 type={showPassword ? "text" : "password"}
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                id="confirmPassword"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className={styles.input}
+                                placeholder="Repite la contraseña"
                                 required
                                 minLength={6}
-                                placeholder="Mínimo 6 caracteres"
-                                className="text-[#666]"
-                                style={{ paddingRight: '40px' }}
+                                disabled={loading}
                             />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                style={{
-                                    position: 'absolute',
-                                    right: '10px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    color: '#666',
-                                    fontSize: '18px',
-                                    padding: '5px'
-                                }}
-                                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                            >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
                         </div>
-                    </div>
 
-                    <div className={styles.formGroup}>
-                        <label htmlFor="confirmPassword">Confirmar Contraseña</label>
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            id="confirmPassword"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            minLength={6}
-                            placeholder="Repite la contraseña"
-                            className="text-[#666]"
-                        />
-                    </div>
+                        <button
+                            type="submit"
+                            className={styles.submitButton}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <span className={styles.spinner}></span>
+                                    Actualizando...
+                                </>
+                            ) : (
+                                'Cambiar Contraseña'
+                            )}
+                        </button>
+                    </form>
 
-                    <button
-                        type="submit"
-                        className={styles.loginButton}
-                        disabled={loading}
-                    >
-                        {loading ? 'Actualizando...' : 'Cambiar Contraseña'}
-                    </button>
-                </form>
+                    <Link to="/login" className={styles.forgotLink}>
+                        Volver al Login
+                    </Link>
+                </div>
             </div>
         </div>
     );
