@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import Swal from 'sweetalert2';
+import { FaArrowLeft } from 'react-icons/fa';
 import styles from './Login.module.css';
+import logoClicando from '../assets/logo-clicando.png';
 
 function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -53,48 +55,61 @@ function ForgotPassword() {
 
     return (
         <div className={styles.loginContainer}>
-            <div className={styles.loginBox}>
-                <h1>Recuperar Contraseña</h1>
-                <p style={{ marginBottom: '1.5rem', color: '#666', fontSize: '0.9rem' }}>
-                    Ingresa tu email y te enviaremos un link para restablecer tu contraseña
-                </p>
-
-                <form onSubmit={handleSubmit}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            placeholder="tu@email.com"
-                            className="text-[#666]"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className={styles.loginButton}
-                        disabled={loading}
-                    >
-                        {loading ? 'Enviando...' : 'Enviar Email'}
-                    </button>
-                </form>
-
-                <Link
-                    to="/login"
-                    style={{
-                        display: 'block',
-                        textAlign: 'center',
-                        marginTop: '1rem',
-                        color: '#ff6900',
-                        textDecoration: 'none',
-                        fontSize: '0.9rem'
-                    }}
-                >
-                    Volver al Login
+            {/* Panel de Branding - Izquierda */}
+            <div className={styles.brandingPanel}>
+                <Link to="/" className={styles.backButton}>
+                    <FaArrowLeft /> Volver a Clicando
                 </Link>
+                <div className={styles.brandingContent}>
+                    <img src={logoClicando} alt="Clicando" className={styles.logo} />
+                    <h2 className={styles.tagline}>Tu catálogo digital con WhatsApp</h2>
+                    <p className={styles.subtitle}>Conecta con tus clientes de forma simple y efectiva</p>
+                </div>
+            </div>
+
+            {/* Panel de Formulario - Derecha */}
+            <div className={styles.formPanel}>
+                <div className={styles.formContainer}>
+                    <h1 className={styles.welcomeTitle}>Recuperar Contraseña</h1>
+                    <p className={styles.welcomeSubtitle}>
+                        Ingresa tu email y te enviaremos un link para restablecer tu contraseña
+                    </p>
+
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="email" className={styles.label}>Correo Electrónico</label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className={styles.input}
+                                placeholder="tu@email.com"
+                                required
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            className={styles.submitButton}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <span className={styles.spinner}></span>
+                                    Enviando...
+                                </>
+                            ) : (
+                                'Enviar Email'
+                            )}
+                        </button>
+                    </form>
+
+                    <Link to="/login" className={styles.forgotLink}>
+                        Volver al Login
+                    </Link>
+                </div>
             </div>
         </div>
     );
