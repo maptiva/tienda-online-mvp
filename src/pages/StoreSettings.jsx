@@ -3,6 +3,7 @@ import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
 import { compressLogo } from '../utils/imageCompression';
+import { getStoragePath } from '../utils/storageUtils';
 import StoreMap from '../components/StoreMap'; // Import StoreMap component
 
 function StoreSettings() {
@@ -160,7 +161,24 @@ function StoreSettings() {
     if (!logoFile) return storeData.logo_url;
 
     try {
-      // Comprimir logo a WebP con calidad premium (90%)
+      // 1. Limpieza del logo antiguo si existe y es diferente al nuevo
+      if (storeData.logo_url) {
+        const oldPath = getStoragePath(storeData.logo_url, 'store-logos');
+        if (oldPath) {
+          console.log('[Storage] Intentando eliminar logo antiguo:', oldPath);
+          const { error: removeError } = await supabase.storage
+            .from('store-logos')
+            .remove([oldPath]);
+
+          if (removeError) {
+            console.warn('[Storage] No se pudo borrar el logo antiguo (podría no existir):', removeError);
+          } else {
+            console.log('[Storage] Logo antiguo eliminado con éxito.');
+          }
+        }
+      }
+
+      // 2. Comprimir logo a WebP con calidad premium (90%)
       const compressedFile = await compressLogo(logoFile);
 
       // Usar extensión .webp para el archivo comprimido

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { formConfig } from '../config/productFormConfig';
 import styles from './ProductForm.module.css';
 import { compressImage } from '../utils/imageCompression';
+import { getStoragePath } from '../utils/storageUtils';
 import Swal from 'sweetalert2';
 
 
@@ -25,6 +26,7 @@ function ProductForm() {
   const [galleryFiles, setGalleryFiles] = useState([]);
   const [galleryPreviews, setGalleryPreviews] = useState([]);
   const [existingGalleryImages, setExistingGalleryImages] = useState([]);
+  const [galleryImagesToDelete, setGalleryImagesToDelete] = useState([]);
 
   useEffect(() => {
     // Intentar recuperar datos guardados de localStorage
@@ -134,6 +136,8 @@ function ProductForm() {
 
   const removeGalleryImage = (index, isExisting) => {
     if (isExisting) {
+      const imageUrl = existingGalleryImages[index];
+      setGalleryImagesToDelete(prev => [...prev, imageUrl]);
       setExistingGalleryImages(prev => prev.filter((_, i) => i !== index));
       // Nota: La eliminación física del storage se hará al guardar para evitar errores si cancela
     } else {
@@ -210,13 +214,35 @@ function ProductForm() {
 
     finalFormData.gallery_images = newGalleryUrls;
 
-    // 3. Limpieza de imagen principal antigua
-    if (productId && newImageUrl && originalImageUrl) {
-      const urlParts = originalImageUrl.split('/product-images/');
-      if (urlParts.length > 1) {
-        const oldImagePath = urlParts[1];
-        await supabase.storage.from('product-images').remove([oldImagePath]);
+    // 3. Limpieza de imágenes en Storage
+    try {
+      // 3a. Limpiar imagen principal antigua si cambió
+      if (productId && newImageUrl && originalImageUrl) {
+        const oldImagePath = getStoragePath(originalImageUrl, 'product-images');
+        if (oldImagePath) {
+          console.log('[Storage] Intentando eliminar imagen principal antigua:', oldImagePath);
+          const { error: removeError } = await supabase.storage.from('product-images').remove([oldImagePath]);
+          if (removeError) console.warn('[Storage] Error al borrar imagen principal antigua:', removeError);
+          else console.log('[Storage] Imagen principal antigua eliminada.');
+        }
       }
+
+      // 3b. Limpiar imágenes de galería marcadas para borrar
+      if (galleryImagesToDelete.length > 0) {
+        const pathsToDelete = galleryImagesToDelete
+          .map(url => getStoragePath(url, 'product-images'))
+          .filter(Boolean);
+
+        if (pathsToDelete.length > 0) {
+          console.log('[Storage] Intentando eliminar imágenes de galería:', pathsToDelete);
+          const { error: galleryRemoveError } = await supabase.storage.from('product-images').remove(pathsToDelete);
+          if (galleryRemoveError) console.warn('[Storage] Error al borrar galería:', galleryRemoveError);
+          else console.log('[Storage] Imágenes de galería eliminadas con éxito.');
+        }
+      }
+    } catch (cleanupErr) {
+      console.warn('[Storage] Error no crítico durante la limpieza:', cleanupErr);
+      // No bloqueamos el flujo principal por errores de limpieza
     }
 
     try {
