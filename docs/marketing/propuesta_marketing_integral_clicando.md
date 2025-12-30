@@ -152,3 +152,77 @@ Miralo acá: [LINK A TU WEB/DEMO] 🌍"
 - [ ] Definir el "Comercio de la Semana" para destacar en un post.
 - [ ] Grabar un mini-tutorial de "Cómo comprar en 3 clics".
 - [ ] Crear placas con testimonios (si ya tenemos comercios activos).
+
+---
+
+## 📸 Lanzamiento en Instagram (Guía Paso a Paso)
+
+### 1. Configuración de la Cuenta
+
+**Opciones de Usuario (@):**
+- `@clicando.ar` (La más profesional y limpia).
+- `@clicando.chajari` (Ideal si queremos un arranque súper local y fuerte en SEO).
+- `@holaclicando` (Más amigable y cercano).
+
+**Biografía (Optimizada):**
+> **Clicando | Catálogo Digital & Mapa 📍**
+> 🚀 Transformamos el comercio local.
+> 💬 Pedidos directo a tu WhatsApp (¡Sin comisiones!).
+> 🔍 Tu negocio en el mapa y en Google.
+> 👇 Sumá tu tienda hoy mismo
+> [LINK EN BIO]
+
+**Foto de Perfil:** El logo de Clicando sobre fondo sólido (preferentemente el color principal de la marca o blanco/negro para que resalte).
+
+---
+
+### 2. La "Grilla de Lanzamiento" (Primeros 3 posteos)
+
+**Post 1: La Presentación (Impacto)**
+- **Imagen:** Una placa limpia con la palabra "LLEGAMOS" o "HOLA CHAJARÍ" y el logo.
+- **Copy:** "Clicando ya está en la calle. 🚀 Vinimos a conectar los mejores comercios con sus clientes de forma directa, fácil y digital. ¿Tenés un negocio? Es hora de que te encuentren. ¿Sos cliente? Es hora de comprar mejor. ¡Bienvenidos! 👋"
+
+**Post 2: El "¿Cómo funciona?" (Educativo)**
+- **Formato:** Reel o Carrusel de 3 pasos.
+- **Diapositiva 1:** "¿Cómo compro?"
+- **Diapositiva 2:** "Buscás en el mapa interactivo."
+- **Diapositiva 3:** "Armas tu carrito y lo mandás por WhatsApp."
+
+**Post 3: El Diferencial (Beneficio)**
+- **Imagen:** Captura de un celular mostrando lo lindo que queda un catálogo.
+- **Copy:** "Vender online no debería ser difícil ni caro. Con Clicando tenés tu catálogo profesional, visibilidad en Google y pedidos directos al WhatsApp. ✅ Sin intermediarios. ✅ Sin comisiones. ✅ 100% tuyo."
+
+---
+
+### 3. Guía de Hashtags (#) y Tags (@)
+
+**Hashtags Locales (Fundamentales):**
+`#Chajari #Federacion #EntreRios #ComercioLocal #EmprendedoresChajari`
+
+**Hashtags de Nicho (Para el algoritmo):**
+`#VentasPorWhatsApp #CatalogoDigital #TiendaOnline #MarketingLocal #EcomerceArgentina`
+
+**Tips para novatos:**
+- **Etiquetar ubicación:** En cada post, SIEMPRE poné la ubicación "Chajarí" o la ciudad que corresponda. Eso te hace aparecer en las búsquedas locales.
+- **Stories:** Subí contenido todos los días (aunque sea una captura de una tienda nueva) para mantener la cuenta activa.
+
+---
+
+### 📱 Tutorial: Cómo crear la cuenta de Clicando desde tu celular
+
+¡No necesitás salir de tu sesión actual! Instagram permite tener varias cuentas y saltar de una a otra. Seguí estos pasos:
+
+1.  **Abrí Instagram** en tu teléfono (donde ya tenés tu cuenta de Alejandro).
+2.  Andá a tu perfil (el ícono de tu foto abajo a la derecha).
+3.  **Mantené apretada** tu foto de perfil (abajo a la derecha) durante un segundo. Se va a abrir un menú desplegable.
+4.  Seleccioná **"Agregar cuenta"** (Add Account).
+5.  Elegí **"Crear cuenta nueva"** (Create New Account).
+6.  **Elegí el nombre de usuario (@):** Te recomiendo probar con `clicando.ar` primero.
+7.  **Método de registro:** Usá el email de Clicando (o el que uses para el proyecto). No uses tu número de teléfono personal si ya está vinculado a tu cuenta de Ale, así quedan bien separadas.
+8.  **Completar perfil:** Cuando te pida "Sincronizar contactos" o "Buscar amigos de Facebook", dale a **Omitir (Skip)**. Esto es una cuenta de negocio, no personal.
+9.  **¡Listo!** Ahora, para cambiar entre tu cuenta de Ale y la de Clicando, solo tenés que hacer **doble toque** rápido en el ícono de tu foto abajo a la derecha.
+
+---
+
+### 💡 Tip de Configuración Inicial
+Una vez creada, andá a **Configuración y Privacidad** > **Tipo de cuenta y herramientas** > **Cambiar a cuenta profesional**. Elegí la categoría "Emprendedor" o "Sitio Web de Comercio Electrónico". Esto te va a dar las estadísticas para ver cuánta gente ve tus posts.
