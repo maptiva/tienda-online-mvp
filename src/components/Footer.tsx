@@ -5,8 +5,8 @@ import { legalTexts, footerDisclaimer } from '../constants/legalTexts'
 import { IoLocation } from 'react-icons/io5' // Filled icon
 import { IoCall } from 'react-icons/io5' // Filled icon
 import { IoTime } from 'react-icons/io5' // Filled icon
-import { FaInstagram, FaFacebook } from 'react-icons/fa'
-import { IoMap } from 'react-icons/io5'
+import { IoMap, IoStorefront } from 'react-icons/io5'
+import { FaInstagram, FaFacebook, FaStore } from 'react-icons/fa'
 import StoreDirectory from './StoreDirectory'
 import StoreMap from './StoreMap' // Import StoreMap
 import { Link } from 'react-router-dom'
@@ -239,13 +239,13 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                 </Link>
                                 <button
                                     onClick={() => setShowDirectory(true)}
-                                    className='font-bold py-2 px-4 rounded-lg text-sm transition-transform hover:scale-105 cursor-pointer'
+                                    className='font-bold py-2 px-4 rounded-lg text-sm transition-transform hover:scale-105 cursor-pointer inline-flex items-center gap-2'
                                     style={{
                                         backgroundColor: 'var(--color-primary)',
                                         color: 'var(--color-primary-text)'
                                     }}
                                 >
-                                    Lista de Tiendas
+                                    <FaStore size={16} /> Lista de Tiendas
                                 </button>
                             </div>
                         </div>
