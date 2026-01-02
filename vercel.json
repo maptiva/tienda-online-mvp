@@ -6,10 +6,5 @@
             "source": "/(.*)",
             "destination": "/index.html"
         }
-    ],
-    "functions": {
-        "middleware.js": {
-            "runtime": "edge"
-        }
-    }
+    ]
 }
