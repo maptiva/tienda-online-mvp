@@ -3,6 +3,14 @@
     "installCommand": "npm install",
     "rewrites": [
         {
+            "source": "/sitemap.xml",
+            "destination": "https://lnvgxxzgwubhmhzxwfly.supabase.co/functions/v1/sitemap"
+        },
+        {
+            "source": "/sitemaps.xml",
+            "destination": "https://lnvgxxzgwubhmhzxwfly.supabase.co/functions/v1/sitemap"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
