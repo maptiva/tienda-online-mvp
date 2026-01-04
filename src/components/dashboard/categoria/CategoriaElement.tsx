@@ -40,13 +40,13 @@ export const CategoriaElement = ({ categoria }: Props) => {
     };
 
     return (
-        <tr className='text-center text-2xl border border-gray-300 rounded-lg'>
-            <td className='py-2'>{id}</td>
-            <td className='py-2'>{name}</td>
-            <td className='py-2'>
+        <tr className='text-center border-b border-gray-200 hover:bg-gray-50 transition-colors'>
+            <td className='py-3 text-lg'>{id}</td>
+            <td className='py-3 text-lg font-medium text-gray-800'>{name}</td>
+            <td className='py-3'>
                 <div className='flex gap-5 items-center justify-center'>
-                    <BiPencil onClick={handleUpdate} className='text-gray-500 cursor-pointer hover:opacity-70 transition-all duration-300' />
-                    <MdDeleteOutline onClick={handleDelete} className='text-red-500 cursor-pointer hover:opacity-70 transition-all duration-300' />
+                    <BiPencil size={22} onClick={handleUpdate} className='text-gray-500 cursor-pointer hover:text-blue-600 transition-all duration-300' />
+                    <MdDeleteOutline size={22} onClick={handleDelete} className='text-red-500 cursor-pointer hover:text-red-600 transition-all duration-300' />
                 </div>
             </td>
         </tr>

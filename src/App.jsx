@@ -24,6 +24,7 @@ import SuperAdminRoute from './router/SuperAdminRoute';
 import CRMDashboard from './pages/admin/crm/Dashboard';
 import Clients from './pages/admin/crm/Clients';
 import Payments from './pages/admin/crm/Payments';
+import BulkPriceUpdate from './pages/admin/BulkPriceUpdate';
 
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
           <Route path="settings" element={<StoreSettings />} />
           <Route path="new" element={<ProductForm />} />
           <Route path="edit/:productId" element={<ProductForm />} />
+          <Route path="precios" element={<BulkPriceUpdate />} />
 
           {/* CRM Routes - PROTECTED BY SUPER ADMIN ROUTE */}
           <Route path="crm" element={<SuperAdminRoute><Outlet /></SuperAdminRoute>}>

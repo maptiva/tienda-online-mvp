@@ -12,9 +12,9 @@ const CategoriaList = ({ categories }: Props) => {
             <table className='w-full'>
                 <thead className='bg-gray-300 border-b border-gray-500'>
                     <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Acciones</th>
+                        <th className="py-2 px-4">ID</th>
+                        <th className="py-2 px-4 text-left">Nombre</th>
+                        <th className="py-2 px-4">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>

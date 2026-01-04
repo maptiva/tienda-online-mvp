@@ -35,19 +35,18 @@ export const ProductElement = ({ product }: Props) => {
     }
 
     return (
-        <tr key={id} className={`text-center py-2 ${!estado ? 'hidden' : ''}`}>
-            <td className='py-2 text-lg border-y border-slate-400'>{id}</td>
-            <td className='py-2 text-lg border-y border-slate-400'>{name}</td>
-            <td className='py-2 text-lg border-y border-slate-400'>${price.toFixed(2)}</td>
-            <td className='py-2 text-lg border-y border-slate-400'>{categories.name}</td>
-            <td className='py-2 text-lg border-y border-slate-400'>
-                <div className='gap-2 flex items-center justify-center'>
-                    <button className='cursor-pointer hover:opacity-70 transition-all duration-300' onClick={(e) => navigate(`/admin/edit/${id}`)}>
-                        {/* Icono de lapiz de react-icons/md */}
-                        <RiPencilLine size={25} />
+        <tr key={id} className={`text-center py-2 ${!estado ? 'hidden' : ''} border-b border-gray-200 hover:bg-gray-50 transition-colors`}>
+            <td className='py-3 text-lg'>{id}</td>
+            <td className='py-3 text-lg font-medium text-gray-800'>{name}</td>
+            <td className='py-3 text-lg text-gray-700'>${price.toLocaleString()}</td>
+            <td className='py-3 text-lg text-gray-500'>{categories?.name}</td>
+            <td className='py-3'>
+                <div className='gap-4 flex items-center justify-center'>
+                    <button className='cursor-pointer hover:text-blue-600 transition-all duration-300' onClick={(e) => navigate(`/admin/edit/${id}`)}>
+                        <RiPencilLine size={22} />
                     </button>
-                    <button className='cursor-pointer hover:opacity-70 transition-all duration-300' onClick={handleDlete}>
-                        <MdOutlineDelete className='text-red-500' size={25} />
+                    <button className='cursor-pointer hover:text-red-600 transition-all duration-300' onClick={handleDlete}>
+                        <MdOutlineDelete size={22} />
                     </button>
                 </div>
             </td>

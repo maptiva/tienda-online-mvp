@@ -33,6 +33,10 @@ export const AsideBar = () => {
                     <span role="img" aria-label="box" style={{ marginRight: '8px' }}>📦</span>
                     Productos
                 </NavLink>
+                <NavLink to={'/admin/precios'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
+                    <span role="img" aria-label="money" style={{ marginRight: '8px' }}>💰</span>
+                    Actualización Masiva
+                </NavLink>
                 <NavLink to={'/admin/settings'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
                     <span role="img" aria-label="settings" style={{ marginRight: '8px' }}>⚙️</span>
                     Configuración

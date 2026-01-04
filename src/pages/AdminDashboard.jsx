@@ -30,40 +30,38 @@ function AdminDashboard() {
 
     return (
         <div className='w-full border-collapse shadow-xl bg-white p-8 rounded-xl'>
-            <div className='p-5'>
-                <h2 className='text-3xl font-bold'>Panel de Administración</h2>
+            <h1 className='text-3xl border-b border-gray-300 pb-3 mb-3 font-bold'>Panel de Administración</h1>
 
-                {/* Buscador */}
-                <div className='mt-5 mb-3'>
-                    <SearchBar
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                        placeholder="Buscar productos por nombre, categoría o ID..."
-                    />
-                </div>
-
-                <button className='bg-green-500 text-white p-2 cursor-pointer hover:opacity-80 mt-3 rounded-lg'
-                    onClick={() => navigate('/admin/new')}>
-                    Añadir Nuevo Producto
-                </button>
-
-                {/* Contador de resultados */}
-                {products && (
-                    <p className='text-sm text-gray-600 mt-2'>
-                        Mostrando {filteredProducts.length} de {products.length} productos
-                    </p>
-                )}
+            {/* Buscador */}
+            <div className='mt-5 mb-3'>
+                <SearchBar
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    placeholder="Buscar productos por nombre, categoría o ID..."
+                />
             </div>
 
-            <div className='overflow-y-scroll h-[440px]'>
-                <table className='w-full overflow-y-scroll'>
-                    <thead>
-                        <tr className='bg-slate-200'>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Precio</th>
-                            <th>Categoría</th>
-                            <th>Acciones</th>
+            <button className='bg-green-500 text-white p-2 cursor-pointer hover:opacity-80 mt-3 rounded-lg'
+                onClick={() => navigate('/admin/new')}>
+                Añadir Nuevo Producto
+            </button>
+
+            {/* Contador de resultados */}
+            {products && (
+                <p className='text-sm text-gray-600 mt-2 mb-3'>
+                    Mostrando {filteredProducts.length} de {products.length} productos
+                </p>
+            )}
+
+            <div className='mt-5 overflow-y-scroll h-[440px]'>
+                <table className='w-full'>
+                    <thead className='bg-gray-300 border-b border-gray-500'>
+                        <tr>
+                            <th className="py-2 px-4">ID</th>
+                            <th className="py-2 px-4 text-left">Nombre</th>
+                            <th className="py-2 px-4 text-left">Precio</th>
+                            <th className="py-2 px-4 text-left">Categoría</th>
+                            <th className="py-2 px-4">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
