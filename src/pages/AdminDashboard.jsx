@@ -58,6 +58,7 @@ function AdminDashboard() {
                     <thead className='bg-gray-300 border-b border-gray-500'>
                         <tr>
                             <th className="py-2 px-4">ID</th>
+                            <th className="py-2 px-4 text-left">Imagen</th>
                             <th className="py-2 px-4 text-left">Nombre</th>
                             <th className="py-2 px-4 text-left">Precio</th>
                             <th className="py-2 px-4 text-left">Categoría</th>

@@ -273,18 +273,20 @@ const BulkPriceUpdate = () => {
                                     className="w-4 h-4 cursor-pointer"
                                 />
                             </th>
+                            <th className="py-2 px-4 font-semibold text-gray-600 text-left">Imagen</th>
                             <th className="py-2 px-4 font-semibold text-gray-600 text-left">Producto</th>
                             <th className="py-2 px-4 font-semibold text-gray-600 text-left">Categoría</th>
                             <th className="py-2 px-4 font-semibold text-gray-600 text-left">Precio Actual</th>
                             <th className="py-2 px-4 font-semibold text-gray-600 text-left">Nuevo Precio</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 font-outfit">
+                    <tbody className="font-outfit">
                         {filteredProducts.map(product => {
                             const isSelected = selectedProducts.has(product.id);
-                            const newPrice = isSelected ? calculateNewPrice(product.price) : product.price;
+                            const newPrice = calculateNewPrice(product.price);
+
                             return (
-                                <tr key={product.id} className={`hover:bg-gray-50 transition-colors ${isSelected ? 'bg-blue-50/30' : ''}`}>
+                                <tr key={product.id} className={`hover:bg-blue-50 transition-colors border-b border-gray-200 ${isSelected ? 'bg-blue-50/50' : ''}`}>
                                     <td className="p-4">
                                         <input
                                             type="checkbox"
@@ -293,7 +295,22 @@ const BulkPriceUpdate = () => {
                                             className="w-4 h-4 cursor-pointer"
                                         />
                                     </td>
-                                    <td className="p-4 font-medium text-gray-800">{product.name}</td>
+                                    <td className="p-4">
+                                        {product.image_url ? (
+                                            <img
+                                                src={product.image_url}
+                                                alt={product.name}
+                                                className="w-10 h-10 object-cover rounded-md border border-gray-200 shadow-sm"
+                                            />
+                                        ) : (
+                                            <div className="w-10 h-10 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-[10px] text-gray-400">
+                                                Sin foto
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="p-4">
+                                        <div className="font-medium text-gray-800">{product.name}</div>
+                                    </td>
                                     <td className="p-4 text-gray-500 text-sm">{product.categories?.name}</td>
                                     <td className="p-4 text-gray-600">${product.price.toLocaleString()}</td>
                                     <td className="p-4">

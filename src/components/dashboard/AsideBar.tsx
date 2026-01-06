@@ -1,14 +1,25 @@
 import React from 'react'
 import { BiLogOut } from 'react-icons/bi'
 import { MdShoppingCart } from 'react-icons/md'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { isSuperAdmin } from '../../utils/authRoles'
 
 export const AsideBar = () => {
     const navigate = useNavigate();
     const { signOut, user } = useAuth();
+    const location = useLocation();
     const isMaster = isSuperAdmin(user);
+
+    // Helper para detectar si estamos en la sección de productos (incluyendo edición/creación)
+    const isProductSection = location.pathname.startsWith('/admin/producto') ||
+        location.pathname.startsWith('/admin/edit') ||
+        location.pathname.startsWith('/admin/new') ||
+        location.pathname === '/admin';
+
+    const activeClass = "bg-[#5FAFB8] text-[#1e293b] shadow-md font-bold";
+    const inactiveClass = "text-gray-600 hover:bg-slate-100 hover:text-slate-700 font-medium";
+    const commonClass = "flex items-center gap-3 p-2 rounded-lg transition-all group";
 
     const handleLogout = async () => {
         try {
@@ -16,7 +27,6 @@ export const AsideBar = () => {
             navigate('/login');
         } catch (error) {
             console.error('Error al cerrar sesión:', error);
-            // Optionally, show an error message to the user
         }
     };
 
@@ -24,22 +34,37 @@ export const AsideBar = () => {
         <aside className='px-5 flex flex-col mt-5'>
             <h3 className='text-2xl font-bold mb-2 border-b'>Menu</h3>
 
-            <nav className='flex flex-col flex-1 gap-3'>
-                <NavLink to={'/admin/categoria'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
-                    <span role="img" aria-label="categories" style={{ marginRight: '8px' }}>🗂️</span>
-                    Categorías
+            <nav className='flex flex-col flex-1 gap-1'>
+                <NavLink
+                    to={'/admin/categoria'}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">🗂️</span>
+                    <span>Categorías</span>
                 </NavLink>
-                <NavLink to={'/admin/producto'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
-                    <span role="img" aria-label="box" style={{ marginRight: '8px' }}>📦</span>
-                    Productos
+
+                <NavLink
+                    to={'/admin/producto'}
+                    className={`${commonClass} ${isProductSection ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">📦</span>
+                    <span>Productos</span>
                 </NavLink>
-                <NavLink to={'/admin/precios'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
-                    <span role="img" aria-label="money" style={{ marginRight: '8px' }}>💰</span>
-                    Actualización Masiva
+
+                <NavLink
+                    to={'/admin/precios'}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">💰</span>
+                    <span>Actualización Masiva</span>
                 </NavLink>
-                <NavLink to={'/admin/settings'} className={({ isActive }) => `flex ${isActive ? 'bg-slate-400 text-white rounded-lg px-5 py-1' : ''}`}>
-                    <span role="img" aria-label="settings" style={{ marginRight: '8px' }}>⚙️</span>
-                    Configuración
+
+                <NavLink
+                    to={'/admin/settings'}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">⚙️</span>
+                    <span>Configuración</span>
                 </NavLink>
 
                 {/* Súper Admin Portal (Visible solo para Alejandro) */}
@@ -52,24 +77,24 @@ export const AsideBar = () => {
                             <NavLink
                                 to={'/admin/crm'}
                                 end
-                                className={({ isActive }) => `flex items-center gap-2 p-2 rounded-lg transition-all ${isActive ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'}`}
+                                className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                             >
-                                <span className="text-lg">📊</span>
-                                <span className="text-sm font-medium">Dashboard CRM</span>
+                                <span className="text-xl">📊</span>
+                                <span className="text-sm">Dashboard CRM</span>
                             </NavLink>
                             <NavLink
                                 to={'/admin/crm/clients'}
-                                className={({ isActive }) => `flex items-center gap-2 p-2 rounded-lg transition-all ${isActive ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'}`}
+                                className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                             >
-                                <span className="text-lg">👥</span>
-                                <span className="text-sm font-medium">Gestión Clientes</span>
+                                <span className="text-xl">👥</span>
+                                <span className="text-sm">Gestión Clientes</span>
                             </NavLink>
                             <NavLink
                                 to={'/admin/crm/payments'}
-                                className={({ isActive }) => `flex items-center gap-2 p-2 rounded-lg transition-all ${isActive ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'}`}
+                                className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                             >
-                                <span className="text-lg">💰</span>
-                                <span className="text-sm font-medium">Pagos</span>
+                                <span className="text-xl">💰</span>
+                                <span className="text-sm">Pagos</span>
                             </NavLink>
                         </div>
                     </div>
