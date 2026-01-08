@@ -4,7 +4,11 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaFilter, FaList, FaMap, FaSearch, FaTimes } from 'react-icons/fa';
+import {
+    FaArrowLeft, FaFilter, FaList, FaMap, FaSearch, FaTimes,
+    FaTshirt, FaUtensils, FaBirthdayCake, FaGamepad, FaPaw,
+    FaChair, FaShoppingCart, FaLaptop, FaTools, FaBook, FaTag, FaHome
+} from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import logoClicandoPng from '../assets/logo-clicando.png';
 
@@ -68,20 +72,24 @@ const MapRecenter = ({ lat, lng }) => {
 
 // Mapeo detallado de rubros a colores e iconos
 const categoryMeta = {
-    'Comida': { color: 'orange', emoji: '🍔', marker: 'orange' },
-    'Gastronomía': { color: 'orange', emoji: '🍔', marker: 'orange' },
-    'Ropa': { color: 'violet', emoji: '👕', marker: 'violet' },
-    'Indumentaria': { color: 'violet', emoji: '👕', marker: 'violet' },
-    'Almacén': { color: 'green', emoji: '🛒', marker: 'green' },
-    'Supermercado': { color: 'green', emoji: '🛒', marker: 'green' },
-    'Veterinaria': { color: 'red', emoji: '🐾', marker: 'red' },
-    'Petshop': { color: 'red', emoji: '🐾', marker: 'red' },
-    'Juguetería': { color: 'gold', emoji: '🧸', marker: 'gold' },
-    'Bazar': { color: 'yellow', emoji: '🏠', marker: 'yellow' },
-    'Hogar': { color: 'yellow', emoji: '🏠', marker: 'yellow' },
-    'Servicios': { color: 'blue', emoji: '🛠️', marker: 'blue' },
-    'Electrónica': { color: 'blue', emoji: '💻', marker: 'blue' },
-    'Default': { color: 'gray', emoji: '🏪', marker: 'blue' }
+    'Indumentaria': { color: 'violet', icon: FaTshirt, marker: 'violet' },
+    'Ropa': { color: 'violet', icon: FaTshirt, marker: 'violet' },
+    'Comida': { color: 'orange', icon: FaUtensils, marker: 'orange' },
+    'Gastronomía': { color: 'orange', icon: FaUtensils, marker: 'orange' },
+    'Repostería': { color: 'orange', icon: FaBirthdayCake, marker: 'orange' },
+    'Juguetería': { color: 'gold', icon: FaGamepad, marker: 'gold' },
+    'Veterinaria': { color: 'red', icon: FaPaw, marker: 'red' },
+    'Petshop': { color: 'red', icon: FaPaw, marker: 'red' },
+    'Decoración': { color: 'yellow', icon: FaChair, marker: 'yellow' },
+    'Bazar': { color: 'yellow', icon: FaHome, marker: 'yellow' },
+    'Hogar': { color: 'yellow', icon: FaHome, marker: 'yellow' },
+    'Almacén': { color: 'green', icon: FaShoppingCart, marker: 'green' },
+    'Supermercado': { color: 'green', icon: FaShoppingCart, marker: 'green' },
+    'Electrónica': { color: 'blue', icon: FaLaptop, marker: 'blue' },
+    'Servicios': { color: 'blue', icon: FaTools, marker: 'blue' },
+    'Librería': { color: 'blue', icon: FaBook, marker: 'blue' },
+    'Otros': { color: 'gray', icon: FaTag, marker: 'grey' },
+    'Default': { color: 'gray', icon: FaTag, marker: 'blue' }
 };
 
 const getCategoryIcon = (category) => {
@@ -189,9 +197,13 @@ const ExploreMap = () => {
                                     </div>
                                     <div className="flex items-end justify-between mt-1">
                                         <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border flex items-center gap-1 uppercase tracking-tighter truncate"
+                                            <span className="text-[10px] font-bold px-1.5 py-1 rounded border flex items-center gap-1.5 uppercase tracking-tighter truncate"
                                                 style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-light)', borderColor: 'var(--color-border)' }}>
-                                                {meta.emoji} {store.category || 'Tienda'}
+                                                {(() => {
+                                                    const IconComp = meta.icon || FaTag;
+                                                    return <IconComp size={12} />;
+                                                })()}
+                                                {store.category || 'Tienda'}
                                             </span>
                                             <span className="text-[10px] font-bold uppercase tracking-tighter truncate" style={{ color: 'var(--color-primary)' }}>
                                                 {store.city}
@@ -268,12 +280,26 @@ const ExploreMap = () => {
                                         setShowFilters(false);
                                     }}
                                 >
-                                    <option value="">Todos los rubros</option>
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat}>
-                                            {(categoryMeta[cat] || categoryMeta['Default']).emoji} {cat}
-                                        </option>
-                                    ))}
+                                    <option value="">📂 Todos los rubros</option>
+                                    {categories.map(cat => {
+                                        const meta = categoryMeta[cat] || categoryMeta['Default'];
+                                        // Mapeo manual de emojis para el select nativo
+                                        const emojiMap = {
+                                            'Indumentaria': '👕', 'Ropa': '👕',
+                                            'Comida': '🍔', 'Gastronomía': '🍔',
+                                            'Repostería': '🍰', 'Juguetería': '🧸',
+                                            'Veterinaria': '🐾', 'Petshop': '🐾',
+                                            'Decoración': '🛋️', 'Bazar': '🏠', 'Hogar': '🏠',
+                                            'Almacén': '🛒', 'Supermercado': '🛒',
+                                            'Electrónica': '💻', 'Servicios': '🛠️',
+                                            'Librería': '📚', 'Otros': '🏷️'
+                                        };
+                                        return (
+                                            <option key={cat} value={cat}>
+                                                {emojiMap[cat] || '🏪'} {cat}
+                                            </option>
+                                        );
+                                    })}
                                 </select>
                             </div>
 
