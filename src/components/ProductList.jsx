@@ -110,7 +110,10 @@ const ProductList = () => {
       {filteredProducts.length > 0 ? (
         <div className={styles.productosContainer}>
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={{ ...product, store_whatsapp: store?.whatsapp_number }}
+            />
           ))}
         </div>
       ) : (

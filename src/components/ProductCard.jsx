@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -74,51 +75,81 @@ const ProductCard = ({ product }) => {
           </p>
 
           <div>
-            <p
-              className='font-bold text-2xl mb-4 text-center'
-              style={{
-                color: theme === 'light' ? 'var(--color-primary-darker)' : 'var(--color-primary)'
-              }}
-            >
-              ${product.price ? product.price.toFixed(2) : '0.00'}
-            </p>
-
-            <div className='grid grid-cols-2 gap-2 items-center'>
-              <input
-                type="number"
-                className='text-center rounded-lg py-2 focus:outline-none w-full transition-all duration-300 font-semibold'
-                style={{
-                  backgroundColor: theme === 'light' ? 'var(--color-background-light)' : 'var(--color-background)',
-                  color: 'var(--color-text-main)',
-                  border: `1px solid var(--color-border)`
-                }}
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                min="1"
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--color-border)';
-                }}
-              />
-              <button
-                onClick={handleAddToCart}
-                className='font-bold py-2 px-3 rounded-lg transition-all duration-300 w-full'
+            {product.price_on_request ? (
+              // Mostrar botón "Consultar Precio"
+              <a
+                href={`https://wa.me/${product.store_whatsapp}?text=${encodeURIComponent(
+                  `Hola! Me interesa el producto "${product.name}" y quisiera consultar el precio.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className='flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-all duration-300 w-full shadow-md hover:shadow-lg'
                 style={{
                   backgroundColor: 'var(--color-primary)',
                   color: 'var(--color-primary-text)'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                  e.target.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = 'var(--color-primary)';
+                  e.target.style.transform = 'translateY(0)';
                 }}
               >
-                Agregar
-              </button>
-            </div>
+                <FaWhatsapp size={20} />
+                Consultar Precio
+              </a>
+            ) : (
+              // Mostrar precio y botón agregar (comportamiento normal)
+              <>
+                <p
+                  className='font-bold text-2xl mb-4 text-center'
+                  style={{
+                    color: theme === 'light' ? 'var(--color-primary-darker)' : 'var(--color-primary)'
+                  }}
+                >
+                  ${product.price ? product.price.toFixed(2) : '0.00'}
+                </p>
+
+                <div className='grid grid-cols-2 gap-2 items-center'>
+                  <input
+                    type="number"
+                    className='text-center rounded-lg py-2 focus:outline-none w-full transition-all duration-300 font-semibold'
+                    style={{
+                      backgroundColor: theme === 'light' ? 'var(--color-background-light)' : 'var(--color-background)',
+                      color: 'var(--color-text-main)',
+                      border: `1px solid var(--color-border)`
+                    }}
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    min="1"
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'var(--color-primary)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'var(--color-border)';
+                    }}
+                  />
+                  <button
+                    onClick={handleAddToCart}
+                    className='font-bold py-2 px-3 rounded-lg transition-all duration-300 w-full'
+                    style={{
+                      backgroundColor: 'var(--color-primary)',
+                      color: 'var(--color-primary-text)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'var(--color-primary)';
+                    }}
+                  >
+                    Agregar
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

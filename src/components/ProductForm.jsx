@@ -126,7 +126,27 @@ function ProductForm() {
       setGalleryPreviews(prev => [...prev, ...newPreviews]);
 
     } else {
-      const newData = { ...formData, [name]: value };
+      const { type, checked } = e.target;
+      let val = type === 'checkbox' ? checked : value;
+
+      let newData = { ...formData, [name]: val };
+
+      // Lógica especial para "Consultar Precio"
+      if (name === 'price_on_request') {
+        if (checked) {
+          // Si activa "Consultar Precio", respaldamos el precio actual
+          newData.backup_price = formData.price;
+          // Opcional: Podríamos resetear el precio a 0 si quisiéramos, 
+          // pero el backup_price ya lo guarda para la restauración.
+        } else {
+          // Si desactiva, restauramos desde el backup si existe
+          if (formData.backup_price !== undefined && formData.backup_price !== null) {
+            newData.price = formData.backup_price;
+          }
+          newData.backup_price = null;
+        }
+      }
+
       setFormData(newData);
       if (!productId) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
@@ -369,6 +389,22 @@ function ProductForm() {
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
+              ) : field.type === 'checkbox' ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="checkbox"
+                    id={field.name}
+                    name={field.name}
+                    checked={formData[field.name] || false}
+                    onChange={handleChange}
+                    className="w-5 h-5 accent-[var(--color-primary)] cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-600 italic">
+                    {field.name === 'price_on_request' && formData.price_on_request
+                      ? "✨ El precio se guardará internamente pero no se mostrará al cliente."
+                      : ""}
+                  </span>
+                </div>
               ) : (
                 <input
                   type={field.type}
@@ -376,7 +412,9 @@ function ProductForm() {
                   name={field.name}
                   value={formData[field.name] || ''}
                   onChange={handleChange}
-                  required={field.required}
+                  required={field.name === 'price' && formData.price_on_request ? false : field.required}
+                  disabled={field.name === 'price' && formData.price_on_request}
+                  placeholder={field.name === 'price' && formData.price_on_request ? "Precio oculto (Consultar Precio activo)" : ""}
                 />
               )}
             </div>
