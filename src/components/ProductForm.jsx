@@ -34,7 +34,12 @@ function ProductForm() {
 
     const initialData = {};
     formConfig.forEach(field => {
-      initialData[field.name] = field.required ? '' : null;
+      // Si el campo es 'price', empezamos con 0 para evitar errores de tipo numeric
+      if (field.name === 'price') {
+        initialData[field.name] = 0;
+      } else {
+        initialData[field.name] = field.required ? '' : null;
+      }
     });
 
     // Si hay datos guardados y no estamos editando, usarlos
@@ -176,6 +181,16 @@ function ProductForm() {
     setError(null);
 
     let finalFormData = { ...formData };
+
+    // Sanitización de campos numéricos para evitar errores de Supabase (PostgreSQL)
+    // El tipo 'numeric' en DB no acepta strings vacíos ""
+    if (finalFormData.price === '' || finalFormData.price === undefined) {
+      finalFormData.price = 0;
+    }
+    if (finalFormData.backup_price === '' || finalFormData.backup_price === undefined) {
+      finalFormData.backup_price = null;
+    }
+
     let newImageUrl = null;
     let newGalleryUrls = [...existingGalleryImages];
 
