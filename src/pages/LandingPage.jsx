@@ -67,14 +67,30 @@ function LandingPage() {
 
     const jsonLd = {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Clicando",
-        "url": "https://clicando.com.ar", // Replace with real domain if different
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://clicando.com.ar/search?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-        }
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "name": "Clicando",
+                "url": "https://clicando.com.ar"
+            },
+            {
+                "@type": "SiteNavigationElement",
+                "hasPart": [
+                    {
+                        "@type": "WebPage",
+                        "name": "Acceso Clientes",
+                        "description": "Ingresa a tu panel de administración para gestionar tu tienda.",
+                        "url": "https://clicando.com.ar/login"
+                    },
+                    {
+                        "@type": "WebPage",
+                        "name": "Mapa de Tiendas",
+                        "description": "Explora los comercios cercanos en nuestro mapa interactivo.",
+                        "url": "https://clicando.com.ar/mapa"
+                    }
+                ]
+            }
+        ]
     };
 
     return (
