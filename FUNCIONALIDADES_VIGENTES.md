@@ -58,6 +58,7 @@ Clicando no es solo un catálogo, es una plataforma de gestión ágil diseñada 
 - **V4 (UX Core):** Miniaturas de productos, galería de imágenes y optimización de carga.
 - **V5 (Precios 2026):** Lanzamiento de Actualización Masiva, Modo Consultar Precio y Sistema Undo.
 - **Seguridad de Datos:** Implementación de sanitización automática para evitar errores de sintaxis numérica en campos vacíos.
+- **🚀 SEO Pro:** Optimización masiva de Schema.org (JSON-LD) para cumplimiento con Google Merchant Center (Envío, Devoluciones y Validez).
 
 ---
 **Última actualización:** 09/01/2026 - *Fase de Gestión de Precios Masivos Completada.*
