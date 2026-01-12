@@ -70,17 +70,43 @@ const ProductDetail = () => {
     addToCart(product, numQuantity);
   };
 
+  // Preparar datos para SEO (Schema.org / JSON-LD)
+  const nextYear = new Date();
+  nextYear.setFullYear(nextYear.getFullYear() + 1);
+  const priceValidUntil = nextYear.toISOString().split('T')[0];
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.name,
-    "image": product.image_url,
+    "image": imageUrl,
     "description": product.description,
     "offers": {
       "@type": "Offer",
       "priceCurrency": "ARS",
-      "price": product.price,
-      "availability": "https://schema.org/InStock"
+      "price": product.price || 0,
+      "priceValidUntil": priceValidUntil,
+      "availability": "https://schema.org/InStock",
+      "url": window.location.href,
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "AR",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 30,
+        "returnMethod": "https://schema.org/ReturnInStore"
+      },
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": 0,
+          "currency": "ARS"
+        },
+        "shippingDestination": {
+          "@type": "DefinedRegion",
+          "addressCountry": "AR"
+        }
+      }
     }
   };
 
