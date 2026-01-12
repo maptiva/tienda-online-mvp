@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 import styles from './Login.module.css';
 import logoClicando from '../assets/logo-clicando.png';
+import SEO from '../components/shared/SEO';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -35,6 +36,11 @@ function Login() {
 
   return (
     <div className={styles.loginContainer}>
+      <SEO
+        title="Acceso Clientes | Clicando"
+        description="Ingresa a tu panel de administración de Clicando. Gestiona tus productos, categorías y configuración de tu tienda online con WhatsApp."
+        type="website"
+      />
       {/* Panel de Branding - Izquierda */}
       <div className={styles.brandingPanel}>
         <Link to="/" className={styles.backButton}>
