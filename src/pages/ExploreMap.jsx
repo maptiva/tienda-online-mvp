@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
     FaArrowLeft, FaFilter, FaList, FaMap, FaSearch, FaTimes,
     FaTshirt, FaUtensils, FaBirthdayCake, FaGamepad, FaPaw,
-    FaChair, FaShoppingCart, FaLaptop, FaTools, FaBook, FaTag, FaHome
+    FaChair, FaShoppingCart, FaLaptop, FaTools, FaBook, FaTag, FaHome, FaGift
 } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import logoClicandoPng from '../assets/logo-clicando.png';
@@ -78,6 +78,7 @@ const categoryMeta = {
     'Gastronomía': { color: 'orange', icon: FaUtensils, marker: 'orange' },
     'Repostería': { color: 'orange', icon: FaBirthdayCake, marker: 'orange' },
     'Juguetería': { color: 'gold', icon: FaGamepad, marker: 'gold' },
+    'Regalería': { color: 'pink', icon: FaGift, marker: 'violet' },
     'Veterinaria': { color: 'red', icon: FaPaw, marker: 'red' },
     'Petshop': { color: 'red', icon: FaPaw, marker: 'red' },
     'Decoración': { color: 'yellow', icon: FaChair, marker: 'yellow' },
@@ -288,6 +289,7 @@ const ExploreMap = () => {
                                             'Indumentaria': '👕', 'Ropa': '👕',
                                             'Comida': '🍔', 'Gastronomía': '🍔',
                                             'Repostería': '🍰', 'Juguetería': '🧸',
+                                            'Regalería': '🎁',
                                             'Veterinaria': '🐾', 'Petshop': '🐾',
                                             'Decoración': '🛋️', 'Bazar': '🏠', 'Hogar': '🏠',
                                             'Almacén': '🛒', 'Supermercado': '🛒',

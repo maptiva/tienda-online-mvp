@@ -367,6 +367,7 @@ function StoreSettings() {
             <option value="Limpieza">Limpieza</option>
             <option value="Indumentaria">Indumentaria / Ropa</option>
             <option value="Juguetería">Jugueterías</option>
+            <option value="Regalería">Regalería</option>
             <option value="Rotisería">Rotiserías / Comidas</option>
             <option value="Repostería">Repostería</option>
             <option value="Veterinaria">Veterinarias / Pet Shop</option>
