@@ -37,13 +37,14 @@ const Payments = () => {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <div className="mb-10">
-                <h1 className="text-4xl font-black text-gray-800 tracking-tighter italic">Historial de Pagos</h1>
-                <p className="text-gray-400 text-sm mt-1 uppercase tracking-widest font-bold">Registro Completo de Ingresos</p>
+        <div className="p-4 md:p-6 max-w-7xl mx-auto">
+            <div className="mb-6 md:mb-10">
+                <h1 className="text-2xl md:text-4xl font-black text-gray-800 tracking-tighter italic">Historial de Pagos</h1>
+                <p className="text-gray-400 text-xs md:text-sm mt-1 uppercase tracking-widest font-bold">Registro Completo de Ingresos</p>
             </div>
 
-            <div className="bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden">
+            {/* Vista Desktop - Tabla */}
+            <div className="hidden md:block bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden">
                 <table className="w-full text-left">
                     <thead>
                         <tr className="bg-gray-50/50 border-b border-gray-100 italic">
@@ -75,8 +76,8 @@ const Payments = () => {
                                         </td>
                                         <td className="px-8 py-6">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${paymentType.color === 'emerald' ? 'bg-emerald-100 text-emerald-700' :
-                                                    paymentType.color === 'blue' ? 'bg-blue-100 text-blue-700' :
-                                                        'bg-gray-100 text-gray-700'
+                                                paymentType.color === 'blue' ? 'bg-blue-100 text-blue-700' :
+                                                    'bg-gray-100 text-gray-700'
                                                 }`}>
                                                 {paymentType.label}
                                             </span>
@@ -98,11 +99,60 @@ const Payments = () => {
                 </table>
             </div>
 
+            {/* Vista Mobile - Cards */}
+            <div className="md:hidden space-y-3">
+                {payments.length === 0 ? (
+                    <div className="bg-white rounded-2xl p-8 text-center shadow-lg">
+                        <p className="text-gray-300 text-base font-medium italic">No hay pagos registrados todavía.</p>
+                    </div>
+                ) : (
+                    payments.map((payment) => {
+                        const paymentType = getPaymentType(payment.notes);
+                        return (
+                            <div key={payment.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
+                                {/* Header con Cliente y Fecha */}
+                                <div className="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 className="font-black text-gray-800 text-lg">{payment.clients?.name || 'Sin cliente'}</h3>
+                                        <p className="text-xs text-gray-400 mt-1">{formatDate(payment.created_at)}</p>
+                                    </div>
+                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${paymentType.color === 'emerald' ? 'bg-emerald-100 text-emerald-700' :
+                                            paymentType.color === 'blue' ? 'bg-blue-100 text-blue-700' :
+                                                'bg-gray-100 text-gray-700'
+                                        }`}>
+                                        {paymentType.label}
+                                    </span>
+                                </div>
+
+                                {/* Monto destacado */}
+                                <div className="mb-3">
+                                    <p className="text-3xl font-black text-emerald-600">{formatCurrency(payment.amount)}</p>
+                                </div>
+
+                                {/* Método y Notas */}
+                                <div className="space-y-2 pt-3 border-t border-gray-100">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs font-bold text-gray-400 uppercase">Método:</span>
+                                        <span className="text-sm text-gray-600 font-medium">{payment.payment_method}</span>
+                                    </div>
+                                    {payment.notes && (
+                                        <div>
+                                            <span className="text-xs font-bold text-gray-400 uppercase block mb-1">Notas:</span>
+                                            <p className="text-xs text-gray-500 italic">{payment.notes}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
+            </div>
+
             {payments.length > 0 && (
-                <div className="mt-6 p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
-                    <div className="flex justify-between items-center">
-                        <span className="text-sm font-bold text-emerald-700 uppercase tracking-widest">Total Registrado</span>
-                        <span className="text-3xl font-black text-emerald-600">
+                <div className="mt-4 md:mt-6 p-4 md:p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                    <div className="flex flex-col md:flex-row justify-between md:items-center gap-2">
+                        <span className="text-xs md:text-sm font-bold text-emerald-700 uppercase tracking-widest">Total Registrado</span>
+                        <span className="text-2xl md:text-3xl font-black text-emerald-600">
                             {formatCurrency(payments.reduce((sum, p) => sum + (p.amount || 0), 0))}
                         </span>
                     </div>

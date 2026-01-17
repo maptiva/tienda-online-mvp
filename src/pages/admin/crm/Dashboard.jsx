@@ -116,18 +116,18 @@ const RecentPayments = () => {
 
 const CRMDashboard = () => {
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-8">
+        <div className="p-4 md:p-6">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 md:mb-8 gap-2">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Dashboard de Gestión</h1>
-                    <p className="text-gray-500 mt-1">Nivel Súper Admin Maestro</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Dashboard de Gestión</h1>
+                    <p className="text-sm md:text-base text-gray-500 mt-1">Nivel Súper Admin Maestro</p>
                 </div>
             </div>
             <CRMStats />
             <RecentPayments />
-            <div className="bg-blue-50 border border-blue-100 p-6 rounded-xl text-blue-800 flex items-center gap-4 mt-8">
-                <span className="text-2xl">👑</span>
-                <p className="text-sm">Bienvenido Alejandro. Solo tú puedes ver esta sección comercial.</p>
+            <div className="bg-blue-50 border border-blue-100 p-4 md:p-6 rounded-xl text-blue-800 flex items-center gap-3 md:gap-4 mt-6 md:mt-8">
+                <span className="text-xl md:text-2xl">👑</span>
+                <p className="text-xs md:text-sm">Bienvenido Alejandro. Solo tú puedes ver esta sección comercial.</p>
             </div>
         </div>
     );

@@ -272,10 +272,10 @@ function StoreSettings() {
   }
 
   return (
-    <div className="w-full bg-white p-8 rounded-xl shadow-xl">
-      <h2 className="text-3xl font-bold mb-6">Configuración de Tienda</h2>
+    <div className="w-full bg-white p-4 md:p-8 rounded-xl shadow-xl">
+      <h2 className="text-2xl md:text-3xl font-bold mb-6">Configuración de Tienda</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
         {/* Store Name */}
         <div>
           <label className="block text-sm font-medium mb-2">

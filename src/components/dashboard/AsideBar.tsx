@@ -5,7 +5,12 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { isSuperAdmin } from '../../utils/authRoles'
 
-export const AsideBar = () => {
+interface AsideBarProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) => {
     const navigate = useNavigate();
     const { signOut, user } = useAuth();
     const location = useLocation();
@@ -30,13 +35,28 @@ export const AsideBar = () => {
         }
     };
 
-    return (
-        <aside className='px-5 flex flex-col mt-5'>
-            <h3 className='text-2xl font-bold mb-2 border-b'>Menu</h3>
+    const handleNavClick = () => {
+        // Cerrar el menú móvil al hacer clic en un enlace
+        if (onClose) {
+            onClose();
+        }
+    };
 
-            <nav className='flex flex-col flex-1 gap-1'>
+    return (
+        <aside className={`
+            fixed top-0 left-0 h-full bg-white shadow-xl z-[999]
+            transition-transform duration-300 ease-in-out
+            w-[280px] px-5 flex flex-col pb-5
+            lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:w-[280px]
+            lg:rounded-2xl lg:shadow-lg lg:border lg:border-gray-200 lg:p-8
+            ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}>
+            <h3 className='text-2xl font-bold mb-2 border-b pb-2'>Menu</h3>
+
+            <nav className='flex flex-col flex-1 gap-1 overflow-y-auto'>
                 <NavLink
                     to={'/admin/categoria'}
+                    onClick={handleNavClick}
                     className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">🗂️</span>
@@ -45,6 +65,7 @@ export const AsideBar = () => {
 
                 <NavLink
                     to={'/admin/producto'}
+                    onClick={handleNavClick}
                     className={`${commonClass} ${isProductSection ? activeClass : inactiveClass}`}
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">📦</span>
@@ -53,6 +74,7 @@ export const AsideBar = () => {
 
                 <NavLink
                     to={'/admin/precios'}
+                    onClick={handleNavClick}
                     className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">💰</span>
@@ -61,6 +83,7 @@ export const AsideBar = () => {
 
                 <NavLink
                     to={'/admin/settings'}
+                    onClick={handleNavClick}
                     className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">⚙️</span>
@@ -77,6 +100,7 @@ export const AsideBar = () => {
                             <NavLink
                                 to={'/admin/crm'}
                                 end
+                                onClick={handleNavClick}
                                 className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                             >
                                 <span className="text-xl">📊</span>
@@ -84,6 +108,7 @@ export const AsideBar = () => {
                             </NavLink>
                             <NavLink
                                 to={'/admin/crm/clients'}
+                                onClick={handleNavClick}
                                 className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                             >
                                 <span className="text-xl">👥</span>
@@ -91,6 +116,7 @@ export const AsideBar = () => {
                             </NavLink>
                             <NavLink
                                 to={'/admin/crm/payments'}
+                                onClick={handleNavClick}
                                 className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                             >
                                 <span className="text-xl">💰</span>
@@ -102,7 +128,7 @@ export const AsideBar = () => {
 
 
                 <div className='mt-auto mb-2'>
-                    <button onClick={handleLogout} className="flex items-center gap-2 mt-10 text-red-600 w-full text-left cursor-pointer">
+                    <button onClick={handleLogout} className="flex items-center gap-2 mt-10 text-red-600 w-full text-left cursor-pointer hover:bg-red-50 p-2 rounded-lg transition-colors">
                         <BiLogOut />
                         Cerrar Sesión
                     </button>

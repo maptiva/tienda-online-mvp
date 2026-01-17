@@ -28,6 +28,7 @@ const BulkPriceUpdate = () => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateMessage, setUpdateMessage] = useState(null);
     const [lastActionBackup, setLastActionBackup] = useState(null);
+    const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
     // Lógica de redondeo
     const applyRounding = (price) => {
@@ -124,6 +125,8 @@ const BulkPriceUpdate = () => {
             if (hasError) throw new Error("Error en algunas actualizaciones");
 
             setUpdateMessage({ type: 'success', text: `¡Precios actualizados con éxito!` });
+            // Limpiar mensaje después de 5 segundos
+            setTimeout(() => setUpdateMessage(null), 5000);
             // Ya no recargamos automáticamente para no perder el estado del "Deshacer"
             // setTimeout(() => window.location.reload(), 2000);
         } catch (err) {
@@ -265,22 +268,33 @@ const BulkPriceUpdate = () => {
     if (productsLoading || categoriesLoading) return <Loading message="Cargando productos..." />;
 
     return (
-        <div className="w-full border-collapse shadow-xl bg-white p-8 rounded-xl font-outfit">
-            <div className="flex justify-between items-end border-b border-gray-300 pb-3 mb-3">
+        <div className="w-full border-collapse shadow-xl bg-white p-4 md:p-8 rounded-xl font-outfit md:h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-end border-b border-gray-300 pb-3 mb-3 gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold">Actualización Masiva de Precios</h1>
-                    <p className="text-gray-500 mt-1 text-sm italic">Gestiona múltiples precios con precisión y rapidez.</p>
+                    <h1 className="text-2xl md:text-3xl font-bold">Actualización Masiva de Precios</h1>
+                    <p className="text-gray-500 mt-1 text-xs md:text-sm italic">Gestiona múltiples precios con precisión y rapidez.</p>
                 </div>
                 {updateMessage && (
-                    <div className={`px-4 py-2 rounded-lg text-sm font-semibold ${updateMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {updateMessage.text}
+                    <div className="flex items-center gap-3">
+                        <div className={`px-4 py-2 rounded-lg text-sm font-semibold ${updateMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {updateMessage.text}
+                        </div>
+                        {updateMessage.type === 'success' && lastActionBackup && (
+                            <button
+                                onClick={handleUndo}
+                                disabled={isUpdating}
+                                className="px-3 py-2 rounded-lg font-bold text-red-600 border border-red-200 hover:bg-red-100 bg-red-50 transition-all flex items-center justify-center gap-1 text-xs shadow-sm active:scale-95"
+                            >
+                                🔄 Deshacer
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
 
             {/* Panel de Filtros */}
-            <div className="bg-white py-4 flex flex-wrap gap-4 items-center">
-                <div className="flex-1 min-w-[300px]">
+            <div className="bg-white py-4 flex flex-col md:flex-row flex-wrap gap-3 md:gap-4 items-stretch md:items-center">
+                <div className="flex-1 min-w-[200px]">
                     <SearchBar
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
@@ -297,107 +311,79 @@ const BulkPriceUpdate = () => {
                         <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                 </select>
-                <div className="text-sm text-gray-600 font-semibold bg-gray-100 px-3 py-2 rounded-lg">
+                <div className="text-xs md:text-sm text-gray-600 font-semibold bg-gray-100 px-3 py-2 rounded-lg text-center">
                     {selectedProducts.size} seleccionados / {filteredProducts.length} filtrados
                 </div>
             </div>
 
-            {/* Panel de Acción (Integrado arriba) */}
-            <div className="bg-slate-50 p-6 border rounded-xl mb-6 flex flex-wrap items-center justify-between gap-6 shadow-sm">
-                <div className="flex items-center gap-4">
-
+            {/* Panel de Acción Refinado - Más compacto */}
+            <div className="bg-slate-50 p-3 md:p-6 border rounded-xl mb-6 shadow-sm">
+                {/* Controles principales compactos */}
+                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2">
                     <select
-                        className="bg-white border p-2 rounded-lg font-bold text-gray-700 outline-none"
+                        className="bg-white border px-3 rounded-lg font-bold text-gray-700 outline-none w-full sm:w-auto text-sm h-[42px]"
                         value={operation}
                         onChange={(e) => setOperation(e.target.value)}
                     >
                         <option value="increase">Aumentar (+)</option>
                         <option value="decrease">Disminuir (-)</option>
-                        <option value="visibility">👀 Visibilidad Precio</option>
+                        <option value="visibility">👀 Visibilidad</option>
                     </select>
 
-                    {operation === 'visibility' ? (
-                        <div className="flex bg-white border p-1 rounded-lg">
-                            <button
-                                className={`px-4 py-2 rounded-md text-sm font-semibold transition-all flex items-center gap-2 ${allHidden
-                                    ? 'text-gray-300 cursor-not-allowed'
-                                    : visibilityAction === 'hide'
-                                        ? 'bg-orange-500 text-white shadow'
-                                        : 'text-gray-500 hover:bg-gray-50'
-                                    }`}
-                                onClick={() => !allHidden && setVisibilityAction('hide')}
-                                disabled={allHidden}
-                                title={allHidden ? "Todos los seleccionados ya tienen precio oculto" : ""}
-                            >
-                                🙈 Ocultar (Consultar Precio)
-                            </button>
-                            <button
-                                className={`px-4 py-2 rounded-md text-sm font-semibold transition-all flex items-center gap-2 ${allVisible
-                                    ? 'text-gray-300 cursor-not-allowed'
-                                    : visibilityAction === 'show'
-                                        ? 'bg-green-600 text-white shadow'
-                                        : 'text-gray-500 hover:bg-gray-50'
-                                    }`}
-                                onClick={() => !allVisible && setVisibilityAction('show')}
-                                disabled={allVisible}
-                                title={allVisible ? "Todos los seleccionados ya tienen precio visible" : ""}
-                            >
-                                👁️ Mostrar Precio
-                            </button>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="flex bg-white border p-1 rounded-lg">
+                    <div className="flex w-full sm:flex-1 items-center gap-2">
+                        {operation === 'visibility' ? (
+                            <div className="flex bg-white border p-1 rounded-lg w-full h-[42px]">
                                 <button
-                                    className={`px-3 py-1 rounded-md text-sm font-semibold transition-all ${valueType === 'percentage' ? 'bg-blue-600 text-white shadow' : 'text-gray-500'}`}
-                                    onClick={() => setValueType('percentage')}
+                                    className={`flex-1 px-2 py-1.5 rounded-md text-xs font-bold transition-all flex items-center justify-center gap-1 ${allHidden
+                                        ? 'text-gray-300 cursor-not-allowed'
+                                        : visibilityAction === 'hide'
+                                            ? 'bg-orange-500 text-white shadow'
+                                            : 'text-gray-500 hover:bg-gray-50'
+                                        }`}
+                                    onClick={() => !allHidden && setVisibilityAction('hide')}
+                                    disabled={allHidden}
                                 >
-                                    %
+                                    🙈 Ocultar
                                 </button>
                                 <button
-                                    className={`px-3 py-1 rounded-md text-sm font-semibold transition-all ${valueType === 'fixed' ? 'bg-blue-600 text-white shadow' : 'text-gray-500'}`}
-                                    onClick={() => setValueType('fixed')}
+                                    className={`flex-1 px-2 py-1.5 rounded-md text-xs font-bold transition-all flex items-center justify-center gap-1 ${allVisible
+                                        ? 'text-gray-300 cursor-not-allowed'
+                                        : visibilityAction === 'show'
+                                            ? 'bg-green-600 text-white shadow'
+                                            : 'text-gray-500 hover:bg-gray-50'
+                                        }`}
+                                    onClick={() => !allVisible && setVisibilityAction('show')}
+                                    disabled={allVisible}
                                 >
-                                    $
+                                    👁️ Mostrar
                                 </button>
                             </div>
-                            <input
-                                type="number"
-                                className="bg-white border p-2 rounded-lg w-24 font-bold text-center outline-none ring-2 ring-transparent focus:ring-blue-400 transition-all"
-                                value={amount}
-                                onChange={(e) => setAmount(Number(e.target.value))}
-                                placeholder="0"
-                            />
-                        </>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                    {lastActionBackup && (
-                        <div className="flex flex-col items-end gap-1">
-                            <button
-                                onClick={handleUndo}
-                                disabled={isUpdating}
-                                className="px-6 py-2 rounded-lg font-bold text-red-600 border border-red-200 hover:bg-red-50 transition-all flex items-center gap-2 bg-white"
-                            >
-                                🔄 Deshacer
-                            </button>
-                            <span className="text-[10px] text-gray-400 italic">Disponible hasta recargar página</span>
-                        </div>
-                    )}
-
-                    {operation !== 'visibility' && (
-                        <select
-                            className="bg-white border p-2 rounded-lg text-sm outline-none"
-                            value={rounding}
-                            onChange={(e) => setRounding(e.target.value)}
-                        >
-                            <option value="none">Sin redondeo</option>
-                            <option value="to10">Redondear a 10s</option>
-                            <option value="to100">Redondear a 100s</option>
-                            <option value="to99">Marketing (.99)</option>
-                        </select>
-                    )}
+                        ) : (
+                            <div className="flex items-center gap-2 w-full md:w-auto">
+                                <div className="flex bg-white border p-1 rounded-lg flex-shrink-0 h-[42px] items-center">
+                                    <button
+                                        className={`px-3 sm:px-4 py-1 rounded-md text-sm font-bold transition-all h-full ${valueType === 'percentage' ? 'bg-blue-600 text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}
+                                        onClick={() => setValueType('percentage')}
+                                    >
+                                        %
+                                    </button>
+                                    <button
+                                        className={`px-3 sm:px-4 py-1 rounded-md text-sm font-bold transition-all h-full ${valueType === 'fixed' ? 'bg-blue-600 text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}
+                                        onClick={() => setValueType('fixed')}
+                                    >
+                                        $
+                                    </button>
+                                </div>
+                                <input
+                                    type="number"
+                                    className="bg-white border p-1 rounded-lg flex-1 md:flex-none md:w-44 min-w-0 font-black text-center outline-none ring-2 ring-transparent focus:ring-blue-400 transition-all text-lg md:text-xl h-[42px]"
+                                    value={amount}
+                                    onChange={(e) => setAmount(Number(e.target.value))}
+                                    placeholder="0"
+                                />
+                            </div>
+                        )}
+                    </div>
 
                     <button
                         disabled={
@@ -410,122 +396,248 @@ const BulkPriceUpdate = () => {
                             (operation !== 'visibility' && amount <= 0)
                         }
                         onClick={operation === 'visibility' ? handleVisibilityUpdate : handleUpdate}
-                        className={`px-8 py-2 rounded-lg font-bold text-white shadow-md transition-all transform active:scale-95 ${selectedProducts.size === 0 || (operation !== 'visibility' && amount <= 0) || isUpdating
+                        className={`w-full sm:w-auto px-6 rounded-lg font-black text-white shadow-md transition-all transform active:scale-95 text-sm h-[42px] flex items-center justify-center ${selectedProducts.size === 0 || (operation !== 'visibility' && amount <= 0) || isUpdating
                             ? 'bg-gray-300 cursor-not-allowed opacity-50'
                             : operation === 'visibility'
                                 ? visibilityAction === 'hide' ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-600 hover:bg-green-700'
                                 : 'bg-blue-600 hover:bg-blue-700'
                             }`}
                     >
-                        {isUpdating ? 'Procesando...' :
+                        {isUpdating ? '...' :
                             operation === 'visibility'
-                                ? `Aplicar a ${selectedProducts.size}`
-                                : `Confirmar para ${selectedProducts.size}`
+                                ? `Aplicar (${selectedProducts.size})`
+                                : `Confirmar (${selectedProducts.size})`
                         }
                     </button>
                 </div>
+
+                {/* Accordion: Opciones Avanzadas */}
+                <div className="mt-2 pt-2 border-t border-gray-200">
+                    <button
+                        onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                        className="flex items-center gap-2 text-[11px] text-gray-400 hover:text-gray-600 font-bold uppercase transition-colors"
+                    >
+                        <span>{showAdvancedOptions ? '▼' : '▶'}</span>
+                        ⚙️ Opciones avanzadas
+                    </button>
+
+                    {showAdvancedOptions && (
+                        <div className="mt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-gray-50/50 p-2 rounded-lg border border-gray-100">
+                            {operation !== 'visibility' && (
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[10px] text-gray-400 font-bold uppercase">Redondeo:</label>
+                                    <select
+                                        className="bg-white border p-1 rounded-md text-xs outline-none"
+                                        value={rounding}
+                                        onChange={(e) => setRounding(e.target.value)}
+                                    >
+                                        <option value="none">Sin redondeo</option>
+                                        <option value="to10">a 10s</option>
+                                        <option value="to100">a 100s</option>
+                                        <option value="to99">.99</option>
+                                    </select>
+                                </div>
+                            )}
+
+                            {lastActionBackup && (
+                                <button
+                                    onClick={handleUndo}
+                                    disabled={isUpdating}
+                                    className="px-3 py-1.5 rounded-md font-bold text-red-600 border border-red-200 hover:bg-red-50 transition-all flex items-center justify-center gap-1 bg-white text-[10px]"
+                                >
+                                    🔄 Deshacer
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Tabla de Productos */}
-            <div className='mt-5 overflow-y-scroll h-[440px] border border-gray-200 rounded-lg'>
-                <table className="w-full">
-                    <thead className="bg-gray-300 border-b border-gray-500 sticky top-0 z-10">
-                        <tr>
-                            <th className="py-2 px-4 w-10">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
-                                    onChange={toggleSelectAll}
-                                    className="w-4 h-4 cursor-pointer"
-                                />
-                            </th>
-                            <th className="py-2 px-4 font-semibold text-gray-600 text-left">Imagen</th>
-                            <th className="py-2 px-4 font-semibold text-gray-600 text-left">Producto</th>
-                            <th className="py-2 px-4 font-semibold text-gray-600 text-left">Categoría</th>
-                            <th className="py-2 px-4 font-semibold text-gray-600 text-left">Consultar Precio</th>
-                            <th className="py-2 px-4 font-semibold text-gray-600 text-left">Precio Actual</th>
-                            <th className="py-2 px-4 font-semibold text-gray-600 text-left">Nuevo Precio</th>
-                        </tr>
-                    </thead>
-                    <tbody className="font-outfit">
-                        {filteredProducts.map(product => {
-                            const isSelected = selectedProducts.has(product.id);
-                            const newPrice = calculateNewPrice(product.price);
+            {/* Vista Desktop - Tabla de Productos */}
+            <div className='hidden md:flex flex-col flex-1 mt-5 overflow-x-auto border border-gray-200 rounded-lg'>
+                <div className="overflow-y-auto flex-1">
+                    <table className="w-full">
+                        <thead className="bg-gray-300 border-b border-gray-500 sticky top-0 z-10">
+                            <tr>
+                                <th className="py-2 px-4 w-10">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
+                                        onChange={toggleSelectAll}
+                                        className="w-4 h-4 cursor-pointer"
+                                    />
+                                </th>
+                                <th className="py-2 px-4 font-semibold text-left">Imagen</th>
+                                <th className="py-2 px-4 font-semibold text-left">Producto</th>
+                                <th className="py-2 px-4 font-semibold text-left">Categoría</th>
+                                <th className="py-2 px-4 font-semibold text-left">Consultar Precio</th>
+                                <th className="py-2 px-4 font-semibold text-left">Precio Actual</th>
+                                <th className="py-2 px-4 font-semibold text-left">Nuevo Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody className="font-outfit">
+                            {filteredProducts.map(product => {
+                                const isSelected = selectedProducts.has(product.id);
+                                const newPrice = calculateNewPrice(product.price);
 
-                            return (
-                                <tr key={product.id} className={`hover:bg-blue-50 transition-colors border-b border-gray-200 ${isSelected ? 'bg-blue-50/50' : ''}`}>
-                                    <td className="p-4">
-                                        <input
-                                            type="checkbox"
-                                            checked={isSelected}
-                                            onChange={() => toggleProduct(product.id)}
-                                            className="w-4 h-4 cursor-pointer"
-                                        />
-                                    </td>
-                                    <td className="p-4">
-                                        {product.image_url ? (
-                                            <img
-                                                src={product.image_url}
-                                                alt={product.name}
-                                                className="w-10 h-10 object-cover rounded-md border border-gray-200 shadow-sm"
+                                return (
+                                    <tr key={product.id} className={`hover:bg-blue-50 transition-colors border-b border-gray-200 ${isSelected ? 'bg-blue-50/50' : ''}`}>
+                                        <td className="p-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={isSelected}
+                                                onChange={() => toggleProduct(product.id)}
+                                                className="w-4 h-4 cursor-pointer"
                                             />
-                                        ) : (
-                                            <div className="w-10 h-10 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-[10px] text-gray-400">
-                                                Sin foto
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="p-4">
-                                        <div className="font-medium text-gray-800">{product.name}</div>
-                                    </td>
-                                    <td className="p-4 text-gray-500 text-sm">{product.categories?.name}</td>
-                                    <td className="p-4">
-                                        {product.price_on_request ? (
-                                            <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold border border-orange-200">
-                                                Activo
+                                        </td>
+                                        <td className="p-4">
+                                            {product.image_url ? (
+                                                <img
+                                                    src={product.image_url}
+                                                    alt={product.name}
+                                                    className="w-10 h-10 object-cover rounded-md border border-gray-200 shadow-sm"
+                                                />
+                                            ) : (
+                                                <div className="w-10 h-10 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-[10px] text-gray-400">
+                                                    Sin foto
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="text-lg font-medium text-gray-800">{product.name}</div>
+                                        </td>
+                                        <td className="p-4 text-gray-500 text-lg">{product.categories?.name}</td>
+                                        <td className="p-4">
+                                            {product.price_on_request ? (
+                                                <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm font-bold border border-orange-200">
+                                                    Activo
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-400 text-sm">Inactivo</span>
+                                            )}
+                                        </td>
+                                        <td className="p-4 text-gray-700 text-lg text-center">
+                                            {product.price_on_request ? (
+                                                <span className="text-gray-400 italic text-sm line-through decoration-orange-500">
+                                                    ${product.price.toLocaleString()}
+                                                </span>
+                                            ) : (
+                                                `$${product.price.toLocaleString()}`
+                                            )}
+                                        </td>
+                                        <td className="p-4 text-lg text-center">
+                                            {isSelected ? (
+                                                operation === 'visibility' ? (
+                                                    visibilityAction === 'hide' ? (
+                                                        <span className="text-orange-600 font-bold text-xs flex items-center gap-1">
+                                                            SE OCULTARÁ
+                                                            <span className="text-[10px] bg-orange-100 px-1 rounded">🙈</span>
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-green-600 font-bold text-xs flex items-center gap-1">
+                                                            SE MOSTRARÁ
+                                                            <span className="text-[10px] bg-green-100 px-1 rounded">👁️</span>
+                                                        </span>
+                                                    )
+                                                ) : amount > 0 ? (
+                                                    <span className="font-bold text-green-600 flex items-center gap-1">
+                                                        ${newPrice.toLocaleString()}
+                                                        <span className="text-[10px] bg-green-100 px-1 rounded">NUEVO</span>
+                                                    </span>
+                                                ) : <span className="text-gray-300">---</span>
+                                            ) : (
+                                                <span className="text-gray-300">---</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {/* Vista Mobile - Cards Refinadas (Más legibles) */}
+            <div className="md:hidden mt-5 space-y-3 max-h-[500px] overflow-y-auto pr-1 pb-20">
+                {filteredProducts.length > 0 ? (
+                    filteredProducts.map(product => {
+                        const isSelected = selectedProducts.has(product.id);
+                        const newPrice = calculateNewPrice(product.price);
+
+                        return (
+                            <div
+                                key={product.id}
+                                className={`bg-white border rounded-2xl p-4 shadow-md transition-all ${isSelected ? 'border-blue-500 bg-blue-50/70 ring-2 ring-blue-100' : 'border-gray-200'}`}
+                            >
+                                <div className="flex items-start gap-4">
+                                    <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => toggleProduct(product.id)}
+                                        className="w-6 h-6 cursor-pointer flex-shrink-0 mt-1 accent-blue-600"
+                                    />
+
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                                            <h3 className="font-extrabold text-gray-900 text-[15px] leading-tight flex-1">
+                                                {product.name}
+                                            </h3>
+                                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                                {product.categories?.name}
                                             </span>
-                                        ) : (
-                                            <span className="text-gray-400 text-xs">Inactivo</span>
-                                        )}
-                                    </td>
-                                    <td className="p-4 text-gray-600">
-                                        {product.price_on_request ? (
-                                            <span className="text-gray-400 italic text-sm line-through decoration-orange-500">
+                                        </div>
+
+                                        <div className="flex items-baseline gap-3">
+                                            <span className={`text-base font-bold ${product.price_on_request ? 'text-gray-400 line-through decoration-orange-400' : 'text-gray-600'}`}>
                                                 ${product.price.toLocaleString()}
                                             </span>
-                                        ) : (
-                                            `$${product.price.toLocaleString()}`
-                                        )}
-                                    </td>
-                                    <td className="p-4">
-                                        {isSelected ? (
-                                            operation === 'visibility' ? (
-                                                visibilityAction === 'hide' ? (
-                                                    <span className="text-orange-600 font-bold text-xs flex items-center gap-1">
-                                                        SE OCULTARÁ
-                                                        <span className="text-[10px] bg-orange-100 px-1 rounded">🙈</span>
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-green-600 font-bold text-xs flex items-center gap-1">
-                                                        SE MOSTRARÁ
-                                                        <span className="text-[10px] bg-green-100 px-1 rounded">👁️</span>
-                                                    </span>
-                                                )
-                                            ) : amount > 0 ? (
-                                                <span className="font-bold text-green-600 flex items-center gap-1">
-                                                    ${newPrice.toLocaleString()}
-                                                    <span className="text-[10px] bg-green-100 px-1 rounded">NUEVO</span>
+
+                                            {isSelected && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-gray-400 font-black text-sm">→</span>
+                                                    {operation === 'visibility' ? (
+                                                        <span className={`text-xs font-black px-2 py-1 rounded-lg shadow-sm border ${visibilityAction === 'hide' ? 'bg-orange-500 text-white border-orange-600' : 'bg-green-600 text-white border-green-700'}`}>
+                                                            {visibilityAction === 'hide' ? '🙈 OCULTAR' : '👁️ MOSTRAR'}
+                                                        </span>
+                                                    ) : amount > 0 ? (
+                                                        <span className="text-lg font-black text-green-600 drop-shadow-sm">
+                                                            ${newPrice.toLocaleString()} <span className="text-xs">✨</span>
+                                                        </span>
+                                                    ) : null}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {product.price_on_request && !isSelected && (
+                                            <div className="mt-2">
+                                                <span className="text-[10px] text-orange-600 font-black bg-orange-100 px-2 py-1 rounded-md border border-orange-200 inline-flex items-center gap-1 shadow-sm">
+                                                    🙈 PRECIO OCULTO
                                                 </span>
-                                            ) : <span className="text-gray-300">---</span>
-                                        ) : (
-                                            <span className="text-gray-300">---</span>
+                                            </div>
                                         )}
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                                    </div>
+
+                                    {product.image_url ? (
+                                        <img
+                                            src={product.image_url}
+                                            alt={product.name}
+                                            className="w-16 h-16 object-cover rounded-xl border border-gray-100 flex-shrink-0 shadow-sm bg-white"
+                                        />
+                                    ) : (
+                                        <div className="w-16 h-16 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center text-lg flex-shrink-0 shadow-inner">
+                                            📦
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className="text-center py-12 text-gray-400 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                        <span className="block text-4xl mb-4">🔍</span>
+                        <p className="font-bold">No hay productos que coincidan</p>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -98,21 +98,22 @@ const Clients = () => {
     if (clientsLoading && clients.length === 0) return <div className="p-10 text-center text-gray-400">Accediendo a la red maestra...</div>;
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <div className="p-4 md:p-6 max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-10 gap-4">
                 <div>
-                    <h1 className="text-4xl font-black text-gray-800 tracking-tighter italic">Gestión Clientes Maestro</h1>
-                    <p className="text-gray-400 text-sm mt-1 uppercase tracking-widest font-bold">Consola de Control Comercial</p>
+                    <h1 className="text-2xl md:text-4xl font-black text-gray-800 tracking-tighter italic">Gestión Clientes Maestro</h1>
+                    <p className="text-gray-400 text-xs md:text-sm mt-1 uppercase tracking-widest font-bold">Consola de Control Comercial</p>
                 </div>
                 <button
                     onClick={() => { setSelectedClient(null); setIsClientModalOpen(true); }}
-                    className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-black shadow-xl shadow-blue-200 hover:bg-blue-700 hover:-translate-y-1 active:scale-95 transition-all text-sm uppercase"
+                    className="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-2xl font-black shadow-xl shadow-blue-200 hover:bg-blue-700 hover:-translate-y-1 active:scale-95 transition-all text-sm uppercase"
                 >
                     + Nuevo Cliente
                 </button>
             </div>
 
-            <div className="bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden">
+            {/* Vista Desktop - Tabla */}
+            <div className="hidden md:block bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden">
                 <table className="w-full text-left">
                     <thead>
                         <tr className="bg-gray-50/50 border-b border-gray-100 italic">
@@ -215,6 +216,90 @@ const Clients = () => {
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Vista Mobile - Cards */}
+            <div className="md:hidden space-y-4">
+                {clients.length === 0 ? (
+                    <div className="bg-white rounded-2xl p-8 text-center shadow-lg">
+                        <p className="text-gray-300 text-base font-medium italic">No hay clientes en tu radar comercial todavía.</p>
+                    </div>
+                ) : (
+                    clients.map((client) => {
+                        const payments = client.payments || [];
+                        const latestPayment = payments[0];
+                        let isUpToDate = false;
+
+                        if (latestPayment) {
+                            const pDate = new Date(latestPayment.created_at);
+                            const today = new Date();
+                            const isThisMonth = pDate.getMonth() === today.getMonth() && pDate.getFullYear() === today.getFullYear();
+                            const lastMonth = today.getMonth() === 0 ? 11 : today.getMonth() - 1;
+                            const lastMonthYear = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+                            const isLastMonth = pDate.getMonth() === lastMonth && pDate.getFullYear() === lastMonthYear;
+                            isUpToDate = isThisMonth || (today.getDate() <= 10 && isLastMonth);
+                        }
+
+                        return (
+                            <div key={client.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
+                                {/* Header */}
+                                <div className="mb-3">
+                                    <h3 className="font-black text-gray-800 text-xl">{client.name}</h3>
+                                    <div className="flex flex-col gap-1 mt-2">
+                                        <span className="text-xs text-gray-400">{client.contact_email || 'Sin email'}</span>
+                                        <span className="text-xs text-blue-400 font-bold">{client.contact_phone || 'Sin teléfono'}</span>
+                                    </div>
+                                </div>
+
+                                {/* Estado */}
+                                <div className="mb-3">
+                                    <span className={`inline-block px-3 py-1.5 rounded-full text-[10px] font-black uppercase ${isUpToDate ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-500 border border-red-100'}`}>
+                                        {isUpToDate ? '● Pago al Día' : '● Pago Pendiente'}
+                                    </span>
+                                </div>
+
+                                {/* Tiendas */}
+                                <div className="mb-4">
+                                    <p className="text-xs font-bold text-gray-400 uppercase mb-2">Tiendas Vinculadas</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {client.stores && client.stores.length > 0 ? (
+                                            client.stores.map(store => (
+                                                <div key={store.id} className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
+                                                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                                    <span className="text-xs font-bold text-blue-700">{store.store_name}</span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <span className="text-xs text-gray-300 italic">Sin tiendas vinculadas</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Acciones */}
+                                <div className="flex gap-2 pt-3 border-t border-gray-100">
+                                    <button
+                                        onClick={() => handleOpenPayment(client)}
+                                        className="flex-1 bg-emerald-50 text-emerald-600 py-2 rounded-xl hover:bg-emerald-600 hover:text-white transition-all text-xs font-bold"
+                                    >
+                                        💵 Cobrar
+                                    </button>
+                                    <button
+                                        onClick={() => handleOpenEdit(client)}
+                                        className="flex-1 bg-blue-50 text-blue-600 py-2 rounded-xl hover:bg-blue-600 hover:text-white transition-all text-xs font-bold"
+                                    >
+                                        ✏️ Editar
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(client.id)}
+                                        className="flex-1 bg-red-50 text-red-400 py-2 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold"
+                                    >
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
             </div>
 
             {/* Modales */}
