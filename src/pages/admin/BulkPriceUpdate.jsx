@@ -557,8 +557,27 @@ const BulkPriceUpdate = () => {
                 </div>
             </div>
 
+            {/* Vista Mobile - Selector Masivo */}
+            <div className="md:hidden flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-gray-200 mt-5 shadow-sm">
+                <div className="flex items-center gap-3">
+                    <input
+                        id="select-all-mobile"
+                        type="checkbox"
+                        checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
+                        onChange={toggleSelectAll}
+                        className="w-6 h-6 cursor-pointer accent-blue-600 rounded-md"
+                    />
+                    <label htmlFor="select-all-mobile" className="text-sm font-bold text-gray-800 cursor-pointer">
+                        Seleccionar todos
+                    </label>
+                </div>
+                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
+                    {selectedProducts.size} / {filteredProducts.length}
+                </span>
+            </div>
+
             {/* Vista Mobile - Cards Refinadas (Más legibles) */}
-            <div className="md:hidden mt-5 space-y-3 max-h-[500px] overflow-y-auto pr-1 pb-20">
+            <div className="md:hidden mt-3 space-y-3 max-h-[500px] overflow-y-auto pr-1 pb-20">
                 {filteredProducts.length > 0 ? (
                     filteredProducts.map(product => {
                         const isSelected = selectedProducts.has(product.id);
