@@ -1,16 +1,15 @@
 /* Desktop Layout */
-.admin-wrapper {
-  display: flex;
-  gap: 20px;
-  padding: 2rem;
-  min-height: 100vh;
-  position: relative;
-}
-
 .admin-content {
   flex-grow: 1;
   width: 100%;
-  overflow-x: hidden;
+}
+
+.admin-wrapper {
+  display: flex;
+  gap: 20px;
+  padding: 2rem 2rem 4rem 2rem;
+  min-height: 100vh;
+  position: relative;
 }
 
 /* Mobile Overlay for Menu */
