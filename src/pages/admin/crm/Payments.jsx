@@ -83,7 +83,7 @@ const Payments = () => {
             </div>
 
             {/* Contenedor Historial Estilo Admin - Wrap para Sombra */}
-            <div className="flex-1 min-h-0 pb-4">
+            <div className="flex-1 min-h-0">
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col overflow-hidden h-full">
 
                     {/* SearchBar Integrada */}

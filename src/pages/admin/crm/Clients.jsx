@@ -112,7 +112,7 @@ const Clients = () => {
     if (clientsLoading && clients.length === 0) return <div className="p-10 text-center text-gray-400">Accediendo a la red maestra...</div>;
 
     return (
-        <div className="px-4 md:pt-0 md:px-8 md:pb-6 max-w-7xl mx-auto flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-4rem)]">
+        <div className="px-4 md:pt-0 md:px-8 max-w-7xl mx-auto flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-4rem)]">
             <div className="mb-2">
                 <h1 className="text-2xl md:text-4xl font-black text-gray-800 tracking-tighter italic border-b border-white pb-1 mt-0 leading-none">Gestión Clientes Maestro</h1>
                 <p className="text-gray-400 text-[10px] md:text-xs mt-1 uppercase tracking-[0.2em] font-black opacity-50">Consola de Control Comercial</p>
@@ -135,7 +135,7 @@ const Clients = () => {
             </div>
 
             {/* Contenedor Maestro Estilo Admin - Wrap para Sombra */}
-            <div className="flex-1 min-h-0 pb-4">
+            <div className="flex-1 min-h-0">
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col overflow-hidden h-full">
 
                     {/* SearchBar Integrada */}
