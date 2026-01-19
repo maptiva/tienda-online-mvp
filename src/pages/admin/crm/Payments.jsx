@@ -44,7 +44,7 @@ const Payments = () => {
             </div>
 
             {/* Vista Desktop - Tabla */}
-            <div className="hidden md:block bg-white rounded-[2rem] shadow-2xl border border-gray-100 overflow-hidden">
+            <div className="hidden md:block bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
                 <table className="w-full text-left">
                     <thead>
                         <tr className="bg-gray-50/50 border-b border-gray-100 italic">
@@ -117,8 +117,8 @@ const Payments = () => {
                                         <p className="text-xs text-gray-400 mt-1">{formatDate(payment.created_at)}</p>
                                     </div>
                                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${paymentType.color === 'emerald' ? 'bg-emerald-100 text-emerald-700' :
-                                            paymentType.color === 'blue' ? 'bg-blue-100 text-blue-700' :
-                                                'bg-gray-100 text-gray-700'
+                                        paymentType.color === 'blue' ? 'bg-blue-100 text-blue-700' :
+                                            'bg-gray-100 text-gray-700'
                                         }`}>
                                         {paymentType.label}
                                     </span>

@@ -63,11 +63,11 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-slide-up">
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
+                <div className="bg-gradient-to-r from-[#5FAFB8] to-[#4a9098] p-6 text-white">
                     <h2 className="text-xl font-bold italic tracking-tight">
                         {editingClient ? 'Editar Cliente Maestro' : 'Nuevo Cliente Maestro'}
                     </h2>
-                    <p className="text-blue-100 text-xs mt-1">
+                    <p className="text-emerald-50 text-xs mt-1">
                         {editingClient ? `Modificando a ${editingClient.name}` : 'Registra una nueva entidad comercial y vincula su tienda.'}
                     </p>
                 </div>
@@ -82,7 +82,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                                 <input
                                     required
                                     type="text"
-                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none bg-gray-50"
+                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#5FAFB8]/30 transition-all outline-none bg-gray-50 text-gray-700"
                                     placeholder="Ej: Alejandro Maptiva o Juan Pérez"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -92,7 +92,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                                 <label className="block text-xs font-semibold text-gray-500 mb-1">Email de Contacto</label>
                                 <input
                                     type="email"
-                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none bg-gray-50"
+                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#5FAFB8]/30 transition-all outline-none bg-gray-50 text-gray-700"
                                     placeholder="cliente@ejemplo.com"
                                     value={formData.contact_email}
                                     onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
@@ -102,7 +102,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                                 <label className="block text-xs font-semibold text-gray-500 mb-1">Teléfono</label>
                                 <input
                                     type="text"
-                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none bg-gray-50"
+                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#5FAFB8]/30 transition-all outline-none bg-gray-50 text-gray-700"
                                     placeholder="+54 9 11 ..."
                                     value={formData.contact_phone}
                                     onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
@@ -116,7 +116,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                             <div>
                                 <label className="block text-xs font-semibold text-gray-500 mb-1">Vincular Tienda Existente</label>
                                 <select
-                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none bg-gray-50"
+                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#5FAFB8]/30 transition-all outline-none bg-gray-50 text-gray-700"
                                     value={selectedStoreId}
                                     onChange={(e) => setSelectedStoreId(e.target.value)}
                                 >
@@ -135,7 +135,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                                 <label className="block text-xs font-semibold text-gray-500 mb-1">CUIT / ID Fiscal</label>
                                 <input
                                     type="text"
-                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none bg-gray-50"
+                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#5FAFB8]/30 transition-all outline-none bg-gray-50 text-gray-700"
                                     placeholder="20-XXXXXXXX-X"
                                     value={formData.billing_info.cuit}
                                     onChange={(e) => setFormData({
@@ -148,7 +148,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                                 <label className="block text-xs font-semibold text-gray-500 mb-1">Dirección Legal</label>
                                 <input
                                     type="text"
-                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none bg-gray-50"
+                                    className="w-full border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#5FAFB8]/30 transition-all outline-none bg-gray-50 text-gray-700"
                                     placeholder="Calle 123, Ciudad"
                                     value={formData.billing_info.address}
                                     onChange={(e) => setFormData({
@@ -170,7 +170,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                         </button>
                         <button
                             type="submit"
-                            className="px-8 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all"
+                            className="px-8 py-2.5 rounded-xl bg-[#5FAFB8] text-[#1e293b] text-sm font-black shadow-lg shadow-[#5FAFB8]/20 hover:opacity-90 hover:scale-105 active:scale-95 transition-all uppercase tracking-wider"
                         >
                             {editingClient ? 'Guardar Cambios' : 'Crear Cliente Maestro'}
                         </button>
