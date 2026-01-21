@@ -22,8 +22,7 @@ function LandingPage() {
             const { data, error } = await supabase
                 .from('stores')
                 .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, created_at')
-                .or('is_active.eq.true,coming_soon.eq.true')
-                .limit(12); // Fetch more to sort and then pick top 4
+                .limit(20); // Simplified query to avoid filter issues
 
             if (error) {
                 console.error("Error fetching featured stores:", error);
@@ -45,20 +44,22 @@ function LandingPage() {
                     return 4; // Others
                 };
 
-                const sortedData = data.sort((a, b) => {
-                    const rankA = getStoreRank(a);
-                    const rankB = getStoreRank(b);
+                const sortedData = (data || [])
+                    .filter(s => s.is_active || s.coming_soon || s.is_demo)
+                    .sort((a, b) => {
+                        const rankA = getStoreRank(a);
+                        const rankB = getStoreRank(b);
 
-                    if (rankA !== rankB) {
-                        return rankA - rankB;
-                    }
+                        if (rankA !== rankB) {
+                            return rankA - rankB;
+                        }
 
-                    // Secondary sort by creation date (newest first)
-                    if (a.created_at && b.created_at) {
-                        return new Date(b.created_at) - new Date(a.created_at);
-                    }
-                    return 0;
-                });
+                        // Secondary sort by creation date (newest first)
+                        if (a.created_at && b.created_at) {
+                            return new Date(b.created_at) - new Date(a.created_at);
+                        }
+                        return 0;
+                    });
 
                 setFeaturedStores(sortedData.slice(0, 4));
             }
@@ -188,29 +189,33 @@ function LandingPage() {
                         className="text-2xl font-medium tracking-tight"
                         style={{ color: 'var(--color-text-light)' }}
                     >
-                        Tu Tienda Online Simple y Rápida
+                        Tu Catálogo Digital Simple y Rápido
                     </p>
                 </motion.div>
 
                 {/* Features */}
                 <motion.div variants={itemVariants} className="grid md:grid-cols-3 gap-8 mb-16">
                     <div
-                        className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center hover:transform hover:-translate-y-2"
+                        className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.6)',
+                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.5)',
                             border: `1px solid var(--color-border)`,
-                            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.05)'
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
                         }}
                     >
-                        <div className="bg-blue-500/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
+                        <motion.div
+                            animate={{ y: [0, -4, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            className="bg-emerald-500/10 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
+                        >
                             <img
                                 src={catalogoIllustration}
                                 alt="Catálogo Completo"
-                                className="w-16 h-16 object-contain"
+                                className="w-20 h-20 object-contain opacity-90"
                             />
-                        </div>
+                        </motion.div>
                         <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: 'var(--color-text-main)' }}>
-                            Catálogo Maestro
+                            Catálogo Completo
                         </h3>
                         <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
                             Gestiona tus productos con eficiencia y estilo.
@@ -218,22 +223,26 @@ function LandingPage() {
                     </div>
 
                     <div
-                        className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center hover:transform hover:-translate-y-2"
+                        className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.6)',
+                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.5)',
                             border: `1px solid var(--color-border)`,
-                            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.05)'
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
                         }}
                     >
-                        <div className="bg-emerald-500/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
+                        <motion.div
+                            animate={{ y: [0, -4, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                            className="bg-emerald-500/10 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
+                        >
                             <img
                                 src={whatsappIllustration}
                                 alt="WhatsApp Integrado"
-                                className="w-16 h-16 object-contain"
+                                className="w-20 h-20 object-contain opacity-90"
                             />
-                        </div>
+                        </motion.div>
                         <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: 'var(--color-text-main)' }}>
-                            Flujo WhatsApp
+                            WhatsApp Integrado
                         </h3>
                         <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
                             Recibe pedidos directos sin intermediarios.
@@ -241,22 +250,26 @@ function LandingPage() {
                     </div>
 
                     <div
-                        className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center hover:transform hover:-translate-y-2"
+                        className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.6)',
+                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.5)',
                             border: `1px solid var(--color-border)`,
-                            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.05)'
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
                         }}
                     >
-                        <div className="bg-amber-500/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-500">
+                        <motion.div
+                            animate={{ y: [0, -4, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                            className="bg-emerald-500/10 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
+                        >
                             <img
                                 src={personalizableIllustration}
                                 alt="100% Personalizable"
-                                className="w-16 h-16 object-contain"
+                                className="w-20 h-20 object-contain opacity-90"
                             />
-                        </div>
+                        </motion.div>
                         <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: 'var(--color-text-main)' }}>
-                            Identidad Única
+                            100% Personalizable
                         </h3>
                         <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
                             Tu marca es la protagonista en cada detalle.
@@ -266,9 +279,14 @@ function LandingPage() {
 
                 {/* Featured Stores Section */}
                 {featuredStores.length > 0 && (
-                    <motion.div variants={itemVariants} className="mb-20">
+                    <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        variants={itemVariants}
+                        className="mb-20"
+                    >
                         <h2 className="text-3xl font-black mb-10 italic" style={{ color: 'var(--color-text-main)' }}>
-                            Comercios en el Radar
+                            Confían en Nosotros
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
                             {featuredStores.map(store => {
@@ -282,7 +300,7 @@ function LandingPage() {
                                         className="relative"
                                     >
                                         <CardWrapper {...cardProps}
-                                            className="block p-5 rounded-2xl transition-all duration-500 relative bg-white/70 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-xl"
+                                            className="block p-5 rounded-2xl transition-all duration-500 relative bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg"
                                             style={{
                                                 cursor: store.coming_soon ? 'default' : 'pointer',
                                                 opacity: store.coming_soon ? 0.8 : 1,
@@ -326,81 +344,73 @@ function LandingPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowDirectory(true)}
-                            className="font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-lg uppercase tracking-widest text-xs"
+                            className="font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-md uppercase tracking-widest text-xs"
                             style={{
-                                background: 'white',
+                                background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'white',
                                 color: 'var(--color-primary)',
-                                border: '2px solid var(--color-primary)'
+                                border: '1px solid var(--color-primary)',
+                                opacity: 0.8
                             }}
                         >
-                            Ver Red Completa
+                            Ver todas las tiendas
                         </motion.button>
                     </motion.div>
                 )}
 
-                {/* Mapa Interactivo CTA - Rediseñado "Ah, el mapa!" */}
                 <motion.div variants={itemVariants} className="mb-20">
                     <div
-                        className="p-1 md:p-1.5 rounded-[2.5rem] shadow-2xl overflow-hidden relative group"
+                        className="p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden flex flex-col items-center justify-center text-center gap-4 border-[3px]"
                         style={{
-                            background: 'linear-gradient(45deg, var(--color-primary), #4FBCC4, #5FAFB8)'
+                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.2)' : '#F9F7F4',
+                            borderColor: 'var(--color-primary)'
                         }}
                     >
-                        <div
-                            className="p-10 md:p-14 rounded-[2.2rem] overflow-hidden relative flex flex-col items-center justify-center text-center gap-8 backdrop-blur-3xl bg-white/90 dark:bg-slate-900/90"
+                        {/* Abstract Map Background Decoration - Even more subtle */}
+                        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] pointer-events-none -z-10 text-turquesa-500">
+                            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                                        <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                                    </pattern>
+                                </defs>
+                                <rect width="100%" height="100%" fill="url(#grid)" />
+                            </svg>
+                        </div>
+
+                        <motion.div
+                            className="text-7xl md:text-8xl mb-2 drop-shadow-lg"
+                            style={{ filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.1))' }}
                         >
-                            {/* Abstract Map Background Decoration */}
-                            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none -z-10">
-                                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                                        </pattern>
-                                    </defs>
-                                    <rect width="100%" height="100%" fill="url(#grid)" />
-                                </svg>
-                            </div>
+                            🗺️
+                        </motion.div>
 
+                        <div className="max-w-2xl">
+                            <h2 className="text-3xl md:text-4xl font-black mb-3 tracking-tighter italic" style={{ color: 'var(--color-text-main)' }}>
+                                Mapa Interactivo
+                            </h2>
+                            <p className="text-base md:text-lg font-medium text-gray-500 dark:text-gray-400 mb-6 leading-relaxed max-w-md mx-auto">
+                                Descubrí todos los comercios adheridos cerca de tu ubicación en tiempo real.
+                            </p>
+                        </div>
+
+                        <div className="relative group/btn">
+                            {/* Subtle Pulse Effect */}
                             <motion.div
-                                animate={{
-                                    scale: [1, 1.05, 1],
-                                    rotate: [0, 5, -5, 0]
+                                animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.1, 0.3] }}
+                                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                                className="absolute inset-0 bg-turquesa-400 rounded-2xl -z-10 blur-md"
+                            />
+
+                            <Link
+                                to="/mapa"
+                                className="inline-block font-black py-4 px-10 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-md uppercase tracking-widest text-xs"
+                                style={{
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'white'
                                 }}
-                                transition={{ duration: 6, repeat: Infinity }}
-                                className="text-6xl md:text-7xl mb-2"
                             >
-                                🗺️
-                            </motion.div>
-
-                            <div className="max-w-2xl">
-                                <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tighter italic" style={{ color: 'var(--color-text-main)' }}>
-                                    Explorá el Mapa de Tiendas
-                                </h2>
-                                <p className="text-lg md:text-xl font-medium text-gray-500 dark:text-gray-400 mb-8 leading-tight">
-                                    Descubrí todos los comercios adheridos cerca de tu ubicación en tiempo real.
-                                    <span className="block mt-1 font-bold text-blue-500">Simple, visual y dinámico.</span>
-                                </p>
-                            </div>
-
-                            <div className="relative">
-                                {/* Pulse Effect */}
-                                <motion.div
-                                    animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
-                                    className="absolute inset-0 bg-blue-400 rounded-2xl -z-10"
-                                />
-
-                                <Link
-                                    to="/mapa"
-                                    className="block font-black py-5 px-14 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl uppercase tracking-[0.15em] text-sm"
-                                    style={{
-                                        backgroundColor: 'var(--color-primary)',
-                                        color: 'white'
-                                    }}
-                                >
-                                    Abrir Mapa Interactivo
-                                </Link>
-                            </div>
+                                Abrir Mapa Interactivo
+                            </Link>
                         </div>
                     </div>
                 </motion.div>
@@ -410,28 +420,29 @@ function LandingPage() {
                     <div className="relative inline-block group">
                         <Link
                             to="/login"
-                            className="relative z-10 inline-block font-black py-5 px-12 rounded-2xl transition-all duration-300 transform shadow-xl uppercase tracking-widest text-sm"
+                            className="relative z-10 inline-block font-black py-4 px-12 rounded-2xl transition-all duration-300 transform shadow-xl uppercase tracking-widest text-sm"
                             style={{
                                 backgroundColor: 'var(--color-primary)',
                                 color: 'white'
                             }}
                         >
-                            Acceder a mi Panel
+                            Acceder a mi Tienda
                         </Link>
                         {/* Shadow decoration */}
                         <div className="absolute inset-0 bg-blue-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
                     </div>
 
-                    <p className="text-sm font-bold uppercase tracking-widest opacity-40" style={{ color: 'var(--color-text-light)' }}>
+                    <p className="text-sm font-medium uppercase tracking-widest text-gray-400 dark:text-gray-500">
                         Gestión profesional para clientes Clicando
                     </p>
 
                     {/* CTA para nuevos clientes */}
                     <motion.div
                         whileHover={{ y: -5 }}
-                        className="mt-12 p-10 rounded-[2.5rem] backdrop-blur-md transition-all duration-500 border border-white/50 dark:border-slate-800 shadow-2xl"
+                        className="mt-12 p-10 rounded-[2.5rem] backdrop-blur-md transition-all duration-500 border-[3px] shadow-2xl"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.2)' : 'rgba(255, 255, 255, 0.4)',
+                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.2)' : '#F9F7F4',
+                            borderColor: 'var(--color-primary)'
                         }}
                     >
                         <h4 className="text-2xl font-black mb-2 italic" style={{ color: 'var(--color-text-main)' }}>
@@ -460,7 +471,7 @@ function LandingPage() {
                     style={{ color: 'var(--color-text-light)' }}
                 >
                     <p>
-                        Engineered by{' '}
+                        Desarrollado por{' '}
                         <a
                             href="https://maptiva.github.io/maptiva/"
                             target="_blank"
