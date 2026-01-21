@@ -8,7 +8,7 @@ import { FaSearch, FaUserPlus } from 'react-icons/fa';
 import SearchBar from '../../../components/SearchBar';
 
 const Clients = () => {
-    const { clients, loading: clientsLoading, error, fetchClients, getRealStores, createClient, updateClient, deleteClient } = useClients();
+    const { clients, loading: clientsLoading, error, fetchClients, getRealStores, createClient, updateClient, archiveClient, reactivateClient } = useClients();
     const { registerPayment, loading: paymentLoading } = usePayments();
 
     const [isClientModalOpen, setIsClientModalOpen] = useState(false);
@@ -16,9 +16,11 @@ const Clients = () => {
     const [selectedClient, setSelectedClient] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const [showArchived, setShowArchived] = useState(false);
+
     useEffect(() => {
-        fetchClients();
-    }, [fetchClients]);
+        fetchClients(showArchived);
+    }, [fetchClients, showArchived]);
 
     const handleOpenEdit = (client) => {
         setSelectedClient(client);
@@ -76,22 +78,44 @@ const Clients = () => {
         }
     };
 
-    const handleDelete = async (id) => {
+    const handleArchive = async (id) => {
         const confirm = await Swal.fire({
-            title: '¿Eliminar Cliente?',
-            text: "Esta acción no se puede deshacer y desvinculará sus tiendas.",
+            title: '¿Dar de baja cliente?',
+            text: "El cliente será archivado y su tienda quedará vacante, pero conservarás su historial contable.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#94a3b8',
-            confirmButtonText: 'Sí, eliminar',
+            confirmButtonText: 'Sí, dar de baja',
             cancelButtonText: 'Cancelar'
         });
 
         if (confirm.isConfirmed) {
-            const result = await deleteClient(id);
+            const result = await archiveClient(id);
             if (result.success) {
-                Swal.fire('Eliminado', 'El cliente ha sido borrado.', 'success');
+                Swal.fire('Archivado', 'El cliente ha sido dado de baja.', 'success');
+            } else {
+                Swal.fire('Error', result.error, 'error');
+            }
+        }
+    };
+
+    const handleReactivate = async (id) => {
+        const confirm = await Swal.fire({
+            title: '¿Reactivar cliente?',
+            text: "El cliente volverá al radar de gestión activa.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: 'Sí, reactivar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (confirm.isConfirmed) {
+            const result = await reactivateClient(id);
+            if (result.success) {
+                Swal.fire('Reactivado', 'El cliente está activo nuevamente.', 'success');
             } else {
                 Swal.fire('Error', result.error, 'error');
             }
@@ -113,9 +137,26 @@ const Clients = () => {
 
     return (
         <div className="px-4 md:pt-0 md:px-8 max-w-7xl mx-auto flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-4rem)]">
-            <div className="mb-2">
-                <h1 className="text-2xl md:text-4xl font-black text-gray-800 tracking-tighter italic border-b border-white pb-1 mt-0 leading-none">Gestión Clientes Maestro</h1>
-                <p className="text-gray-400 text-[10px] md:text-xs mt-1 uppercase tracking-[0.2em] font-black opacity-50">Consola de Control Comercial</p>
+            <div className="mb-2 flex justify-between items-end border-b border-white pb-1 mt-0">
+                <div>
+                    <h1 className="text-2xl md:text-4xl font-black text-gray-800 tracking-tighter italic leading-none">
+                        {showArchived ? 'Archivo de Clientes' : 'Gestión Clientes Maestro'}
+                    </h1>
+                    <p className="text-gray-400 text-[10px] md:text-xs mt-1 uppercase tracking-[0.2em] font-black opacity-50">
+                        {showArchived ? 'Historial de Bajas y Auditoría' : 'Consola de Control Comercial'}
+                    </p>
+                </div>
+
+                {/* Toggle Archivados */}
+                <button
+                    onClick={() => setShowArchived(!showArchived)}
+                    className={`text-[10px] p-2 px-4 rounded-full font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2 ${showArchived
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                        }`}
+                >
+                    {showArchived ? '● Viendo Archivados' : 'Ver Archivados'}
+                </button>
             </div>
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -129,7 +170,7 @@ const Clients = () => {
 
                 {clients && (
                     <p className='text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest'>
-                        Radar: <span className='text-gray-800'>{filteredClients.length}</span> de <span className='text-gray-800'>{clients.length}</span> Clientes
+                        {showArchived ? 'Archivo:' : 'Radar:'} <span className='text-gray-800'>{filteredClients.length}</span> de <span className='text-gray-800'>{clients.length}</span> Clientes
                     </p>
                 )}
             </div>
@@ -225,27 +266,39 @@ const Clients = () => {
                                             </td>
                                             <td className="px-8 py-4 text-right">
                                                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                                    <button
-                                                        onClick={() => handleOpenPayment(client)}
-                                                        className="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
-                                                        title="Registrar Pago"
-                                                    >
-                                                        💵
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleOpenEdit(client)}
-                                                        className="bg-blue-50 text-blue-600 p-2.5 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                                                        title="Editar"
-                                                    >
-                                                        ✏️
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(client.id)}
-                                                        className="bg-red-50 text-red-400 p-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
-                                                        title="Eliminar"
-                                                    >
-                                                        🗑️
-                                                    </button>
+                                                    {showArchived ? (
+                                                        <button
+                                                            onClick={() => handleReactivate(client.id)}
+                                                            className="bg-blue-50 text-blue-600 p-2.5 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                            title="Reactivar Cliente"
+                                                        >
+                                                            🔄
+                                                        </button>
+                                                    ) : (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleOpenPayment(client)}
+                                                                className="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                                                                title="Registrar Pago"
+                                                            >
+                                                                💵
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleOpenEdit(client)}
+                                                                className="bg-blue-50 text-blue-600 p-2.5 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                                title="Editar"
+                                                            >
+                                                                ✏️
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleArchive(client.id)}
+                                                                className="bg-red-50 text-red-400 p-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                                                                title="Dar de Baja"
+                                                            >
+                                                                🗑️
+                                                            </button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -316,24 +369,35 @@ const Clients = () => {
 
                                         {/* Acciones */}
                                         <div className="flex gap-2 pt-3 border-t border-gray-100">
-                                            <button
-                                                onClick={() => handleOpenPayment(client)}
-                                                className="flex-1 bg-emerald-50 text-emerald-600 py-2 rounded-xl hover:bg-emerald-600 hover:text-white transition-all text-xs font-bold"
-                                            >
-                                                💵 Cobrar
-                                            </button>
-                                            <button
-                                                onClick={() => handleOpenEdit(client)}
-                                                className="flex-1 bg-blue-50 text-blue-600 py-2 rounded-xl hover:bg-blue-600 hover:text-white transition-all text-xs font-bold"
-                                            >
-                                                ✏️ Editar
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(client.id)}
-                                                className="flex-1 bg-red-50 text-red-400 py-2 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold"
-                                            >
-                                                🗑️
-                                            </button>
+                                            {showArchived ? (
+                                                <button
+                                                    onClick={() => handleReactivate(client.id)}
+                                                    className="flex-1 bg-blue-600 text-white py-2 rounded-xl hover:opacity-90 transition-all text-xs font-black uppercase tracking-widest"
+                                                >
+                                                    🔄 Reactivar
+                                                </button>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleOpenPayment(client)}
+                                                        className="flex-1 bg-emerald-50 text-emerald-600 py-2 rounded-xl hover:bg-emerald-600 hover:text-white transition-all text-xs font-bold"
+                                                    >
+                                                        💵 Cobrar
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleOpenEdit(client)}
+                                                        className="flex-1 bg-blue-50 text-blue-600 py-2 rounded-xl hover:bg-blue-600 hover:text-white transition-all text-xs font-bold"
+                                                    >
+                                                        ✏️ Editar
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleArchive(client.id)}
+                                                        className="flex-1 bg-red-50 text-red-400 py-2 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold"
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 );

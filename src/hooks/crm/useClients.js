@@ -6,14 +6,19 @@ export const useClients = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const fetchClients = useCallback(async () => {
+    const fetchClients = useCallback(async (showArchived = false) => {
         setLoading(true);
         try {
-            // Primero traer todos los clientes
-            const { data: clientsData, error: clientsError } = await supabase
-                .from('clients')
-                .select('*')
-                .order('created_at', { ascending: false });
+            // Primero traer los clientes (filtrando por estado)
+            let query = supabase.from('clients').select('*');
+
+            if (!showArchived) {
+                query = query.eq('status', 'active');
+            } else {
+                query = query.eq('status', 'archived');
+            }
+
+            const { data: clientsData, error: clientsError } = await query.order('created_at', { ascending: false });
 
             if (clientsError) {
                 console.error('❌ Error trayendo clientes:', clientsError);
@@ -162,19 +167,44 @@ export const useClients = () => {
         }
     };
 
-    const deleteClient = async (id) => {
+    const reactivateClient = async (id) => {
         setLoading(true);
         try {
-            // Desvincular tiendas antes de borrar (FK constraint)
-            await supabase.from('stores').update({ client_id: null }).eq('client_id', id);
+            const { error } = await supabase
+                .from('clients')
+                .update({ status: 'active' })
+                .eq('id', id);
 
-            const { error } = await supabase.from('clients').delete().eq('id', id);
             if (error) throw error;
 
             await fetchClients();
             return { success: true };
         } catch (err) {
-            console.error('Error deleting client:', err);
+            console.error('Error reactivating client:', err);
+            return { success: false, error: err.message };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const archiveClient = async (id) => {
+        setLoading(true);
+        try {
+            // 1. Desvincular tiendas (quedan libres para otros clientes)
+            await supabase.from('stores').update({ client_id: null }).eq('client_id', id);
+
+            // 2. Marcar como archivado (Soft Delete) para preservar historial contable
+            const { error } = await supabase
+                .from('clients')
+                .update({ status: 'archived' })
+                .eq('id', id);
+
+            if (error) throw error;
+
+            await fetchClients();
+            return { success: true };
+        } catch (err) {
+            console.error('Error archiving client:', err);
             return { success: false, error: err.message };
         } finally {
             setLoading(false);
@@ -189,6 +219,7 @@ export const useClients = () => {
         getRealStores,
         createClient,
         updateClient,
-        deleteClient
+        archiveClient,
+        reactivateClient
     };
 };

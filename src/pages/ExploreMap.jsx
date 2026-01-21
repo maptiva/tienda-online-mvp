@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useStores } from '../hooks/useStores';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -11,9 +11,11 @@ import {
 } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import logoClicandoPng from '../assets/logo-clicando.png';
+import * as FaIcons from 'react-icons/fa';
+import { useShopCategories } from '../hooks/useShopCategories';
 
 // Componente para manejar cada marcador individualmente con su popup
-const StoreMarker = ({ store, isSelected, onSelect }) => {
+const StoreMarker = ({ store, isSelected, onSelect, metaMap }) => {
     const markerRef = useRef(null);
 
     useEffect(() => {
@@ -25,7 +27,7 @@ const StoreMarker = ({ store, isSelected, onSelect }) => {
     return (
         <Marker
             position={[store.latitude, store.longitude]}
-            icon={getCategoryIcon(store.category)}
+            icon={getCategoryIcon(store.category, metaMap)}
             ref={markerRef}
             eventHandlers={{
                 click: onSelect
@@ -70,32 +72,15 @@ const MapRecenter = ({ lat, lng }) => {
     return null;
 };
 
-// Mapeo detallado de rubros a colores e iconos
-const categoryMeta = {
-    'Indumentaria': { color: 'violet', icon: FaTshirt, marker: 'violet' },
-    'Ropa': { color: 'violet', icon: FaTshirt, marker: 'violet' },
-    'Comida': { color: 'orange', icon: FaUtensils, marker: 'orange' },
-    'Gastronomía': { color: 'orange', icon: FaUtensils, marker: 'orange' },
-    'Repostería': { color: 'orange', icon: FaBirthdayCake, marker: 'orange' },
-    'Juguetería': { color: 'gold', icon: FaGamepad, marker: 'gold' },
-    'Regalería': { color: 'pink', icon: FaGift, marker: 'violet' },
-    'Veterinaria': { color: 'red', icon: FaPaw, marker: 'red' },
-    'Petshop': { color: 'red', icon: FaPaw, marker: 'red' },
-    'Decoración': { color: 'yellow', icon: FaChair, marker: 'yellow' },
-    'Bazar': { color: 'yellow', icon: FaHome, marker: 'yellow' },
-    'Hogar': { color: 'yellow', icon: FaHome, marker: 'yellow' },
-    'Almacén': { color: 'green', icon: FaShoppingCart, marker: 'green' },
-    'Supermercado': { color: 'green', icon: FaShoppingCart, marker: 'green' },
-    'Electrónica': { color: 'blue', icon: FaLaptop, marker: 'blue' },
-    'Servicios': { color: 'blue', icon: FaTools, marker: 'blue' },
-    'Librería': { color: 'blue', icon: FaBook, marker: 'blue' },
-    'Otros': { color: 'gray', icon: FaTag, marker: 'grey' },
-    'Default': { color: 'gray', icon: FaTag, marker: 'blue' }
-};
+const getCategoryIcon = (category, metaMap = null) => {
+    const defaultMeta = { marker: 'blue' };
+    const meta = (metaMap && metaMap[category]) || defaultMeta;
 
-const getCategoryIcon = (category) => {
-    const meta = categoryMeta[category] || categoryMeta['Default'];
-    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${meta.marker}.png`;
+    // Normalizar color: Leaflet espera 'grey' pero es común escribir 'gray'
+    let markerColor = meta.marker || 'blue';
+    if (markerColor === 'gray') markerColor = 'grey';
+
+    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`;
 
     return new L.Icon({
         iconUrl,
@@ -110,7 +95,9 @@ const getCategoryIcon = (category) => {
 const ExploreMap = () => {
     const { theme } = useTheme();
     const navigate = useNavigate();
-    const { stores, loading, error } = useStores();
+    const { stores, loading: storesLoading } = useStores();
+    const { categories: shopCategories, loading: categoriesLoading } = useShopCategories();
+
     const [selectedStore, setSelectedStore] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -119,21 +106,35 @@ const ExploreMap = () => {
     const [showFilters, setShowFilters] = useState(false);
 
     // Extraer opciones únicas
-    const categories = [...new Set(stores.map(s => s.category).filter(Boolean))].sort();
     const cities = [...new Set(stores.map(s => s.city).filter(Boolean))].sort();
 
-    const filteredStores = stores.filter(store => {
+    // Mapeo dinámico de categorías para UI externa
+    const categoryMetaMap = useMemo(() => {
+        const map = {};
+        shopCategories.forEach(cat => {
+            map[cat.id] = {
+                label: cat.label,
+                icon: FaIcons[cat.icon_name] || FaIcons.FaTag,
+                marker: cat.marker_color
+            };
+        });
+        return map;
+    }, [shopCategories]);
+
+    const filteredStores = stores.map(s => ({
+        ...s,
+        category: (s.category === 'Veterinaria' || s.category === 'Petshop') ? 'Pet Shop' : (s.category || 'Otros')
+    })).filter(store => {
         const matchesSearch = store.store_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             store.address?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = !selectedCategory || store.category === selectedCategory;
         const matchesCity = !selectedCity || store.city === selectedCity;
         return matchesSearch && matchesCategory && matchesCity;
     }).sort((a, b) => {
-        // Orden solicitado: 1. ACTIVAS, 2. DEMOS, 3. PROXIMAMENTE
         const getWeight = (s) => {
             if (s.coming_soon) return 3;
             if (s.is_demo) return 2;
-            return 1; // Activas
+            return 1;
         };
         return getWeight(a) - getWeight(b);
     });
@@ -145,7 +146,7 @@ const ExploreMap = () => {
         }
     }, [selectedCity]);
 
-    if (loading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa...</div>;
+    if (storesLoading || categoriesLoading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa...</div>;
 
     const StoreList = ({ className = "" }) => (
         <div className={`flex flex-col min-h-0 ${className}`} style={{ backgroundColor: 'var(--color-surface)' }}>
@@ -166,7 +167,7 @@ const ExploreMap = () => {
             </div>
             <div className="flex-1 divide-y overflow-y-auto pb-24">
                 {filteredStores.map(store => {
-                    const meta = categoryMeta[store.category] || categoryMeta['Default'];
+                    const meta = categoryMetaMap[store.category] || { label: store.category, icon: FaIcons.FaTag };
                     return (
                         <div
                             key={store.id}
@@ -282,23 +283,10 @@ const ExploreMap = () => {
                                     }}
                                 >
                                     <option value="">📂 Todos los rubros</option>
-                                    {categories.map(cat => {
-                                        const meta = categoryMeta[cat] || categoryMeta['Default'];
-                                        // Mapeo manual de emojis para el select nativo
-                                        const emojiMap = {
-                                            'Indumentaria': '👕', 'Ropa': '👕',
-                                            'Comida': '🍔', 'Gastronomía': '🍔',
-                                            'Repostería': '🍰', 'Juguetería': '🧸',
-                                            'Regalería': '🎁',
-                                            'Veterinaria': '🐾', 'Petshop': '🐾',
-                                            'Decoración': '🛋️', 'Bazar': '🏠', 'Hogar': '🏠',
-                                            'Almacén': '🛒', 'Supermercado': '🛒',
-                                            'Electrónica': '💻', 'Servicios': '🛠️',
-                                            'Librería': '📚', 'Otros': '🏷️'
-                                        };
+                                    {shopCategories.map(cat => {
                                         return (
-                                            <option key={cat} value={cat}>
-                                                {emojiMap[cat] || '🏪'} {cat}
+                                            <option key={cat.id} value={cat.id}>
+                                                {cat.label}
                                             </option>
                                         );
                                     })}
@@ -389,7 +377,7 @@ const ExploreMap = () => {
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >
                             <option value="">Todos los Rubros</option>
-                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                            {shopCategories.map(cat => <option key={cat.id} value={cat.id}>{cat.label}</option>)}
                         </select>
                         <select
                             className="p-2.5 border-2 rounded-xl text-xs font-bold outline-none"
@@ -535,6 +523,7 @@ const ExploreMap = () => {
                                 store={store}
                                 isSelected={selectedStore?.id === store.id}
                                 onSelect={() => setSelectedStore(store)}
+                                metaMap={categoryMetaMap}
                             />
                         ))}
                     </MapContainer>

@@ -5,9 +5,11 @@ import Swal from 'sweetalert2';
 import { compressLogo } from '../utils/imageCompression';
 import { getStoragePath } from '../utils/storageUtils';
 import StoreMap from '../components/StoreMap'; // Import StoreMap component
+import { useShopCategories } from '../hooks/useShopCategories';
 
 function StoreSettings() {
   const { user } = useAuth();
+  const { categories: shopCategories, loading: categoriesLoading } = useShopCategories();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [storeData, setStoreData] = useState({
@@ -87,7 +89,7 @@ function StoreSettings() {
           longitude: data.longitude ? parseFloat(data.longitude) : null,
           show_map: data.show_map || false,
           city: data.city || '',
-          category: data.category || ''
+          category: (data.category === 'Veterinaria' || data.category === 'Petshop') ? 'Pet Shop' : (data.category || '')
         });
 
         // Show map preview if coordinates exist
@@ -360,22 +362,15 @@ function StoreSettings() {
             name="category"
             value={storeData.category || ''}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            disabled={categoriesLoading}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
           >
-            <option value="">Selecciona una categoría</option>
-            <option value="Almacén">Almacén / Comestibles</option>
-            <option value="Limpieza">Limpieza</option>
-            <option value="Indumentaria">Indumentaria / Ropa</option>
-            <option value="Juguetería">Jugueterías</option>
-            <option value="Regalería">Regalería</option>
-            <option value="Rotisería">Rotiserías / Comidas</option>
-            <option value="Repostería">Repostería</option>
-            <option value="Veterinaria">Veterinarias / Pet Shop</option>
-            <option value="Tecnología">Tecnología / Accesorios</option>
-            <option value="Decoración">Decoración / Hogar</option>
-            <option value="Artesanías">Artesanías</option>
-            <option value="Farmacia">Farmacia / Perfumería</option>
-            <option value="Otros">Otros</option>
+            <option value="">{categoriesLoading ? 'Cargando rubros...' : 'Selecciona una categoría'}</option>
+            {shopCategories.map(cat => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
+              </option>
+            ))}
           </select>
         </div>
 
