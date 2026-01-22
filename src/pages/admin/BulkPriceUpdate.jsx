@@ -68,8 +68,8 @@ const BulkPriceUpdate = () => {
                 (p.price && p.price.toString().includes(searchLower)) ||
                 (p.sku && p.sku.toLowerCase().includes(searchLower)) ||
                 (searchLower.startsWith('#')
-                    ? p.id.toString() === searchLower.replace('#', '')
-                    : p.id.toString() === searchLower);
+                    ? (p.display_id || p.id).toString() === searchLower.replace('#', '')
+                    : (p.display_id || p.id).toString() === searchLower);
 
             const matchesCategory = selectedCategory === 'all' ||
                 (p.category_id && p.category_id.toString() === selectedCategory);
@@ -496,7 +496,7 @@ const BulkPriceUpdate = () => {
                                             />
                                         </td>
                                         <td className="p-4 text-xs font-mono text-gray-500">
-                                            {product.sku ? product.sku : `#${product.id}`}
+                                            {product.sku ? product.sku : `#${product.display_id || product.id}`}
                                         </td>
                                         <td className="p-4">
                                             {product.image_url ? (
@@ -608,7 +608,7 @@ const BulkPriceUpdate = () => {
                                         <div className="flex flex-wrap items-center gap-2 mb-2">
                                             <div className="flex flex-col gap-0.5 flex-1">
                                                 <span className="text-[10px] font-mono text-gray-400 uppercase tracking-tighter">
-                                                    {product.sku ? product.sku : `#${product.id}`}
+                                                    {product.sku ? product.sku : `#${product.display_id || product.id}`}
                                                 </span>
                                                 <h3 className="font-extrabold text-gray-900 text-[15px] leading-tight">
                                                     {product.name}

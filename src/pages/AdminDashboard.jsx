@@ -23,11 +23,15 @@ function AdminDashboard() {
             const matchesName = product.name.toLowerCase().includes(searchLower);
             const matchesCategory = product.categories?.name?.toLowerCase().includes(searchLower) || false;
 
-            // Búsqueda por SKU o ID (usando el prefijo # para el ID)
+            // Búsqueda por SKU o ID Local (display_id)
             const matchesSKU = product.sku?.toLowerCase().includes(searchLower) || false;
+
+            // Lógica para ID: Si tiene display_id usamos ese, si no el global (fallback)
+            const idToSearch = product.display_id || product.id;
+
             const matchesID = searchLower.startsWith('#')
-                ? product.id.toString() === searchLower.replace('#', '')
-                : product.id.toString().includes(searchLower);
+                ? idToSearch.toString() === searchLower.replace('#', '')
+                : idToSearch.toString().includes(searchLower);
 
             return matchesName || matchesCategory || matchesSKU || matchesID;
         });

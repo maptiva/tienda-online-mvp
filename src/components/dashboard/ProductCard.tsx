@@ -63,7 +63,7 @@ export const ProductCard = ({ product }: Props) => {
                     </p>
                     <p className="text-xl font-bold text-[#5FAFB8]">${price.toLocaleString()}</p>
                     <p className="text-xs text-gray-400 mt-1">
-                        {product.sku ? `SKU: ${product.sku}` : `ID: #${id}`}
+                        {product.sku ? `SKU: ${product.sku}` : `ID: #${product.display_id || id}`}
                     </p>
                 </div>
             </div>

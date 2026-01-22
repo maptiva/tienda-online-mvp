@@ -39,12 +39,12 @@ const ProductList = () => {
       const matchesName = product.name.toLowerCase().includes(searchLower);
       const matchesDescription = product.description?.toLowerCase().includes(searchLower) || false;
       const matchesCategory = product.categories?.name?.toLowerCase().includes(searchLower) || false;
-      
+
       // Búsqueda por SKU o ID (usando el prefijo # para el ID)
       const matchesSKU = product.sku?.toLowerCase().includes(searchLower) || false;
-      const matchesID = searchLower.startsWith('#') 
-        ? product.id.toString() === searchLower.replace('#', '')
-        : product.id.toString() === searchLower;
+      const matchesID = searchLower.startsWith('#')
+        ? (product.display_id || product.id).toString() === searchLower.replace('#', '')
+        : (product.display_id || product.id).toString() === searchLower;
 
       const matchesSearch = matchesName || matchesDescription || matchesCategory || matchesSKU || matchesID;
 

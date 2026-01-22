@@ -44,7 +44,7 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
 *Pedido:*`;
 
     cart.forEach(item => {
-      const productRef = item.product.sku ? item.product.sku : `#${item.product.id}`;
+      const productRef = item.product.sku ? item.product.sku : `#${item.product.display_id || item.product.id}`;
       message += `
 - ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(item.product.price * item.quantity).toFixed(2)}`;
     });
