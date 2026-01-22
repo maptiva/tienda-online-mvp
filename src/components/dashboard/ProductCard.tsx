@@ -62,7 +62,9 @@ export const ProductCard = ({ product }: Props) => {
                         <span className="font-medium">Categoría:</span> {categories?.name || 'Sin categoría'}
                     </p>
                     <p className="text-xl font-bold text-[#5FAFB8]">${price.toLocaleString()}</p>
-                    <p className="text-xs text-gray-400 mt-1">ID: {id}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                        {product.sku ? `SKU: ${product.sku}` : `ID: #${id}`}
+                    </p>
                 </div>
             </div>
 

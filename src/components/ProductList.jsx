@@ -35,12 +35,18 @@ const ProductList = () => {
     return products.filter((product) => {
       const searchLower = searchTerm.toLowerCase();
 
-      // Buscar en: nombre, descripción y categoría
+      // Buscar en: nombre, descripción, categoría, SKU e ID
       const matchesName = product.name.toLowerCase().includes(searchLower);
       const matchesDescription = product.description?.toLowerCase().includes(searchLower) || false;
       const matchesCategory = product.categories?.name?.toLowerCase().includes(searchLower) || false;
+      
+      // Búsqueda por SKU o ID (usando el prefijo # para el ID)
+      const matchesSKU = product.sku?.toLowerCase().includes(searchLower) || false;
+      const matchesID = searchLower.startsWith('#') 
+        ? product.id.toString() === searchLower.replace('#', '')
+        : product.id.toString() === searchLower;
 
-      const matchesSearch = matchesName || matchesDescription || matchesCategory;
+      const matchesSearch = matchesName || matchesDescription || matchesCategory || matchesSKU || matchesID;
 
       // Aplicar filtro de categoría activa si existe
       if (categoryActive) {

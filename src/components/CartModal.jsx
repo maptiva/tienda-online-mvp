@@ -44,8 +44,9 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
 *Pedido:*`;
 
     cart.forEach(item => {
+      const productRef = item.product.sku ? item.product.sku : `#${item.product.id}`;
       message += `
-- ${item.quantity}x ${item.product.name} - $${(item.product.price * item.quantity).toFixed(2)}`;
+- ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(item.product.price * item.quantity).toFixed(2)}`;
     });
 
     const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
