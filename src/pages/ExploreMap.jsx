@@ -76,9 +76,17 @@ const getCategoryIcon = (category, metaMap = null) => {
     const defaultMeta = { marker: 'blue' };
     const meta = (metaMap && metaMap[category]) || defaultMeta;
 
+    // Colores soportados por leaflet-color-markers
+    const validColors = ['blue', 'gold', 'red', 'green', 'orange', 'yellow', 'violet', 'grey', 'black'];
+
     // Normalizar color: Leaflet espera 'grey' pero es común escribir 'gray'
-    let markerColor = meta.marker || 'blue';
+    let markerColor = meta.marker ? meta.marker.toLowerCase() : 'blue';
     if (markerColor === 'gray') markerColor = 'grey';
+
+    // Si el color no es válido, usar blue por defecto para evitar que el icono desaparezca
+    if (!validColors.includes(markerColor)) {
+        markerColor = 'blue';
+    }
 
     const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`;
 
@@ -108,11 +116,43 @@ const ExploreMap = () => {
     // Extraer opciones únicas
     const cities = [...new Set(stores.map(s => s.city).filter(Boolean))].sort();
 
+    // Mapa de iconos a emojis para el SELECT nativo (que no soporta SVGs)
+    const iconToEmoji = {
+        FaTshirt: '👕',
+        FaUtensils: '🍴',
+        FaBirthdayCake: '🎂',
+        FaGamepad: '🎮',
+        FaPaw: '🐾',
+        FaChair: '🪑',
+        FaShoppingCart: '🛒',
+        FaLaptop: '💻',
+        FaTools: '🛠️',
+        FaBook: '📚',
+        FaTag: '🏷️',
+        FaHome: '🏠',
+        FaGift: '🎁',
+        // Nuevos mapeos solicitados (con variaciones posibles para asegurar que coincida con DB)
+        FaHeartbeat: '🧴', // Farmacia
+        FaMedkit: '🧴',
+        FaClinicMedical: '🧴',
+        FaPlus: '🧴',
+        FaFirstAid: '🧴',
+        FaPills: '🧴',
+        FaPrescriptionBottle: '🧴',
+
+        FaPaintBrush: '🏺', // Artesanías
+        FaPalette: '🏺',
+        FaHandPaper: '🏺',
+        FaMagic: '🏺',
+        FaGem: '🏺',
+    };
+
     // Mapeo dinámico de categorías para UI externa
     const categoryMetaMap = useMemo(() => {
         const map = {};
         shopCategories.forEach(cat => {
-            map[cat.id] = {
+            // Map by label since store.category is a string
+            map[cat.label] = {
                 label: cat.label,
                 icon: FaIcons[cat.icon_name] || FaIcons.FaTag,
                 marker: cat.marker_color
@@ -167,7 +207,16 @@ const ExploreMap = () => {
             </div>
             <div className="flex-1 divide-y overflow-y-auto pb-24">
                 {filteredStores.map(store => {
-                    const meta = categoryMetaMap[store.category] || { label: store.category, icon: FaIcons.FaTag };
+                    // Buscar metadatos: coincidencia exacta O parcial (ej: 'Indumentaria' dentro de 'Indumentaria / Ropa')
+                    let meta = categoryMetaMap[store.category];
+                    if (!meta) {
+                        const matchingKey = Object.keys(categoryMetaMap).find(key =>
+                            key.toLowerCase().includes(store.category?.toLowerCase()) ||
+                            store.category?.toLowerCase().includes(key.toLowerCase())
+                        );
+                        if (matchingKey) meta = categoryMetaMap[matchingKey];
+                    }
+                    meta = meta || { label: store.category, icon: FaIcons.FaTag };
                     return (
                         <div
                             key={store.id}
@@ -284,9 +333,10 @@ const ExploreMap = () => {
                                 >
                                     <option value="">📂 Todos los rubros</option>
                                     {shopCategories.map(cat => {
+                                        const emoji = iconToEmoji[cat.icon_name] || '🏷️';
                                         return (
-                                            <option key={cat.id} value={cat.id}>
-                                                {cat.label}
+                                            <option key={cat.id} value={cat.label}>
+                                                {emoji} {cat.label}
                                             </option>
                                         );
                                     })}
@@ -377,7 +427,10 @@ const ExploreMap = () => {
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >
                             <option value="">Todos los Rubros</option>
-                            {shopCategories.map(cat => <option key={cat.id} value={cat.id}>{cat.label}</option>)}
+                            {shopCategories.map(cat => {
+                                const emoji = iconToEmoji[cat.icon_name] || '🏷️';
+                                return <option key={cat.id} value={cat.label}>{emoji} {cat.label}</option>;
+                            })}
                         </select>
                         <select
                             className="p-2.5 border-2 rounded-xl text-xs font-bold outline-none"
