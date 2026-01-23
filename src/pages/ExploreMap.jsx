@@ -151,11 +151,19 @@ const ExploreMap = () => {
     const categoryMetaMap = useMemo(() => {
         const map = {};
         shopCategories.forEach(cat => {
-            // Map by label since store.category is a string
-            map[cat.label] = {
+            // Decidir emoji: Primero ver si hay override manual por ID, sino buscar por icono
+            let emoji = iconToEmoji[cat.icon_name] || '🏷️';
+
+            // Overrides manuales para corregir datos genéricos de la BD
+            if (cat.id === 'Farmacia') emoji = '🧴';
+            if (cat.id === 'Artesanías') emoji = '🏺';
+
+            // Usamos ID como clave porque las tiendas guardan el ID (ej: "Juguetería") NO la label ("Jugueterías")
+            map[cat.id] = {
                 label: cat.label,
                 icon: FaIcons[cat.icon_name] || FaIcons.FaTag,
-                marker: cat.marker_color
+                marker: cat.marker_color,
+                emoji: emoji
             };
         });
         return map;
@@ -207,16 +215,20 @@ const ExploreMap = () => {
             </div>
             <div className="flex-1 divide-y overflow-y-auto pb-24">
                 {filteredStores.map(store => {
-                    // Buscar metadatos: coincidencia exacta O parcial (ej: 'Indumentaria' dentro de 'Indumentaria / Ropa')
+                    // Buscar metadatos: coincidencia exacta por ID (store.category debería ser el ID)
+                    // Si falla, intentamos fuzzy match por si acaso
                     let meta = categoryMetaMap[store.category];
+
                     if (!meta) {
                         const matchingKey = Object.keys(categoryMetaMap).find(key =>
-                            key.toLowerCase().includes(store.category?.toLowerCase()) ||
-                            store.category?.toLowerCase().includes(key.toLowerCase())
+                            key.toLowerCase() === store.category?.toLowerCase() ||
+                            categoryMetaMap[key].label.toLowerCase() === store.category?.toLowerCase()
                         );
                         if (matchingKey) meta = categoryMetaMap[matchingKey];
                     }
-                    meta = meta || { label: store.category, icon: FaIcons.FaTag };
+
+                    // Fallback visual
+                    meta = meta || { label: store.category, icon: FaIcons.FaTag, emoji: '🏷️' };
                     return (
                         <div
                             key={store.id}
@@ -250,11 +262,7 @@ const ExploreMap = () => {
                                         <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                                             <span className="text-[10px] font-bold px-1.5 py-1 rounded border flex items-center gap-1.5 uppercase tracking-tighter truncate"
                                                 style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-light)', borderColor: 'var(--color-border)' }}>
-                                                {(() => {
-                                                    const IconComp = meta.icon || FaTag;
-                                                    return <IconComp size={12} />;
-                                                })()}
-                                                {store.category || 'Tienda'}
+                                                {meta.emoji} {meta.label}
                                             </span>
                                             <span className="text-[10px] font-bold uppercase tracking-tighter truncate" style={{ color: 'var(--color-primary)' }}>
                                                 {store.city}
@@ -428,8 +436,8 @@ const ExploreMap = () => {
                         >
                             <option value="">Todos los Rubros</option>
                             {shopCategories.map(cat => {
-                                const emoji = iconToEmoji[cat.icon_name] || '🏷️';
-                                return <option key={cat.id} value={cat.label}>{emoji} {cat.label}</option>;
+                                const meta = categoryMetaMap[cat.id];
+                                return <option key={cat.id} value={cat.id}>{meta?.emoji} {cat.label}</option>;
                             })}
                         </select>
                         <select
