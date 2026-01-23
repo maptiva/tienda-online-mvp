@@ -6,6 +6,8 @@ import L from 'leaflet';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaFilter, FaList, FaMap, FaSearch, FaTimes } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
+import 'react-leaflet-markercluster/dist/styles.min.css';
 
 // Componente para manejar cada marcador individualmente con su popup
 const StoreMarker = ({ store, isSelected, onSelect }) => {
@@ -96,6 +98,15 @@ const getCategoryIcon = (category) => {
         shadowSize: [41, 41]
     });
 };
+
+const userLocationIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
 
 const ExploreMap = () => {
     const { theme } = useTheme();
@@ -469,14 +480,28 @@ const ExploreMap = () => {
                         {selectedStore && (
                             <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} />
                         )}
-                        {filteredStores.map(store => (
-                            <StoreMarker
-                                key={store.id}
-                                store={store}
-                                isSelected={selectedStore?.id === store.id}
-                                onSelect={() => setSelectedStore(store)}
-                            />
-                        ))}
+                        <MarkerClusterGroup>
+                            {filteredStores.map(store => (
+                                <StoreMarker
+                                    key={store.id}
+                                    store={store}
+                                    isSelected={selectedStore?.id === store.id}
+                                    onSelect={() => setSelectedStore(store)}
+                                />
+                            ))}
+                        </MarkerClusterGroup>
+                        {selectedStore?.isUserLocation && (
+                            <Marker
+                                position={[selectedStore.latitude, selectedStore.longitude]}
+                                icon={userLocationIcon}
+                            >
+                                <Popup>
+                                    <div className="text-center">
+                                        <p className="font-bold">Tu ubicación</p>
+                                    </div>
+                                </Popup>
+                            </Marker>
+                        )}
                     </MapContainer>
                 </div>
             </main>
