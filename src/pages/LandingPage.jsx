@@ -16,9 +16,6 @@ function LandingPage() {
     const { theme, toggleTheme } = useTheme();
     const [featuredStores, setFeaturedStores] = useState([]);
     const [showDirectory, setShowDirectory] = useState(false);
-    const carouselRef = React.useRef(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         const fetchFeaturedStores = async () => {
@@ -291,106 +288,56 @@ function LandingPage() {
                         <h2 className="text-3xl font-black mb-10 italic" style={{ color: 'var(--color-text-main)' }}>
                             Confían en Nosotros
                         </h2>
-{/* Carousel Container */}
-                        <div className="relative overflow-hidden group mb-10">
-                            <div 
-                                ref={carouselRef}
-                                className="flex space-x-8 whitespace-nowrap py-4 cursor-grab active:cursor-grabbing overflow-x-auto scrollbar-hide scroll-smooth"
-                                style={{
-                                    scrollbarWidth: 'none',
-                                    msOverflowStyle: 'none'
-                                }}
-                                onMouseDown={(e) => {
-                                    e.preventDefault();
-                                    setIsDragging(true);
-                                    setDragStart({ x: e.pageX, y: e.pageY });
-                                    
-                                    const slider = e.currentTarget;
-                                    const scrollLeft = slider.scrollLeft;
-                                    
-                                    const handleMouseMove = (e) => {
-                                        if (!isDragging) return;
-                                        
-                                        const currentX = e.pageX;
-                                        const currentY = e.pageY;
-                                        const deltaX = currentX - dragStart.x;
-                                        const deltaY = currentY - dragStart.y;
-                                        
-                                        // Solo si el movimiento es más horizontal que vertical
-                                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                                            slider.scrollLeft = scrollLeft - deltaX * 0.8; // Más ligero
-                                        }
-                                    };
-                                    
-                                    const handleMouseUp = () => {
-                                        setTimeout(() => setIsDragging(false), 100); // Pequeña demora
-                                        document.removeEventListener('mousemove', handleMouseMove);
-                                        document.removeEventListener('mouseup', handleMouseUp);
-                                    };
-                                    
-                                    document.addEventListener('mousemove', handleMouseMove);
-                                    document.addEventListener('mouseup', handleMouseUp);
-                                }}
-                            >
-                                {/* Duplicate stores for infinite scroll effect */}
-                                {[...featuredStores, ...featuredStores].map((store, index) => {
-                                    const CardWrapper = store.coming_soon ? 'div' : Link;
-                                    const cardProps = store.coming_soon ? {} : { to: `/${store.store_slug}` };
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+                            {featuredStores.map(store => {
+                                const CardWrapper = store.coming_soon ? 'div' : Link;
+                                const cardProps = store.coming_soon ? {} : { to: `/${store.store_slug}` };
 
-                                    return (
-                                        <div
-                                            key={`${store.id}-${index}`}
-                                            onClick={() => {
-                                                if (!isDragging && !store.coming_soon) {
-                                                    window.location.href = `/${store.store_slug}`;
-                                                }
+                                return (
+                                    <motion.div
+                                        key={store.id}
+                                        whileHover={{ y: -8, scale: 1.02 }}
+                                        className="relative"
+                                    >
+                                        <CardWrapper {...cardProps}
+                                            className="block p-5 rounded-2xl transition-all duration-500 relative bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg"
+                                            style={{
+                                                cursor: store.coming_soon ? 'default' : 'pointer',
+                                                opacity: store.coming_soon ? 0.8 : 1,
                                             }}
                                         >
-                                            <motion.div
-                                                whileHover={{ y: -8, scale: 1.02 }}
-                                                className="w-72 h-40 bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm rounded-xl shadow-md flex flex-col items-center justify-center p-6 border border-gray-100 dark:border-slate-700/50 hover:shadow-xl transition-all relative"
-                                                style={{
-                                                    cursor: store.coming_soon ? 'default' : (isDragging ? 'grabbing' : 'pointer'),
-                                                    opacity: store.coming_soon ? 0.8 : 1,
-                                                }}
-                                            >
-                                                {store.is_demo && (
-                                                    <span className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase italic tracking-tighter z-10">
-                                                        DEMO
-                                                    </span>
-                                                )}
-                                                {store.coming_soon && !store.is_demo && (
-                                                    <span className="absolute top-3 right-3 bg-slate-500 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase italic tracking-tighter z-10">
-                                                        PRÓXIMAMENTE
-                                                    </span>
-                                                )}
+                                            {store.is_demo && (
+                                                <span className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
+                                                    DEMO
+                                                </span>
+                                            )}
+                                            {store.coming_soon && !store.is_demo && (
+                                                <span className="absolute top-3 right-3 bg-slate-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
+                                                    PRÓXIMAMENTE
+                                                </span>
+                                            )}
 
-                                                <div className="mb-3 relative">
-                                                    {store.logo_url ? (
-                                                        <img
-                                                            src={store.logo_url}
-                                                            alt={store.store_name}
-                                                            className="w-20 h-20 mx-auto rounded-full object-contain bg-white p-2 shadow-inner border-2 border-slate-50 dark:border-slate-700"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-20 h-20 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                                                            <FaStore className="text-4xl text-slate-300 dark:text-slate-500" />
-                                                        </div>
-                                                    )}
-                                                </div>
+                                            <div className="mb-4 relative">
+                                                {store.logo_url ? (
+                                                    <img
+                                                        src={store.logo_url}
+                                                        alt={store.store_name}
+                                                        className="w-24 h-24 mx-auto rounded-full object-contain bg-white p-1 shadow-inner border-2 border-slate-50 dark:border-slate-700"
+                                                    />
+                                                ) : (
+                                                    <div className="w-24 h-24 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                                                        <FaStore className="text-4xl text-slate-300 dark:text-slate-500" />
+                                                    </div>
+                                                )}
+                                            </div>
 
-                                                <h3 className="font-black text-sm truncate uppercase tracking-tight text-center px-2" style={{ color: 'var(--color-text-main)' }}>
-                                                    {store.store_name}
-                                                </h3>
-                                            </motion.div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                            
-                            {/* Fade Edges */}
-                            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
-                            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
+                                            <h3 className="font-black text-sm truncate uppercase tracking-tight" style={{ color: 'var(--color-text-main)' }}>
+                                                {store.store_name}
+                                            </h3>
+                                        </CardWrapper>
+                                    </motion.div>
+                                );
+                            })}
                         </div>
 
                         <motion.button
