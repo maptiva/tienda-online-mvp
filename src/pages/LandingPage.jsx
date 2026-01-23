@@ -16,6 +16,7 @@ function LandingPage() {
     const { theme, toggleTheme } = useTheme();
     const [featuredStores, setFeaturedStores] = useState([]);
     const [showDirectory, setShowDirectory] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         const fetchFeaturedStores = async () => {
@@ -291,8 +292,15 @@ function LandingPage() {
 {/* Carousel Container */}
                         <div className="relative overflow-hidden group mb-10">
                             <div 
-                                className="flex space-x-8 animate-scroll whitespace-nowrap py-4 cursor-grab active:cursor-grabbing"
+                                ref={(el) => {
+                                    if (el && !el.dataset.initialized) {
+                                        el.dataset.initialized = 'true';
+                                        el.classList.add('animate-scroll');
+                                    }
+                                }}
+                                className={`flex space-x-8 whitespace-nowrap py-4 cursor-grab active:cursor-grabbing ${!isDragging ? 'animate-scroll' : ''}`}
                                 onMouseDown={(e) => {
+                                    setIsDragging(true);
                                     const slider = e.currentTarget;
                                     const startX = e.pageX - slider.offsetLeft;
                                     const scrollLeft = slider.scrollLeft;
@@ -304,12 +312,11 @@ function LandingPage() {
                                     };
                                     
                                     const handleMouseUp = () => {
-                                        slider.classList.remove('active:cursor-grabbing');
+                                        setIsDragging(false);
                                         document.removeEventListener('mousemove', handleMouseMove);
                                         document.removeEventListener('mouseup', handleMouseUp);
                                     };
                                     
-                                    slider.classList.add('active:cursor-grabbing');
                                     document.addEventListener('mousemove', handleMouseMove);
                                     document.addEventListener('mouseup', handleMouseUp);
                                 }}
