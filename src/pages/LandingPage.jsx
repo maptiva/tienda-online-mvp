@@ -288,56 +288,61 @@ function LandingPage() {
                         <h2 className="text-3xl font-black mb-10 italic" style={{ color: 'var(--color-text-main)' }}>
                             Confían en Nosotros
                         </h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-                            {featuredStores.map(store => {
-                                const CardWrapper = store.coming_soon ? 'div' : Link;
-                                const cardProps = store.coming_soon ? {} : { to: `/${store.store_slug}` };
+{/* Carousel Container */}
+                        <div className="relative overflow-hidden group mb-10">
+                            <div className="flex space-x-8 animate-scroll whitespace-nowrap py-4">
+                                {/* Duplicate stores for infinite scroll effect */}
+                                {[...featuredStores, ...featuredStores].map((store, index) => {
+                                    const CardWrapper = store.coming_soon ? 'div' : Link;
+                                    const cardProps = store.coming_soon ? {} : { to: `/${store.store_slug}` };
 
-                                return (
-                                    <motion.div
-                                        key={store.id}
-                                        whileHover={{ y: -8, scale: 1.02 }}
-                                        className="relative"
-                                    >
-                                        <CardWrapper {...cardProps}
-                                            className="block p-5 rounded-2xl transition-all duration-500 relative bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm border border-gray-100 dark:border-slate-700/50 hover:shadow-lg"
-                                            style={{
-                                                cursor: store.coming_soon ? 'default' : 'pointer',
-                                                opacity: store.coming_soon ? 0.8 : 1,
-                                            }}
-                                        >
-                                            {store.is_demo && (
-                                                <span className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
-                                                    DEMO
-                                                </span>
-                                            )}
-                                            {store.coming_soon && !store.is_demo && (
-                                                <span className="absolute top-3 right-3 bg-slate-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
-                                                    PRÓXIMAMENTE
-                                                </span>
-                                            )}
-
-                                            <div className="mb-4 relative">
-                                                {store.logo_url ? (
-                                                    <img
-                                                        src={store.logo_url}
-                                                        alt={store.store_name}
-                                                        className="w-24 h-24 mx-auto rounded-full object-contain bg-white p-1 shadow-inner border-2 border-slate-50 dark:border-slate-700"
-                                                    />
-                                                ) : (
-                                                    <div className="w-24 h-24 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                                                        <FaStore className="text-4xl text-slate-300 dark:text-slate-500" />
-                                                    </div>
+                                    return (
+                                        <CardWrapper {...cardProps} key={`${store.id}-${index}`}>
+                                            <motion.div
+                                                whileHover={{ y: -8, scale: 1.02 }}
+                                                className="w-56 h-32 bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-gray-100 dark:border-slate-700/50 hover:shadow-xl transition-all relative"
+                                                style={{
+                                                    cursor: store.coming_soon ? 'default' : 'pointer',
+                                                    opacity: store.coming_soon ? 0.8 : 1,
+                                                }}
+                                            >
+                                                {store.is_demo && (
+                                                    <span className="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
+                                                        DEMO
+                                                    </span>
                                                 )}
-                                            </div>
+                                                {store.coming_soon && !store.is_demo && (
+                                                    <span className="absolute top-2 right-2 bg-slate-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
+                                                        PRÓXIMAMENTE
+                                                    </span>
+                                                )}
 
-                                            <h3 className="font-black text-sm truncate uppercase tracking-tight" style={{ color: 'var(--color-text-main)' }}>
-                                                {store.store_name}
-                                            </h3>
+                                                <div className="mb-2 relative">
+                                                    {store.logo_url ? (
+                                                        <img
+                                                            src={store.logo_url}
+                                                            alt={store.store_name}
+                                                            className="w-16 h-16 mx-auto rounded-full object-contain bg-white p-1 shadow-inner border-2 border-slate-50 dark:border-slate-700"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-16 h-16 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                                                            <FaStore className="text-3xl text-slate-300 dark:text-slate-500" />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <h3 className="font-black text-xs truncate uppercase tracking-tight text-center" style={{ color: 'var(--color-text-main)' }}>
+                                                    {store.store_name}
+                                                </h3>
+                                            </motion.div>
                                         </CardWrapper>
-                                    </motion.div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
+                            
+                            {/* Fade Edges */}
+                            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
+                            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
                         </div>
 
                         <motion.button

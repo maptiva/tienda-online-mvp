@@ -94,3 +94,27 @@ h2 {
     color: var(--color-text-main);
     transition: color 0.3s ease;
 }
+
+/* =====================================================
+   ANIMACIONES PARA CARRUSEL
+   ===================================================== */
+
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+    animation: scroll 40s linear infinite;
+}
+
+/* Variables de color para el carrusel */
+:root {
+    --background-light: #e8e2d9;
+    --background-dark: #1a1917;
+}
+
+.dark {
+    --background-light: #e8e2d9;
+    --background-dark: #1a1917;
+}
