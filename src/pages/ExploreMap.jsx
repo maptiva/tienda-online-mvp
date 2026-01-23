@@ -11,7 +11,8 @@ import {
 } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import 'react-leaflet-markercluster/dist/styles.min.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import logoClicandoPng from '../assets/logo-clicando.png';
 import * as FaIcons from 'react-icons/fa';
 import { useShopCategories } from '../hooks/useShopCategories';
@@ -32,7 +33,11 @@ const StoreMarker = ({ store, isSelected, onSelect, metaMap }) => {
             icon={getCategoryIcon(store.category, metaMap)}
             ref={markerRef}
             eventHandlers={{
-                click: onSelect
+                click: () => {
+                    onSelect();
+                    // Abrir popup inmediatamente
+                    setTimeout(() => markerRef.current?.openPopup(), 100);
+                }
             }}
         >
             <Popup>
@@ -64,41 +69,42 @@ const StoreMarker = ({ store, isSelected, onSelect, metaMap }) => {
 };
 
 // Componente para recentrar el mapa suavemente
-const MapRecenter = ({ lat, lng }) => {
+const MapRecenter = ({ lat, lng, isComingSoon }) => {
     const map = useMap();
     useEffect(() => {
-        if (lat && lng) {
+        if (lat && lng && !isComingSoon) {
             map.flyTo([lat, lng], 15, { duration: 1.5 });
         }
-    }, [lat, lng, map]);
+    }, [lat, lng, isComingSoon, map]);
     return null;
 };
 
 const getCategoryIcon = (category, metaMap = null) => {
-    const defaultMeta = { marker: 'blue' };
+    const defaultMeta = { marker: 'blue', emoji: '🏪' };
     const meta = (metaMap && metaMap[category]) || defaultMeta;
 
-    // Colores soportados por leaflet-color-markers
-    const validColors = ['blue', 'gold', 'red', 'green', 'orange', 'yellow', 'violet', 'grey', 'black'];
+    // Crear icono personalizado con emoji
+    const iconHtml = `<div style="
+        background-color: ${meta.marker === 'blue' ? '#3b82f6' : meta.marker === 'green' ? '#10b981' : meta.marker === 'red' ? '#ef4444' : meta.marker === 'orange' ? '#f97316' : meta.marker === 'yellow' ? '#eab308' : meta.marker === 'violet' ? '#8b5cf6' : meta.marker === 'grey' ? '#6b7280' : '#3b82f6'};
+        border: 2px solid white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    ">${meta.emoji}</div>`;
 
-    // Normalizar color: Leaflet espera 'grey' pero es común escribir 'gray'
-    let markerColor = meta.marker ? meta.marker.toLowerCase() : 'blue';
-    if (markerColor === 'gray') markerColor = 'grey';
-
-    // Si el color no es válido, usar blue por defecto para evitar que el icono desaparezca
-    if (!validColors.includes(markerColor)) {
-        markerColor = 'blue';
-    }
-
-    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`;
-
-    return new L.Icon({
-        iconUrl,
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
+    return L.divIcon({
+        html: iconHtml,
+        className: 'custom-marker',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32], // Centro inferior
+        popupAnchor: [0, -32]
     });
 };
 
@@ -205,6 +211,16 @@ const ExploreMap = () => {
         }
     }, [selectedCity]);
 
+    // Scroll to selected store in the list
+    useEffect(() => {
+        if (selectedStore) {
+            const element = document.getElementById(`store-${selectedStore.id}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }, [selectedStore]);
+
     if (storesLoading || categoriesLoading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa...</div>;
 
     const StoreList = ({ className = "" }) => (
@@ -243,6 +259,7 @@ const ExploreMap = () => {
                     return (
                         <div
                             key={store.id}
+                            id={`store-${store.id}`}
                             className={`p-4 transition-colors ${store.coming_soon ? 'opacity-60 cursor-default' : 'cursor-pointer'}`}
                             style={{
                                 backgroundColor: selectedStore?.id === store.id ? 'var(--color-background-light)' : 'transparent',
@@ -587,19 +604,27 @@ const ExploreMap = () => {
                             {/* Zoom controls for desktop only, mobile uses gestures and our custom buttons */}
                         </div>
                         {selectedStore && (
-                            <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} />
+                            <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} isComingSoon={selectedStore.coming_soon} />
                         )}
-                        <MarkerClusterGroup>
-                            {filteredStores.map(store => (
+                        {/* <MarkerClusterGroup> */}
+                            {filteredStores.filter(store => store.id !== selectedStore?.id).map(store => (
                                 <StoreMarker
                                     key={store.id}
                                     store={store}
-                                    isSelected={selectedStore?.id === store.id}
+                                    isSelected={false}
                                     onSelect={() => setSelectedStore(store)}
                                     metaMap={categoryMetaMap}
                                 />
                             ))}
-                        </MarkerClusterGroup>
+                        {/* </MarkerClusterGroup> */}
+                        {selectedStore && !selectedStore.isUserLocation && (
+                            <StoreMarker
+                                store={selectedStore}
+                                isSelected={true}
+                                onSelect={() => setSelectedStore(null)}
+                                metaMap={categoryMetaMap}
+                            />
+                        )}
                         {selectedStore?.isUserLocation && (
                             <Marker
                                 position={[selectedStore.latitude, selectedStore.longitude]}
