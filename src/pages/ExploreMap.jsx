@@ -79,6 +79,18 @@ const MapRecenter = ({ lat, lng, isComingSoon }) => {
     return null;
 };
 
+// Componente para ajustar el zoom a los marcadores filtrados
+const MapFitBounds = ({ stores }) => {
+    const map = useMap();
+    useEffect(() => {
+        if (stores && stores.length > 0) {
+            const bounds = L.latLngBounds(stores.map(s => [s.latitude, s.longitude]));
+            map.fitBounds(bounds, { padding: [20, 20], maxZoom: 15 });
+        }
+    }, [stores, map]);
+    return null;
+};
+
 const getCategoryIcon = (category, metaMap = null) => {
     const defaultMeta = { marker: 'blue', emoji: '🏪' };
     const meta = (metaMap && metaMap[category]) || defaultMeta;
@@ -204,13 +216,6 @@ const ExploreMap = () => {
         };
         return getWeight(a) - getWeight(b);
     });
-
-    useEffect(() => {
-        if (selectedCity && filteredStores.length > 0) {
-            const cityStore = filteredStores.find(s => s.city === selectedCity);
-            if (cityStore) setSelectedStore(cityStore);
-        }
-    }, [selectedCity]);
 
     // Scroll to selected store in the list
     useEffect(() => {
@@ -604,6 +609,7 @@ const ExploreMap = () => {
                         {selectedStore && (
                             <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} isComingSoon={selectedStore.coming_soon} />
                         )}
+                        <MapFitBounds stores={filteredStores} />
                         {/* <MarkerClusterGroup> */}
                             {filteredStores.filter(store => store.id !== selectedStore?.id).map(store => (
                                 <StoreMarker
