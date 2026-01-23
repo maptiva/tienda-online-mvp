@@ -80,8 +80,8 @@ const LegalModal: React.FC<LegalModalProps> = ({ isOpen, onClose, title, content
                     <button
                         onClick={onClose}
                         className={`transition-colors ${theme === 'light'
-                                ? 'text-gray-500 hover:text-gray-700'
-                                : 'text-gray-400 hover:text-gray-200'
+                            ? 'text-gray-500 hover:text-gray-700'
+                            : 'text-gray-400 hover:text-gray-200'
                             }`}
                         aria-label="Cerrar"
                     >
@@ -103,7 +103,14 @@ const LegalModal: React.FC<LegalModalProps> = ({ isOpen, onClose, title, content
                     }`}>
                     <button
                         onClick={onClose}
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                        className={`w-full font-semibold py-3 px-6 rounded-lg transition-colors ${theme === 'light'
+                            ? 'bg-[var(--color-primary)] hover:opacity-90'
+                            : 'bg-[var(--color-primary)] hover:opacity-90'
+                            }`}
+                        style={{
+                            backgroundColor: 'var(--color-primary)',
+                            color: 'var(--color-primary-text)'
+                        }}
                     >
                         Cerrar
                     </button>

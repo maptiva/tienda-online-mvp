@@ -7,7 +7,8 @@ export default function SEO({
     type = 'website',
     image,
     url,
-    schema
+    schema,
+    siteName = 'Clicando'
 }) {
     return (
         <>
@@ -21,7 +22,18 @@ export default function SEO({
             <meta property="og:type" content={type} />
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />
-            {image && <meta property="og:image" content={image} />}
+            <meta property="og:site_name" content={siteName} />
+            <meta property="og:locale" content="es_AR" />
+            {image && (
+                <>
+                    <meta property="og:image" content={image} />
+                    <meta property="og:image:secure_url" content={image} />
+                    <meta property="og:image:type" content="image/png" />
+                    <meta property="og:image:width" content="1200" />
+                    <meta property="og:image:height" content="630" />
+                    <meta property="og:image:alt" content={`Logo de ${title}`} />
+                </>
+            )}
             {url && <meta property="og:url" content={url} />}
             {/* End Facebook tags */}
 

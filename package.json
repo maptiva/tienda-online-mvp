@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "host": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "storage-clean": "node scripts/cleanup-storage.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",

@@ -44,8 +44,9 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
 *Pedido:*`;
 
     cart.forEach(item => {
+      const productRef = item.product.sku ? item.product.sku : `#${item.product.display_id || item.product.id}`;
       message += `
-- ${item.quantity}x ${item.product.name} - $${(item.product.price * item.quantity).toFixed(2)}`;
+- ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(item.product.price * item.quantity).toFixed(2)}`;
     });
 
     const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -111,8 +112,15 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
           </div>
         )}
 
-        <div className={styles.total}>
-          Total: ${total.toFixed(2)}
+        <div className={styles.totalSection}>
+          {cart.length > 0 && (
+            <button className={styles.clearAllButton} onClick={clearCart}>
+              Vaciar carrito
+            </button>
+          )}
+          <div className={styles.total}>
+            Total: ${total.toFixed(2)}
+          </div>
         </div>
 
         <button className={styles.whatsappButton} onClick={handleWhatsAppOrder}>Confirmar Pedido por WhatsApp</button>

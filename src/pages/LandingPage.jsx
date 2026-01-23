@@ -6,6 +6,9 @@ import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../services/supabase';
 import StoreDirectory from '../components/StoreDirectory';
 import logoClicandoPng from '../assets/logo-clicando.png';
+import catalogoIllustration from '../assets/illustrations/catalogo-completo.png';
+import whatsappIllustration from '../assets/illustrations/whatsapp-integrado.png';
+import personalizableIllustration from '../assets/illustrations/personalizable.png';
 import SEO from '../components/shared/SEO';
 
 function LandingPage() {
@@ -64,14 +67,30 @@ function LandingPage() {
 
     const jsonLd = {
         "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Clicando",
-        "url": "https://clicando.com.ar", // Replace with real domain if different
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://clicando.com.ar/search?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-        }
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "name": "Clicando",
+                "url": "https://clicando.com.ar"
+            },
+            {
+                "@type": "SiteNavigationElement",
+                "hasPart": [
+                    {
+                        "@type": "WebPage",
+                        "name": "Acceso Clientes",
+                        "description": "Ingresa a tu panel de administración para gestionar tu tienda.",
+                        "url": "https://clicando.com.ar/login"
+                    },
+                    {
+                        "@type": "WebPage",
+                        "name": "Mapa de Tiendas",
+                        "description": "Explora los comercios cercanos en nuestro mapa interactivo.",
+                        "url": "https://clicando.com.ar/mapa"
+                    }
+                ]
+            }
+        ]
     };
 
     return (
@@ -80,7 +99,7 @@ function LandingPage() {
             style={{
                 background: theme === 'dark'
                     ? 'linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a)'
-                    : 'linear-gradient(to bottom right, #E8E2DB, #F5F1ED, #E8E2DB)'
+                    : 'linear-gradient(135deg, #C9B8A8 0%, #E8E2DB 50%, #C9B8A8 100%)'
             }}
         >
             <SEO
@@ -132,26 +151,32 @@ function LandingPage() {
                 </div>
 
                 {/* Features */}
-                <div className="grid md:grid-cols-3 gap-6 mb-12">
+                <div className="grid md:grid-cols-3 gap-8 mb-12">
                     <div
-                        className="p-6 rounded-xl backdrop-blur transition-colors duration-300"
+                        className="p-8 rounded-2xl backdrop-blur-sm transition-all duration-300 text-center"
                         style={{
-                            backgroundColor: 'var(--color-surface)',
-                            border: `1px solid var(--color-border)`
+                            backgroundColor: theme === 'dark'
+                                ? 'rgba(30, 41, 59, 0.3)'
+                                : 'rgba(255, 255, 255, 0.5)',
+                            border: theme === 'dark'
+                                ? '1px solid rgba(148, 163, 184, 0.1)'
+                                : '1px solid rgba(201, 184, 168, 0.15)',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
                         }}
                     >
-                        <FaShoppingCart
-                            className="text-3xl mx-auto mb-3"
-                            style={{ color: 'var(--color-primary)' }}
+                        <img
+                            src={catalogoIllustration}
+                            alt="Catálogo Completo"
+                            className="w-24 h-24 mx-auto mb-4 object-contain"
                         />
                         <h3
-                            className="font-semibold mb-2"
+                            className="font-bold mb-2 text-center text-lg"
                             style={{ color: 'var(--color-text-main)' }}
                         >
                             Catálogo Completo
                         </h3>
                         <p
-                            className="text-sm"
+                            className="text-sm text-center"
                             style={{ color: 'var(--color-text-light)' }}
                         >
                             Gestiona tus productos fácilmente
@@ -159,24 +184,30 @@ function LandingPage() {
                     </div>
 
                     <div
-                        className="p-6 rounded-xl backdrop-blur transition-colors duration-300"
+                        className="p-8 rounded-2xl backdrop-blur-sm transition-all duration-300 text-center"
                         style={{
-                            backgroundColor: 'var(--color-surface)',
-                            border: `1px solid var(--color-border)`
+                            backgroundColor: theme === 'dark'
+                                ? 'rgba(30, 41, 59, 0.3)'
+                                : 'rgba(255, 255, 255, 0.5)',
+                            border: theme === 'dark'
+                                ? '1px solid rgba(148, 163, 184, 0.1)'
+                                : '1px solid rgba(201, 184, 168, 0.15)',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
                         }}
                     >
-                        <FaWhatsapp
-                            className="text-3xl mx-auto mb-3"
-                            style={{ color: 'var(--color-primary)' }}
+                        <img
+                            src={whatsappIllustration}
+                            alt="WhatsApp Integrado"
+                            className="w-24 h-24 mx-auto mb-4 object-contain"
                         />
                         <h3
-                            className="font-semibold mb-2"
+                            className="font-bold mb-2 text-center text-lg"
                             style={{ color: 'var(--color-text-main)' }}
                         >
                             WhatsApp Integrado
                         </h3>
                         <p
-                            className="text-sm"
+                            className="text-sm text-center"
                             style={{ color: 'var(--color-text-light)' }}
                         >
                             Recibe pedidos directamente
@@ -184,24 +215,30 @@ function LandingPage() {
                     </div>
 
                     <div
-                        className="p-6 rounded-xl backdrop-blur transition-colors duration-300"
+                        className="p-8 rounded-2xl backdrop-blur-sm transition-all duration-300 text-center"
                         style={{
-                            backgroundColor: 'var(--color-surface)',
-                            border: `1px solid var(--color-border)`
+                            backgroundColor: theme === 'dark'
+                                ? 'rgba(30, 41, 59, 0.3)'
+                                : 'rgba(255, 255, 255, 0.5)',
+                            border: theme === 'dark'
+                                ? '1px solid rgba(148, 163, 184, 0.1)'
+                                : '1px solid rgba(201, 184, 168, 0.15)',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
                         }}
                     >
-                        <FaCog
-                            className="text-3xl mx-auto mb-3"
-                            style={{ color: 'var(--color-primary)' }}
+                        <img
+                            src={personalizableIllustration}
+                            alt="100% Personalizable"
+                            className="w-24 h-24 mx-auto mb-4 object-contain"
                         />
                         <h3
-                            className="font-semibold mb-2"
+                            className="font-bold mb-2 text-center text-lg"
                             style={{ color: 'var(--color-text-main)' }}
                         >
                             100% Personalizable
                         </h3>
                         <p
-                            className="text-sm"
+                            className="text-sm text-center"
                             style={{ color: 'var(--color-text-light)' }}
                         >
                             Tu marca, tu estilo
@@ -216,7 +253,7 @@ function LandingPage() {
                             className="text-3xl font-bold mb-8"
                             style={{ color: 'var(--color-text-main)' }}
                         >
-                            Confían en Clicando
+                            Confían en Nosotros
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                             {featuredStores.map(store => {
@@ -267,11 +304,25 @@ function LandingPage() {
                         </div>
                         <button
                             onClick={() => setShowDirectory(true)}
-                            className="font-semibold py-2 px-6 rounded-full transition-colors border-2"
+                            className="font-semibold py-3 px-8 rounded-full transition-all duration-300 hover:-translate-x-1"
                             style={{
-                                borderColor: 'var(--color-primary)',
+                                background: theme === 'dark'
+                                    ? 'rgba(30, 41, 59, 0.3)'
+                                    : 'rgba(255, 255, 255, 0.4)',
+                                backdropFilter: 'blur(10px)',
                                 color: 'var(--color-primary)',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                border: '1.5px solid var(--color-primary)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = theme === 'dark'
+                                    ? 'rgba(30, 41, 59, 0.5)'
+                                    : 'rgba(255, 255, 255, 0.6)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = theme === 'dark'
+                                    ? 'rgba(30, 41, 59, 0.3)'
+                                    : 'rgba(255, 255, 255, 0.4)';
                             }}
                         >
                             Ver todas las tiendas

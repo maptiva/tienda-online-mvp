@@ -3,10 +3,13 @@ import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
 import { compressLogo } from '../utils/imageCompression';
+import { getStoragePath } from '../utils/storageUtils';
 import StoreMap from '../components/StoreMap'; // Import StoreMap component
+import { useShopCategories } from '../hooks/useShopCategories';
 
 function StoreSettings() {
   const { user } = useAuth();
+  const { categories: shopCategories, loading: categoriesLoading } = useShopCategories();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [storeData, setStoreData] = useState({
@@ -86,7 +89,7 @@ function StoreSettings() {
           longitude: data.longitude ? parseFloat(data.longitude) : null,
           show_map: data.show_map || false,
           city: data.city || '',
-          category: data.category || ''
+          category: (data.category === 'Veterinaria' || data.category === 'Petshop') ? 'Pet Shop' : (data.category || '')
         });
 
         // Show map preview if coordinates exist
@@ -160,7 +163,24 @@ function StoreSettings() {
     if (!logoFile) return storeData.logo_url;
 
     try {
-      // Comprimir logo a WebP con calidad premium (90%)
+      // 1. Limpieza del logo antiguo si existe y es diferente al nuevo
+      if (storeData.logo_url) {
+        const oldPath = getStoragePath(storeData.logo_url, 'store-logos');
+        if (oldPath) {
+          console.log('[Storage] Intentando eliminar logo antiguo:', oldPath);
+          const { error: removeError } = await supabase.storage
+            .from('store-logos')
+            .remove([oldPath]);
+
+          if (removeError) {
+            console.warn('[Storage] No se pudo borrar el logo antiguo (podría no existir):', removeError);
+          } else {
+            console.log('[Storage] Logo antiguo eliminado con éxito.');
+          }
+        }
+      }
+
+      // 2. Comprimir logo a WebP con calidad premium (90%)
       const compressedFile = await compressLogo(logoFile);
 
       // Usar extensión .webp para el archivo comprimido
@@ -254,10 +274,10 @@ function StoreSettings() {
   }
 
   return (
-    <div className="w-full bg-white p-8 rounded-xl shadow-xl">
-      <h2 className="text-3xl font-bold mb-6">Configuración de Tienda</h2>
+    <div className="w-full bg-white p-4 md:p-8 rounded-xl shadow-xl">
+      <h2 className="text-2xl md:text-3xl font-bold mb-6">Configuración de Tienda</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
         {/* Store Name */}
         <div>
           <label className="block text-sm font-medium mb-2">
@@ -342,21 +362,15 @@ function StoreSettings() {
             name="category"
             value={storeData.category || ''}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            disabled={categoriesLoading}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
           >
-            <option value="">Selecciona una categoría</option>
-            <option value="Almacén">Almacén / Comestibles</option>
-            <option value="Limpieza">Limpieza</option>
-            <option value="Indumentaria">Indumentaria / Ropa</option>
-            <option value="Juguetería">Jugueterías</option>
-            <option value="Rotisería">Rotiserías / Comidas</option>
-            <option value="Repostería">Repostería</option>
-            <option value="Veterinaria">Veterinarias / Pet Shop</option>
-            <option value="Tecnología">Tecnología / Accesorios</option>
-            <option value="Decoración">Decoración / Hogar</option>
-            <option value="Artesanías">Artesanías</option>
-            <option value="Farmacia">Farmacia / Perfumería</option>
-            <option value="Otros">Otros</option>
+            <option value="">{categoriesLoading ? 'Cargando rubros...' : 'Selecciona una categoría'}</option>
+            {shopCategories.map(cat => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
+              </option>
+            ))}
           </select>
         </div>
 

@@ -11,12 +11,21 @@ import { useSearchState } from '../store/useSearchStore';
 
 const ProductList = () => {
   const { store } = useOutletContext();
-  const { categoryActive } = useCategory();
+  const { categoryActive, limpiarCategoryActive } = useCategory();
   const { theme } = useTheme();
   const { products, loading, error } = useProducts(store?.user_id);
   const { searchTerm, setSearchTerm } = useSearchState();
 
-  console.log('Current theme:', theme); // Debug
+  // Resetear filtros (Categoría -> Todos, Búsqueda -> '') al cambiar de tienda
+  React.useEffect(() => {
+    if (store?.user_id) {
+      // Solo limpiar si hay algo activo para evitar renders innecesarios
+      if (categoryActive) limpiarCategoryActive();
+      if (searchTerm) setSearchTerm('');
+    }
+    // Solo dependemos del ID de la tienda para el reseteo
+  }, [store?.user_id]);
+
 
 
   // Usamos useMemo para no recalcular el filtro en cada render, solo si los productos o el término de búsqueda cambian
@@ -26,12 +35,18 @@ const ProductList = () => {
     return products.filter((product) => {
       const searchLower = searchTerm.toLowerCase();
 
-      // Buscar en: nombre, descripción y categoría
+      // Buscar en: nombre, descripción, categoría, SKU e ID
       const matchesName = product.name.toLowerCase().includes(searchLower);
       const matchesDescription = product.description?.toLowerCase().includes(searchLower) || false;
       const matchesCategory = product.categories?.name?.toLowerCase().includes(searchLower) || false;
 
-      const matchesSearch = matchesName || matchesDescription || matchesCategory;
+      // Búsqueda por SKU o ID (usando el prefijo # para el ID)
+      const matchesSKU = product.sku?.toLowerCase().includes(searchLower) || false;
+      const matchesID = searchLower.startsWith('#')
+        ? (product.display_id || product.id).toString() === searchLower.replace('#', '')
+        : (product.display_id || product.id).toString() === searchLower;
+
+      const matchesSearch = matchesName || matchesDescription || matchesCategory || matchesSKU || matchesID;
 
       // Aplicar filtro de categoría activa si existe
       if (categoryActive) {
@@ -101,7 +116,10 @@ const ProductList = () => {
       {filteredProducts.length > 0 ? (
         <div className={styles.productosContainer}>
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={{ ...product, store_whatsapp: store?.whatsapp_number }}
+            />
           ))}
         </div>
       ) : (

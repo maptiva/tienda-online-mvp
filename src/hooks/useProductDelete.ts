@@ -1,43 +1,70 @@
-import { CgLaptop } from "react-icons/cg";
 import { supabase } from "../services/supabase";
+import { getStoragePath } from "../utils/storageUtils";
 
 export const deleteProduct = async (id: string, imageUrl: string): Promise<boolean> => {
     try {
-        // Solo intentar eliminar la imagen si existe una URL válida
-        if (imageUrl && imageUrl.trim() !== '') {
-            // 1. Extraer el nombre del archivo de la URL de la imagen
-            const imageName = imageUrl.split('/').pop();
+        console.log(`[Storage] Iniciando proceso de eliminación para producto ID: ${id}`);
 
-            if (!imageName) {
-                console.error("No se pudo extraer el nombre de la imagen de la URL:", imageUrl);
-                // Continuar con la eliminación del producto aunque falle la imagen
+        // 1. Obtener datos actuales del producto (especialmente la galería)
+        const { data: product, error: fetchError } = await supabase
+            .from('products')
+            .select('image_url, gallery_images')
+            .eq('id', id)
+            .single();
+
+        if (fetchError) {
+            console.warn('[Storage] No se pudo obtener la galería del producto antes de borrar:', fetchError);
+        }
+
+        const imagesToDelete: string[] = [];
+
+        // 2. Preparar rutas de imágenes para borrar
+        // Imagen principal
+        if (imageUrl) {
+            const path = getStoragePath(imageUrl, 'product-images');
+            if (path) imagesToDelete.push(path);
+        } else if (product?.image_url) {
+            const path = getStoragePath(product.image_url, 'product-images');
+            if (path) imagesToDelete.push(path);
+        }
+
+        // Galería
+        if (product?.gallery_images && Array.isArray(product.gallery_images)) {
+            product.gallery_images.forEach((url: string) => {
+                const path = getStoragePath(url, 'product-images');
+                if (path) imagesToDelete.push(path);
+            });
+        }
+
+        // 3. Eliminar archivos del Storage
+        if (imagesToDelete.length > 0) {
+            console.log('[Storage] Eliminando archivos físicos:', imagesToDelete);
+            const { error: storageError } = await supabase.storage
+                .from('product-images')
+                .remove(imagesToDelete);
+
+            if (storageError) {
+                console.error('[Storage] Error al eliminar archivos físicos:', storageError);
             } else {
-                // 2. Eliminar la imagen del Storage
-                const { error: storageError } = await supabase.storage
-                    .from('product-images')
-                    .remove([imageName]);
-
-                if (storageError) {
-                    console.error('Error al eliminar la imagen del Storage:', storageError);
-                    // Continuar con la eliminación del producto aunque falle la imagen
-                }
+                console.log('[Storage] Archivos físicos eliminados con éxito.');
             }
         }
 
-        // 3. Eliminar el registro del producto de la base de datos
+        // 4. Eliminar el registro del producto de la base de datos
         const { error: dbError } = await supabase
             .from('products')
             .delete()
             .eq('id', id);
 
         if (dbError) {
-            console.error('Error al eliminar el producto de la base de datos:', dbError);
+            console.error('[Database] Error al eliminar el producto de la DB:', dbError);
             return false;
         }
 
-        return true; // Éxito si ambas operaciones funcionaron
+        console.log('[Storage] Producto y archivos eliminados completamente.');
+        return true;
     } catch (error) {
-        console.error("Error inesperado al eliminar el producto:", error);
+        console.error("[Storage] Error inesperado al eliminar el producto:", error);
         return false;
     }
 };

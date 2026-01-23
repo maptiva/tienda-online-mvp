@@ -1,16 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useStores } from '../hooks/useStores';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaFilter, FaList, FaMap, FaSearch, FaTimes } from 'react-icons/fa';
+import {
+    FaArrowLeft, FaFilter, FaList, FaMap, FaSearch, FaTimes,
+    FaTshirt, FaUtensils, FaBirthdayCake, FaGamepad, FaPaw,
+    FaChair, FaShoppingCart, FaLaptop, FaTools, FaBook, FaTag, FaHome, FaGift
+} from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'react-leaflet-markercluster/dist/styles.min.css';
+import logoClicandoPng from '../assets/logo-clicando.png';
+import * as FaIcons from 'react-icons/fa';
+import { useShopCategories } from '../hooks/useShopCategories';
 
 // Componente para manejar cada marcador individualmente con su popup
-const StoreMarker = ({ store, isSelected, onSelect }) => {
+const StoreMarker = ({ store, isSelected, onSelect, metaMap }) => {
     const markerRef = useRef(null);
 
     useEffect(() => {
@@ -22,7 +29,7 @@ const StoreMarker = ({ store, isSelected, onSelect }) => {
     return (
         <Marker
             position={[store.latitude, store.longitude]}
-            icon={getCategoryIcon(store.category)}
+            icon={getCategoryIcon(store.category, metaMap)}
             ref={markerRef}
             eventHandlers={{
                 click: onSelect
@@ -67,27 +74,23 @@ const MapRecenter = ({ lat, lng }) => {
     return null;
 };
 
-// Mapeo detallado de rubros a colores e iconos
-const categoryMeta = {
-    'Comida': { color: 'orange', emoji: '🍔', marker: 'orange' },
-    'Gastronomía': { color: 'orange', emoji: '🍔', marker: 'orange' },
-    'Ropa': { color: 'violet', emoji: '👕', marker: 'violet' },
-    'Indumentaria': { color: 'violet', emoji: '👕', marker: 'violet' },
-    'Almacén': { color: 'green', emoji: '🛒', marker: 'green' },
-    'Supermercado': { color: 'green', emoji: '🛒', marker: 'green' },
-    'Veterinaria': { color: 'red', emoji: '🐾', marker: 'red' },
-    'Petshop': { color: 'red', emoji: '🐾', marker: 'red' },
-    'Juguetería': { color: 'gold', emoji: '🧸', marker: 'gold' },
-    'Bazar': { color: 'yellow', emoji: '🏠', marker: 'yellow' },
-    'Hogar': { color: 'yellow', emoji: '🏠', marker: 'yellow' },
-    'Servicios': { color: 'blue', emoji: '🛠️', marker: 'blue' },
-    'Electrónica': { color: 'blue', emoji: '💻', marker: 'blue' },
-    'Default': { color: 'gray', emoji: '🏪', marker: 'blue' }
-};
+const getCategoryIcon = (category, metaMap = null) => {
+    const defaultMeta = { marker: 'blue' };
+    const meta = (metaMap && metaMap[category]) || defaultMeta;
 
-const getCategoryIcon = (category) => {
-    const meta = categoryMeta[category] || categoryMeta['Default'];
-    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${meta.marker}.png`;
+    // Colores soportados por leaflet-color-markers
+    const validColors = ['blue', 'gold', 'red', 'green', 'orange', 'yellow', 'violet', 'grey', 'black'];
+
+    // Normalizar color: Leaflet espera 'grey' pero es común escribir 'gray'
+    let markerColor = meta.marker ? meta.marker.toLowerCase() : 'blue';
+    if (markerColor === 'gray') markerColor = 'grey';
+
+    // Si el color no es válido, usar blue por defecto para evitar que el icono desaparezca
+    if (!validColors.includes(markerColor)) {
+        markerColor = 'blue';
+    }
+
+    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`;
 
     return new L.Icon({
         iconUrl,
@@ -111,7 +114,9 @@ const userLocationIcon = new L.Icon({
 const ExploreMap = () => {
     const { theme } = useTheme();
     const navigate = useNavigate();
-    const { stores, loading, error } = useStores();
+    const { stores, loading: storesLoading } = useStores();
+    const { categories: shopCategories, loading: categoriesLoading } = useShopCategories();
+
     const [selectedStore, setSelectedStore] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -120,15 +125,77 @@ const ExploreMap = () => {
     const [showFilters, setShowFilters] = useState(false);
 
     // Extraer opciones únicas
-    const categories = [...new Set(stores.map(s => s.category).filter(Boolean))].sort();
     const cities = [...new Set(stores.map(s => s.city).filter(Boolean))].sort();
 
-    const filteredStores = stores.filter(store => {
+    // Mapa de iconos a emojis para el SELECT nativo (que no soporta SVGs)
+    const iconToEmoji = {
+        FaTshirt: '👕',
+        FaUtensils: '🍴',
+        FaBirthdayCake: '🎂',
+        FaGamepad: '🎮',
+        FaPaw: '🐾',
+        FaChair: '🪑',
+        FaShoppingCart: '🛒',
+        FaLaptop: '💻',
+        FaTools: '🛠️',
+        FaBook: '📚',
+        FaTag: '🏷️',
+        FaHome: '🏠',
+        FaGift: '🎁',
+        // Nuevos mapeos solicitados (con variaciones posibles para asegurar que coincida con DB)
+        FaHeartbeat: '🧴', // Farmacia
+        FaMedkit: '🧴',
+        FaClinicMedical: '🧴',
+        FaPlus: '🧴',
+        FaFirstAid: '🧴',
+        FaPills: '🧴',
+        FaPrescriptionBottle: '🧴',
+
+        FaPaintBrush: '🏺', // Artesanías
+        FaPalette: '🏺',
+        FaHandPaper: '🏺',
+        FaMagic: '🏺',
+        FaGem: '🏺',
+    };
+
+    // Mapeo dinámico de categorías para UI externa
+    const categoryMetaMap = useMemo(() => {
+        const map = {};
+        shopCategories.forEach(cat => {
+            // Decidir emoji: Primero ver si hay override manual por ID, sino buscar por icono
+            let emoji = iconToEmoji[cat.icon_name] || '🏷️';
+
+            // Overrides manuales para corregir datos genéricos de la BD
+            if (cat.id === 'Farmacia') emoji = '🧴';
+            if (cat.id === 'Artesanías') emoji = '🏺';
+
+            // Usamos ID como clave porque las tiendas guardan el ID (ej: "Juguetería") NO la label ("Jugueterías")
+            map[cat.id] = {
+                label: cat.label,
+                icon: FaIcons[cat.icon_name] || FaIcons.FaTag,
+                marker: cat.marker_color,
+                emoji: emoji
+            };
+        });
+        return map;
+    }, [shopCategories]);
+
+    const filteredStores = stores.map(s => ({
+        ...s,
+        category: (s.category === 'Veterinaria' || s.category === 'Petshop') ? 'Pet Shop' : (s.category || 'Otros')
+    })).filter(store => {
         const matchesSearch = store.store_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             store.address?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = !selectedCategory || store.category === selectedCategory;
         const matchesCity = !selectedCity || store.city === selectedCity;
         return matchesSearch && matchesCategory && matchesCity;
+    }).sort((a, b) => {
+        const getWeight = (s) => {
+            if (s.coming_soon) return 3;
+            if (s.is_demo) return 2;
+            return 1;
+        };
+        return getWeight(a) - getWeight(b);
     });
 
     useEffect(() => {
@@ -138,10 +205,10 @@ const ExploreMap = () => {
         }
     }, [selectedCity]);
 
-    if (loading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa...</div>;
+    if (storesLoading || categoriesLoading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa...</div>;
 
     const StoreList = ({ className = "" }) => (
-        <div className={`flex flex-col h-full ${className}`} style={{ backgroundColor: 'var(--color-surface)' }}>
+        <div className={`flex flex-col min-h-0 ${className}`} style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="p-4 border-b flex justify-between items-center sticky top-0 z-10" style={{ backgroundColor: 'var(--color-background-light)', borderBottomColor: 'var(--color-border)' }}>
                 <div className="flex flex-col">
                     <h2 className="font-bold text-lg" style={{ color: 'var(--color-text-main)' }}>{filteredStores.length} Comercios</h2>
@@ -157,9 +224,22 @@ const ExploreMap = () => {
                     </button>
                 )}
             </div>
-            <div className="divide-y overflow-y-auto pb-24">
+            <div className="flex-1 divide-y overflow-y-auto pb-24">
                 {filteredStores.map(store => {
-                    const meta = categoryMeta[store.category] || categoryMeta['Default'];
+                    // Buscar metadatos: coincidencia exacta por ID (store.category debería ser el ID)
+                    // Si falla, intentamos fuzzy match por si acaso
+                    let meta = categoryMetaMap[store.category];
+
+                    if (!meta) {
+                        const matchingKey = Object.keys(categoryMetaMap).find(key =>
+                            key.toLowerCase() === store.category?.toLowerCase() ||
+                            categoryMetaMap[key].label.toLowerCase() === store.category?.toLowerCase()
+                        );
+                        if (matchingKey) meta = categoryMetaMap[matchingKey];
+                    }
+
+                    // Fallback visual
+                    meta = meta || { label: store.category, icon: FaIcons.FaTag, emoji: '🏷️' };
                     return (
                         <div
                             key={store.id}
@@ -191,9 +271,9 @@ const ExploreMap = () => {
                                     </div>
                                     <div className="flex items-end justify-between mt-1">
                                         <div className="flex flex-wrap items-center gap-1.5 min-w-0">
-                                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border flex items-center gap-1 uppercase tracking-tighter truncate"
+                                            <span className="text-[10px] font-bold px-1.5 py-1 rounded border flex items-center gap-1.5 uppercase tracking-tighter truncate"
                                                 style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-light)', borderColor: 'var(--color-border)' }}>
-                                                {meta.emoji} {store.category || 'Tienda'}
+                                                {meta.emoji} {meta.label}
                                             </span>
                                             <span className="text-[10px] font-bold uppercase tracking-tighter truncate" style={{ color: 'var(--color-primary)' }}>
                                                 {store.city}
@@ -239,7 +319,7 @@ const ExploreMap = () => {
     );
 
     return (
-        <div className="h-screen flex flex-col md:flex-row overflow-hidden font-sans" style={{ backgroundColor: 'var(--color-background-light)' }}>
+        <div className="h-screen flex flex-col md:flex-row overflow-hidden font-sans" style={{ backgroundColor: 'var(--color-background-light)', height: '100svh' }}>
 
             {/* Overlay Filters Modal (Mobile) */}
             {showFilters && (
@@ -256,36 +336,43 @@ const ExploreMap = () => {
                             <div>
                                 <label className="block text-sm font-bold mb-2" style={{ color: 'var(--color-text-main)' }}>Rubro</label>
                                 <select
-                                    className="w-full p-4 border rounded-2xl outline-none"
+                                    className="w-full p-4 border-2 rounded-2xl outline-none transition-all focus:ring-2 focus:ring-[var(--color-primary)]/20"
                                     style={{
-                                        backgroundColor: 'var(--color-background-light)',
+                                        backgroundColor: 'var(--color-surface)',
                                         borderColor: 'var(--color-border)',
                                         color: 'var(--color-text-main)'
                                     }}
+                                    onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                                    onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                                     value={selectedCategory}
                                     onChange={(e) => {
                                         setSelectedCategory(e.target.value);
                                         setShowFilters(false);
                                     }}
                                 >
-                                    <option value="">Todos los rubros</option>
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat}>
-                                            {(categoryMeta[cat] || categoryMeta['Default']).emoji} {cat}
-                                        </option>
-                                    ))}
+                                    <option value="">📂 Todos los rubros</option>
+                                    {shopCategories.map(cat => {
+                                        const emoji = iconToEmoji[cat.icon_name] || '🏷️';
+                                        return (
+                                            <option key={cat.id} value={cat.label}>
+                                                {emoji} {cat.label}
+                                            </option>
+                                        );
+                                    })}
                                 </select>
                             </div>
 
                             <div>
                                 <label className="block text-sm font-bold mb-2" style={{ color: 'var(--color-text-main)' }}>Ciudad</label>
                                 <select
-                                    className="w-full p-4 border rounded-2xl outline-none"
+                                    className="w-full p-4 border-2 rounded-2xl outline-none transition-all focus:ring-2 focus:ring-[var(--color-primary)]/20"
                                     style={{
-                                        backgroundColor: 'var(--color-background-light)',
+                                        backgroundColor: 'var(--color-surface)',
                                         borderColor: 'var(--color-border)',
                                         color: 'var(--color-text-main)'
                                     }}
+                                    onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                                    onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                                     value={selectedCity}
                                     onChange={(e) => {
                                         setSelectedCity(e.target.value);
@@ -318,11 +405,14 @@ const ExploreMap = () => {
 
             {/* Desktop Sidebar */}
             <aside className="hidden md:flex flex-col w-[350px] lg:w-[400px] border-r shadow-2xl z-20" style={{ backgroundColor: 'var(--color-surface)', borderRightColor: 'var(--color-border)' }}>
-                <div className="p-4 border-b flex items-center gap-4" style={{ backgroundColor: 'var(--color-surface)', borderBottomColor: 'var(--color-border)' }}>
+                <div className="p-4 border-b flex items-center gap-3" style={{ backgroundColor: 'var(--color-surface)', borderBottomColor: 'var(--color-border)' }}>
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors" style={{ color: 'var(--color-text-light)' }}>
                         <FaArrowLeft />
                     </button>
-                    <Link to="/" className="text-2xl font-black tracking-tighter" style={{ color: 'var(--color-primary)' }}>CLICANDO</Link>
+                    <div className="flex items-center gap-2">
+                        <img src={logoClicandoPng} alt="Logo" className="w-8 h-8 rounded-lg shadow-sm" />
+                        <Link to="/" className="text-2xl font-black tracking-tighter" style={{ color: 'var(--color-primary)' }}>Clicando</Link>
+                    </div>
                 </div>
 
                 <div className="p-4 space-y-3" style={{ backgroundColor: 'var(--color-surface)' }}>
@@ -331,12 +421,14 @@ const ExploreMap = () => {
                         <input
                             type="text"
                             placeholder="Buscar tiendas o rubros..."
-                            className="w-full pl-10 pr-4 py-3 border-2 rounded-xl outline-none transition-all text-sm"
+                            className="w-full pl-10 pr-4 py-3 border-2 rounded-xl outline-none transition-all text-sm focus:ring-2 focus:ring-[var(--color-primary)]/20"
                             style={{
-                                backgroundColor: 'var(--color-background-light)',
+                                backgroundColor: 'var(--color-surface)',
                                 borderColor: 'var(--color-border)',
                                 color: 'var(--color-text-main)'
                             }}
+                            onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                            onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -354,7 +446,10 @@ const ExploreMap = () => {
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >
                             <option value="">Todos los Rubros</option>
-                            {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                            {shopCategories.map(cat => {
+                                const meta = categoryMetaMap[cat.id];
+                                return <option key={cat.id} value={cat.id}>{meta?.emoji} {cat.label}</option>;
+                            })}
                         </select>
                         <select
                             className="p-2.5 border-2 rounded-xl text-xs font-bold outline-none"
@@ -372,7 +467,7 @@ const ExploreMap = () => {
                     </div>
                 </div>
 
-                <StoreList />
+                <StoreList className="flex-1" />
             </aside>
 
             {/* Main Content Area */}
@@ -397,12 +492,14 @@ const ExploreMap = () => {
                             <input
                                 type="text"
                                 placeholder="Buscar en Clicando..."
-                                className="w-full pl-11 pr-4 py-3.5 shadow-xl rounded-2xl border outline-none text-sm font-medium"
+                                className="w-full pl-11 pr-4 py-3.5 shadow-xl rounded-2xl border outline-none text-sm font-medium transition-all"
                                 style={{
                                     backgroundColor: 'var(--color-surface)',
                                     borderColor: 'var(--color-border)',
                                     color: 'var(--color-text-main)'
                                 }}
+                                onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                                onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -421,44 +518,56 @@ const ExploreMap = () => {
                     </div>
                 </div>
 
-                {/* Bottom-Right Controls (Mobile Only) */}
-                <div className="absolute bottom-24 right-4 z-[400] flex flex-col gap-2 md:hidden">
-                    <button
-                        onClick={() => {
-                            if (navigator.geolocation) {
-                                navigator.geolocation.getCurrentPosition((position) => {
-                                    const { latitude, longitude } = position.coords;
-                                    setSelectedStore({ latitude, longitude, isUserLocation: true });
-                                });
-                            }
-                        }}
-                        className="p-4 shadow-2xl rounded-2xl border active:scale-95 transition-transform"
-                        style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text-main)' }}
-                        title="Mi ubicación"
-                    >
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="1" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="23"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line></svg>
-                    </button>
-                </div>
+                {/* Bottom-Right Controls (Mobile Only) - REMOVED, moved near switcher */}
 
-                {/* Switcher Button (Mobile Only) */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1200] md:hidden">
-                    <button
-                        onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
-                        className="px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm active:scale-95 transition-transform"
-                        style={{ backgroundColor: 'var(--color-text-main)', color: 'var(--color-surface)' }}
-                    >
-                        {viewMode === 'map' ? (
-                            <><FaList /> Ver Lista</>
-                        ) : (
-                            <><FaMap /> Ver Mapa</>
+                {/* Switcher & GPS Buttons (Mobile Only) */}
+                {!showFilters && (
+                    <>
+                        {/* GPS Button - Hidden when list view is active */}
+                        {viewMode === 'map' && (
+                            <div className="absolute bottom-14 right-4 z-[1200] md:hidden" style={{ bottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}>
+                                <button
+                                    onClick={() => {
+                                        if (navigator.geolocation) {
+                                            navigator.geolocation.getCurrentPosition((position) => {
+                                                const { latitude, longitude } = position.coords;
+                                                setSelectedStore({ latitude, longitude, isUserLocation: true });
+                                            });
+                                        }
+                                    }}
+                                    className="p-4 rounded-full shadow-2xl active:scale-95 transition-transform border"
+                                    style={{
+                                        backgroundColor: 'var(--color-text-main)',
+                                        color: 'var(--color-surface)',
+                                        borderColor: 'var(--color-border)'
+                                    }}
+                                    title="Mi ubicación"
+                                >
+                                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="1" x2="12" y2="4"></line><line x1="12" y1="20" x2="12" y2="23"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line></svg>
+                                </button>
+                            </div>
                         )}
-                    </button>
-                </div>
+                        {/* Switcher Button - Back to bottom-center */}
+                        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-[1200] md:hidden" style={{ bottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}>
+                            <button
+                                onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
+                                className="px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm active:scale-95 transition-transform"
+                                style={{ backgroundColor: 'var(--color-text-main)', color: 'var(--color-surface)' }}
+                            >
+                                {viewMode === 'map' ? (
+                                    <><FaList /> Ver Lista</>
+                                ) : (
+                                    <><FaMap /> Ver Mapa</>
+                                )}
+                            </button>
+                        </div>
+                    </>
+                )}
 
                 {/* Mobile Store List View */}
                 {viewMode === 'list' && (
                     <div className="absolute inset-0 z-[1100] md:hidden bg-white animate-fade-in">
-                        <StoreList />
+                        <StoreList className="h-full" />
                     </div>
                 )}
 
@@ -487,6 +596,7 @@ const ExploreMap = () => {
                                     store={store}
                                     isSelected={selectedStore?.id === store.id}
                                     onSelect={() => setSelectedStore(store)}
+                                    metaMap={categoryMetaMap}
                                 />
                             ))}
                         </MarkerClusterGroup>
@@ -521,9 +631,11 @@ const ExploreMap = () => {
                 .leaflet-popup-content-wrapper {
                     border-radius: 16px;
                     padding: 4px;
+                    background: var(--color-surface);
+                    color: var(--color-text-main);
                 }
-                .leaflet-popup-tip-container {
-                    display: none;
+                .leaflet-popup-tip {
+                    background: var(--color-surface);
                 }
             `}</style>
         </div>

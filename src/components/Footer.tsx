@@ -5,8 +5,8 @@ import { legalTexts, footerDisclaimer } from '../constants/legalTexts'
 import { IoLocation } from 'react-icons/io5' // Filled icon
 import { IoCall } from 'react-icons/io5' // Filled icon
 import { IoTime } from 'react-icons/io5' // Filled icon
-import { FaInstagram, FaFacebook } from 'react-icons/fa'
-import { IoMap } from 'react-icons/io5'
+import { IoMap, IoStorefront } from 'react-icons/io5'
+import { FaInstagram, FaFacebook, FaStore } from 'react-icons/fa'
 import StoreDirectory from './StoreDirectory'
 import StoreMap from './StoreMap' // Import StoreMap
 import { Link } from 'react-router-dom'
@@ -168,11 +168,35 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                 </a>
                             </p>
 
+                            {/* Redes Sociales Clicando */}
+                            <div className='flex gap-4 mt-2 mb-4 justify-start md:justify-end'>
+                                <a
+                                    href='https://instagram.com/clicando.ar'
+                                    target='_blank'
+                                    rel='noopener noreferrer'
+                                    className='transition-opacity hover:opacity-70'
+                                    style={{ color: 'var(--color-primary)' }}
+                                    aria-label="Instagram de Clicando"
+                                >
+                                    <FaInstagram size={24} />
+                                </a>
+                                <a
+                                    href='https://facebook.com/clicando.ar'
+                                    target='_blank'
+                                    rel='noopener noreferrer'
+                                    className='transition-opacity hover:opacity-70'
+                                    style={{ color: 'var(--color-primary)' }}
+                                    aria-label="Facebook de Clicando"
+                                >
+                                    <FaFacebook size={24} />
+                                </a>
+                            </div>
+
                             {/* Links Legales */}
                             <div className='flex flex-wrap gap-2 text-sm mb-4 md:justify-end' style={{ color: 'var(--color-text-light)' }}>
                                 <button
                                     onClick={() => openModal('terms')}
-                                    className='hover:underline transition-colors'
+                                    className='hover:underline transition-colors cursor-pointer'
                                     style={{ color: 'var(--color-text-light)' }}
                                     onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
                                     onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-light)'}
@@ -182,7 +206,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                 <span>|</span>
                                 <button
                                     onClick={() => openModal('privacy')}
-                                    className='hover:underline transition-colors'
+                                    className='hover:underline transition-colors cursor-pointer'
                                     style={{ color: 'var(--color-text-light)' }}
                                     onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
                                     onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-light)'}
@@ -192,7 +216,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                 <span>|</span>
                                 <button
                                     onClick={() => openModal('legal')}
-                                    className='hover:underline transition-colors'
+                                    className='hover:underline transition-colors cursor-pointer'
                                     style={{ color: 'var(--color-text-light)' }}
                                     onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-primary)'}
                                     onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-light)'}
@@ -215,13 +239,13 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                 </Link>
                                 <button
                                     onClick={() => setShowDirectory(true)}
-                                    className='font-bold py-2 px-4 rounded-lg text-sm transition-transform hover:scale-105'
+                                    className='font-bold py-2 px-4 rounded-lg text-sm transition-transform hover:scale-105 cursor-pointer inline-flex items-center gap-2'
                                     style={{
                                         backgroundColor: 'var(--color-primary)',
                                         color: 'var(--color-primary-text)'
                                     }}
                                 >
-                                    Lista de Tiendas
+                                    <FaStore size={16} /> Lista de Tiendas
                                 </button>
                             </div>
                         </div>
@@ -233,7 +257,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             {footerDisclaimer}
                         </p>
                         <p className='text-sm' style={{ color: 'var(--color-text-light)', opacity: 0.9 }}>
-                            © 2025 {displayName}. Todos los derechos reservados
+                            © {new Date().getFullYear()} {displayName}. Todos los derechos reservados
                         </p>
                     </div>
                 </div>

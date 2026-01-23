@@ -34,11 +34,16 @@ const PublicLayout = () => {
     );
   }
 
+  // Asegurar que la URL del logo sea absoluta
+  const absoluteLogoUrl = store.logo_url?.startsWith('http')
+    ? store.logo_url
+    : `${window.location.origin}${store.logo_url}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": store.store_name,
-    "image": store.logo_url,
+    "image": absoluteLogoUrl,
     "telephone": store.whatsapp_number,
     "url": window.location.href
   };
@@ -46,12 +51,13 @@ const PublicLayout = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <SEO
-        title={store.store_name}
-        description={`Bienvenido a ${store.store_name}. Explora nuestro catálogo de productos.`}
+        title={`${store.store_name} - Catálogo Online`}
+        description={`Descubre los productos de ${store.store_name}. Navega nuestro catálogo completo y realiza tu pedido por WhatsApp. ¡Compra fácil y rápido!`}
         name={store.store_name}
-        image={store.logo_url}
+        image={absoluteLogoUrl}
         url={window.location.href}
         schema={jsonLd}
+        siteName={store.store_name}
       />
       <Header storeData={store} onCartClick={() => setIsCartOpen(true)} />
       {isProductListPage && <CategoriaList userId={store.user_id} />}
