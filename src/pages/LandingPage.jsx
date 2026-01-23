@@ -290,7 +290,30 @@ function LandingPage() {
                         </h2>
 {/* Carousel Container */}
                         <div className="relative overflow-hidden group mb-10">
-                            <div className="flex space-x-8 animate-scroll whitespace-nowrap py-4">
+                            <div 
+                                className="flex space-x-8 animate-scroll whitespace-nowrap py-4 cursor-grab active:cursor-grabbing"
+                                onMouseDown={(e) => {
+                                    const slider = e.currentTarget;
+                                    const startX = e.pageX - slider.offsetLeft;
+                                    const scrollLeft = slider.scrollLeft;
+                                    
+                                    const handleMouseMove = (e) => {
+                                        const x = e.pageX - slider.offsetLeft;
+                                        const walk = (x - startX) * 2;
+                                        slider.scrollLeft = scrollLeft - walk;
+                                    };
+                                    
+                                    const handleMouseUp = () => {
+                                        slider.classList.remove('active:cursor-grabbing');
+                                        document.removeEventListener('mousemove', handleMouseMove);
+                                        document.removeEventListener('mouseup', handleMouseUp);
+                                    };
+                                    
+                                    slider.classList.add('active:cursor-grabbing');
+                                    document.addEventListener('mousemove', handleMouseMove);
+                                    document.addEventListener('mouseup', handleMouseUp);
+                                }}
+                            >
                                 {/* Duplicate stores for infinite scroll effect */}
                                 {[...featuredStores, ...featuredStores].map((store, index) => {
                                     const CardWrapper = store.coming_soon ? 'div' : Link;
@@ -300,38 +323,38 @@ function LandingPage() {
                                         <CardWrapper {...cardProps} key={`${store.id}-${index}`}>
                                             <motion.div
                                                 whileHover={{ y: -8, scale: 1.02 }}
-                                                className="w-56 h-32 bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-gray-100 dark:border-slate-700/50 hover:shadow-xl transition-all relative"
+                                                className="w-72 h-40 bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm rounded-xl shadow-md flex flex-col items-center justify-center p-6 border border-gray-100 dark:border-slate-700/50 hover:shadow-xl transition-all relative"
                                                 style={{
                                                     cursor: store.coming_soon ? 'default' : 'pointer',
                                                     opacity: store.coming_soon ? 0.8 : 1,
                                                 }}
                                             >
                                                 {store.is_demo && (
-                                                    <span className="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
+                                                    <span className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
                                                         DEMO
                                                     </span>
                                                 )}
                                                 {store.coming_soon && !store.is_demo && (
-                                                    <span className="absolute top-2 right-2 bg-slate-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
+                                                    <span className="absolute top-3 right-3 bg-slate-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
                                                         PRÓXIMAMENTE
                                                     </span>
                                                 )}
 
-                                                <div className="mb-2 relative">
+                                                <div className="mb-3 relative">
                                                     {store.logo_url ? (
                                                         <img
                                                             src={store.logo_url}
                                                             alt={store.store_name}
-                                                            className="w-16 h-16 mx-auto rounded-full object-contain bg-white p-1 shadow-inner border-2 border-slate-50 dark:border-slate-700"
+                                                            className="w-20 h-20 mx-auto rounded-full object-contain bg-white p-2 shadow-inner border-2 border-slate-50 dark:border-slate-700"
                                                         />
                                                     ) : (
-                                                        <div className="w-16 h-16 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                                                            <FaStore className="text-3xl text-slate-300 dark:text-slate-500" />
+                                                        <div className="w-20 h-20 mx-auto rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                                                            <FaStore className="text-4xl text-slate-300 dark:text-slate-500" />
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <h3 className="font-black text-xs truncate uppercase tracking-tight text-center" style={{ color: 'var(--color-text-main)' }}>
+                                                <h3 className="font-black text-sm truncate uppercase tracking-tight text-center" style={{ color: 'var(--color-text-main)' }}>
                                                     {store.store_name}
                                                 </h3>
                                             </motion.div>
