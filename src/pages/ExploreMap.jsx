@@ -73,7 +73,7 @@ const MapRecenter = ({ lat, lng, isComingSoon }) => {
     const map = useMap();
     useEffect(() => {
         if (lat && lng && !isComingSoon) {
-            map.flyTo([lat, lng], 15, { duration: 1.5 });
+            map.flyTo([lat, lng], 17, { duration: 1.5 });
         }
     }, [lat, lng, isComingSoon, map]);
     return null;
@@ -199,23 +199,25 @@ const ExploreMap = () => {
         return map;
     }, [shopCategories]);
 
-    const filteredStores = stores.map(s => ({
-        ...s,
-        category: (s.category === 'Veterinaria' || s.category === 'Petshop') ? 'Pet Shop' : (s.category || 'Otros')
-    })).filter(store => {
-        const matchesSearch = store.store_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            store.address?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = !selectedCategory || store.category === selectedCategory;
-        const matchesCity = !selectedCity || store.city === selectedCity;
-        return matchesSearch && matchesCategory && matchesCity;
-    }).sort((a, b) => {
-        const getWeight = (s) => {
-            if (s.coming_soon) return 3;
-            if (s.is_demo) return 2;
-            return 1;
-        };
-        return getWeight(a) - getWeight(b);
-    });
+    const filteredStores = useMemo(() => {
+        return stores.map(s => ({
+            ...s,
+            category: (s.category === 'Veterinaria' || s.category === 'Petshop') ? 'Pet Shop' : (s.category || 'Otros')
+        })).filter(store => {
+            const matchesSearch = store.store_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                store.address?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = !selectedCategory || store.category === selectedCategory;
+            const matchesCity = !selectedCity || store.city === selectedCity;
+            return matchesSearch && matchesCategory && matchesCity;
+        }).sort((a, b) => {
+            const getWeight = (s) => {
+                if (s.coming_soon) return 3;
+                if (s.is_demo) return 2;
+                return 1;
+            };
+            return getWeight(a) - getWeight(b);
+        });
+    }, [stores, searchTerm, selectedCategory, selectedCity]);
 
     // Scroll to selected store in the list
     useEffect(() => {
