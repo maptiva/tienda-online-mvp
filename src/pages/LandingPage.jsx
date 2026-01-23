@@ -16,7 +16,9 @@ function LandingPage() {
     const { theme, toggleTheme } = useTheme();
     const [featuredStores, setFeaturedStores] = useState([]);
     const [showDirectory, setShowDirectory] = useState(false);
+    const carouselRef = React.useRef(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         const fetchFeaturedStores = async () => {
@@ -292,27 +294,36 @@ function LandingPage() {
 {/* Carousel Container */}
                         <div className="relative overflow-hidden group mb-10">
                             <div 
-                                ref={(el) => {
-                                    if (el && !el.dataset.initialized) {
-                                        el.dataset.initialized = 'true';
-                                        el.classList.add('animate-scroll');
-                                    }
+                                ref={carouselRef}
+                                className="flex space-x-8 whitespace-nowrap py-4 cursor-grab active:cursor-grabbing overflow-x-auto scrollbar-hide scroll-smooth"
+                                style={{
+                                    scrollbarWidth: 'none',
+                                    msOverflowStyle: 'none'
                                 }}
-                                className={`flex space-x-8 whitespace-nowrap py-4 cursor-grab active:cursor-grabbing ${!isDragging ? 'animate-scroll' : ''}`}
                                 onMouseDown={(e) => {
+                                    e.preventDefault();
                                     setIsDragging(true);
+                                    setDragStart({ x: e.pageX, y: e.pageY });
+                                    
                                     const slider = e.currentTarget;
-                                    const startX = e.pageX - slider.offsetLeft;
                                     const scrollLeft = slider.scrollLeft;
                                     
                                     const handleMouseMove = (e) => {
-                                        const x = e.pageX - slider.offsetLeft;
-                                        const walk = (x - startX) * 2;
-                                        slider.scrollLeft = scrollLeft - walk;
+                                        if (!isDragging) return;
+                                        
+                                        const currentX = e.pageX;
+                                        const currentY = e.pageY;
+                                        const deltaX = currentX - dragStart.x;
+                                        const deltaY = currentY - dragStart.y;
+                                        
+                                        // Solo si el movimiento es más horizontal que vertical
+                                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                                            slider.scrollLeft = scrollLeft - deltaX * 0.8; // Más ligero
+                                        }
                                     };
                                     
                                     const handleMouseUp = () => {
-                                        setIsDragging(false);
+                                        setTimeout(() => setIsDragging(false), 100); // Pequeña demora
                                         document.removeEventListener('mousemove', handleMouseMove);
                                         document.removeEventListener('mouseup', handleMouseUp);
                                     };
@@ -327,22 +338,29 @@ function LandingPage() {
                                     const cardProps = store.coming_soon ? {} : { to: `/${store.store_slug}` };
 
                                     return (
-                                        <CardWrapper {...cardProps} key={`${store.id}-${index}`}>
+                                        <div
+                                            key={`${store.id}-${index}`}
+                                            onClick={() => {
+                                                if (!isDragging && !store.coming_soon) {
+                                                    window.location.href = `/${store.store_slug}`;
+                                                }
+                                            }}
+                                        >
                                             <motion.div
                                                 whileHover={{ y: -8, scale: 1.02 }}
                                                 className="w-72 h-40 bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm rounded-xl shadow-md flex flex-col items-center justify-center p-6 border border-gray-100 dark:border-slate-700/50 hover:shadow-xl transition-all relative"
                                                 style={{
-                                                    cursor: store.coming_soon ? 'default' : 'pointer',
+                                                    cursor: store.coming_soon ? 'default' : (isDragging ? 'grabbing' : 'pointer'),
                                                     opacity: store.coming_soon ? 0.8 : 1,
                                                 }}
                                             >
                                                 {store.is_demo && (
-                                                    <span className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
+                                                    <span className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase italic tracking-tighter z-10">
                                                         DEMO
                                                     </span>
                                                 )}
                                                 {store.coming_soon && !store.is_demo && (
-                                                    <span className="absolute top-3 right-3 bg-slate-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic tracking-tighter z-10">
+                                                    <span className="absolute top-3 right-3 bg-slate-500 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase italic tracking-tighter z-10">
                                                         PRÓXIMAMENTE
                                                     </span>
                                                 )}
@@ -361,11 +379,11 @@ function LandingPage() {
                                                     )}
                                                 </div>
 
-                                                <h3 className="font-black text-sm truncate uppercase tracking-tight text-center" style={{ color: 'var(--color-text-main)' }}>
+                                                <h3 className="font-black text-sm truncate uppercase tracking-tight text-center px-2" style={{ color: 'var(--color-text-main)' }}>
                                                     {store.store_name}
                                                 </h3>
                                             </motion.div>
-                                        </CardWrapper>
+                                        </div>
                                     );
                                 })}
                             </div>
