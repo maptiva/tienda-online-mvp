@@ -357,62 +357,32 @@ function LandingPage() {
                     </motion.div>
                 )}
 
-                <motion.div variants={itemVariants} className="mb-20">
-                    <div
-                        className="p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden flex flex-col items-center justify-center text-center gap-4 border-[3px]"
-                        style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.2)' : '#F9F7F4',
-                            borderColor: 'var(--color-primary)'
-                        }}
-                    >
-                        {/* Abstract Map Background Decoration - Even more subtle */}
-                        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] pointer-events-none -z-10 text-turquesa-500">
-                            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                                        <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="0.5" />
-                                    </pattern>
-                                </defs>
-                                <rect width="100%" height="100%" fill="url(#grid)" />
-                            </svg>
+<motion.div variants={itemVariants} className="mb-20">
+                    <section className="relative overflow-hidden bg-white dark:bg-slate-900 rounded-[2rem] border border-white/40 dark:border-slate-800 shadow-2xl p-8 lg:p-12">
+                        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 opacity-10 dark:opacity-20 pointer-events-none">
+                            <img alt="Map pattern background" className="object-cover w-full h-full rounded-full grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfPmKHXotDCwxBJAaEHs1aynRQGlO_RDOB9OgZWFQqxxukQOVqfFMsRk5Xsrk_QKhf8h4NqPM4yVTeB2Elgb2CrqJpgFZG2K81g8sJ8uah4aV6KVYr1xZuPuUvz-CsSXC6Sw8IVDa2ifTfbwTg5XkpiIQfIvPxvQkrkZmkQVO0RRUOO1FCnNCA16qK3WuYvAkBIv8-i6Ss4Zng5_oU6v9um1itOBt8iW919VRk69IyYAn6aiMSfRQVDr8g88QenwxZAltvQ32UKas"/>
                         </div>
-
-                        <motion.div
-                            className="text-7xl md:text-8xl mb-2 drop-shadow-lg"
-                            style={{ filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.1))' }}
-                        >
-                            🗺️
-                        </motion.div>
-
-                        <div className="max-w-2xl">
-                            <h2 className="text-3xl md:text-4xl font-black mb-3 tracking-tighter italic" style={{ color: 'var(--color-text-main)' }}>
-                                Mapa Interactivo
-                            </h2>
-                            <p className="text-base md:text-lg font-medium text-gray-500 dark:text-gray-400 mb-6 leading-relaxed max-w-md mx-auto">
-                                Descubrí todos los comercios adheridos cerca de tu ubicación en tiempo real.
-                            </p>
-                        </div>
-
-                        <div className="relative group/btn">
-                            {/* Subtle Pulse Effect */}
-                            <motion.div
-                                animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.1, 0.3] }}
-                                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute inset-0 bg-turquesa-400 rounded-2xl -z-10 blur-md"
-                            />
-
+                        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                            <div className="space-y-4 max-w-xl text-center lg:text-left">
+                                <h2 className="text-3xl lg:text-4xl font-extrabold flex items-center justify-center lg:justify-start gap-3 dark:text-white">
+                                    <span className="text-4xl">🗺️</span> ¿Buscás algo cerca?
+                                </h2>
+                                <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
+                                    Explorá nuestro mapa interactivo y descubrí todos los comercios adheridos en tu ciudad. ¡Apoyá lo local!
+                                </p>
+                            </div>
                             <Link
                                 to="/mapa"
-                                className="inline-block font-black py-4 px-10 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-md uppercase tracking-widest text-xs"
+                                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                                 style={{
                                     backgroundColor: 'var(--color-primary)',
-                                    color: 'white'
                                 }}
                             >
+                                <span className="material-icons-round">map</span>
                                 Abrir Mapa Interactivo
                             </Link>
                         </div>
-                    </div>
+                    </section>
                 </motion.div>
 
                 {/* CTA Final */}

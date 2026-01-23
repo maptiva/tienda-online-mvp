@@ -96,25 +96,21 @@ h2 {
 }
 
 /* =====================================================
-   ANIMACIONES PARA CARRUSEL
+   MATERIAL ICONS
    ===================================================== */
 
-@keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-
-.animate-scroll {
-    animation: scroll 40s linear infinite;
-}
-
-/* Variables de color para el carrusel */
-:root {
-    --background-light: #e8e2d9;
-    --background-dark: #1a1917;
-}
-
-.dark {
-    --background-light: #e8e2d9;
-    --background-dark: #1a1917;
+.material-icons-round {
+    font-family: 'Material Icons Round';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
 }
