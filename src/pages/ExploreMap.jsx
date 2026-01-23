@@ -131,6 +131,7 @@ const ExploreMap = () => {
     const [showFilters, setShowFilters] = useState(false);
 
     // Extraer opciones únicas
+    const categories = [...new Set(stores.map(s => s.category).filter(Boolean))].sort();
     const cities = [...new Set(stores.map(s => s.city).filter(Boolean))].sort();
 
     // Mapa de iconos a emojis para el SELECT nativo (que no soporta SVGs)
@@ -368,14 +369,11 @@ const ExploreMap = () => {
                                     }}
                                 >
                                     <option value="">📂 Todos los rubros</option>
-                                    {shopCategories.map(cat => {
-                                        const emoji = iconToEmoji[cat.icon_name] || '🏷️';
-                                        return (
-                                            <option key={cat.id} value={cat.label}>
-                                                {emoji} {cat.label}
-                                            </option>
-                                        );
-                                    })}
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat}>
+                                            {(categoryMetaMap[cat] || {}).emoji || '🏷️'} {cat}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
