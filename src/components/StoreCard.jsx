@@ -49,7 +49,7 @@ return (
             {/* Store Name Container - más margen inferior */}
             <div className="flex-grow flex items-center justify-center min-h-0 mb-4">
                 <span
-                    className="text-base font-black text-center px-3 w-full leading-snug"
+                    className="text-base font-black text-center px-3 w-full leading-relaxed"
                     style={{ 
                         color: 'var(--color-text-main)',
                         display: '-webkit-box',
