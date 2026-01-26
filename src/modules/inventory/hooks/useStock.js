@@ -11,11 +11,11 @@ export const useStock = (productId) => {
   const [inventory, setInventory] = useState(null);
   const [logs, setLogs] = useState([]);
 
-  const cacheKey = `${user?.id}-${productId}`;
+  const cacheKey = user?.id ? `${user?.id}-${productId}` : `public-${productId}`;
 
   // Cargar inventario inicial
   useEffect(() => {
-    if (productId && (user?.id || storeName)) {
+    if (productId && user?.id) {
       loadInventory();
     }
   }, [productId, user?.id]);
@@ -36,10 +36,7 @@ export const useStock = (productId) => {
       setError(null);
 
       const { inventoryService } = await import('../services/inventoryService');
-      
-      // Determinar userId o null para vista pública
-      const targetUserId = user?.id || null;
-      const data = await inventoryService.fetchInventory(productId, targetUserId);
+      const data = await inventoryService.fetchInventory(productId, user?.id);
 
       // Actualizar cache
       stockCache.set(cacheKey, {
@@ -57,6 +54,10 @@ export const useStock = (productId) => {
   };
 
   const adjustStock = async (quantity, reason = 'Ajuste manual') => {
+    if (!user?.id) {
+      throw new Error('No autorizado para ajustar stock');
+    }
+
     try {
       setLoading(true);
       setError(null);
