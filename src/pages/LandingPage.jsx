@@ -297,7 +297,7 @@ function LandingPage() {
                             <button
                                 onClick={() => {
                                     if (carouselRef.current) {
-                                        carouselRef.current.scrollBy({ left: -240, behavior: 'smooth' });
+                                        carouselRef.current.scrollBy({ left: -304, behavior: 'smooth' });
                                     }
                                 }}
                                 className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full shadow-lg transition-all hover:scale-110 flex items-center justify-center"
@@ -314,7 +314,7 @@ function LandingPage() {
                             <button
                                 onClick={() => {
                                     if (carouselRef.current) {
-                                        carouselRef.current.scrollBy({ left: 240, behavior: 'smooth' });
+                                        carouselRef.current.scrollBy({ left: 304, behavior: 'smooth' });
                                     }
                                 }}
                                 className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full shadow-lg transition-all hover:scale-110 flex items-center justify-center"
@@ -331,7 +331,7 @@ function LandingPage() {
                             {/* Scroll Container */}
                             <div
                                 ref={carouselRef}
-                                className="flex space-x-6 overflow-x-auto hide-scrollbar py-4 px-12 scroll-smooth"
+                                className="flex space-x-8 overflow-x-auto hide-scrollbar py-4 px-12 scroll-smooth"
                                 style={{
                                     scrollbarWidth: 'none',
                                     msOverflowStyle: 'none'
