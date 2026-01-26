@@ -3,12 +3,15 @@ import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { FaWhatsapp } from 'react-icons/fa';
+import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
+import StockBadge from '../modules/inventory/components/StockBadge';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { storeName } = useParams();
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
+  const { stockEnabled, loading: configLoading } = useStoreConfig();
 
   if (!product) {
     return null;
@@ -75,6 +78,13 @@ const ProductCard = ({ product }) => {
           </p>
 
           <div>
+            {/* Stock Badge - Mostrar solo si está habilitado para esta tienda */}
+            {stockEnabled && (
+              <div className="mb-2 flex justify-center">
+                <StockBadge productId={product.id} className="text-xs" />
+              </div>
+            )}
+
             {product.price_on_request ? (
               // Mostrar botón "Consultar Precio"
               <a
