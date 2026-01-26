@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import StockBadge from '../modules/inventory/components/StockBadge';
+import { useStock } from '../modules/inventory/hooks/useStock';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -12,10 +13,7 @@ const ProductCard = ({ product }) => {
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
   const { stockEnabled, loading: configLoading } = useStoreConfig();
-  const { inventory } = stockEnabled ? (() => {
-    const { useStock } = require('../modules/inventory/hooks/useStock');
-    return useStock(product.id);
-  })() : { inventory: null };
+  const { inventory } = stockEnabled ? useStock(product.id) : { inventory: null };
 
   if (!product) {
     return null;
