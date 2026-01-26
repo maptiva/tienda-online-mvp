@@ -36,8 +36,7 @@ return (
                     <img
                         src={store.logo_url}
                         alt={store.store_name}
-                        className="rounded-full border-2 w-18 h-18 object-contain bg-white p-2 shadow-sm"
-                        style={{ borderColor: theme === 'dark' ? '#475569' : '#e2e8f0' }}
+                        className="rounded-full w-18 h-18 object-contain shadow-sm"
                     />
                 ) : (
                     <div className="w-18 h-18 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shadow-sm">
@@ -49,7 +48,7 @@ return (
             {/* Store Name Container - más margen inferior */}
             <div className="flex-grow flex items-center justify-center min-h-0 mb-3">
                 <span
-                    className="text-sm font-black text-center px-3 w-full leading-normal"
+                    className="text-base font-black text-center px-3 w-full leading-normal"
                     style={{ 
                         color: 'var(--color-text-main)',
                         display: '-webkit-box',
