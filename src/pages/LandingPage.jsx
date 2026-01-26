@@ -17,6 +17,7 @@ function LandingPage() {
     const { theme, toggleTheme } = useTheme();
     const [featuredStores, setFeaturedStores] = useState([]);
     const [showDirectory, setShowDirectory] = useState(false);
+    const carouselRef = React.useRef(null);
 
     useEffect(() => {
         const fetchFeaturedStores = async () => {
@@ -290,49 +291,73 @@ function LandingPage() {
                             Confían en Nosotros
                         </h2>
 
-                        {/* Infinite Carousel Container */}
-                        <div className="relative overflow-hidden group mb-10">
-                            {/* Scrolling Container */}
-                            <div
-                                className="flex space-x-8 py-4 overflow-x-auto hide-scrollbar"
-                                style={{
-                                    animation: 'scroll 40s linear infinite',
-                                    willChange: 'transform'
+{/* Robust Carousel Container */}
+                        <div className="relative mb-10">
+                            {/* Navigation Arrows */}
+                            <button
+                                onClick={() => {
+                                    if (carouselRef.current) {
+                                        carouselRef.current.scrollBy({ left: -240, behavior: 'smooth' });
+                                    }
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.animationPlayState = 'paused'}
-                                onMouseLeave={(e) => e.currentTarget.style.animationPlayState = 'running'}
+                                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full shadow-lg transition-all hover:scale-110 flex items-center justify-center"
+                                style={{
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'white'
+                                }}
                             >
-                                {/* First set of stores */}
-                                <div className="flex items-center space-x-8">
-                                    {featuredStores.map(store => (
-                                        <StoreCard key={`first-${store.id}`} store={store} />
-                                    ))}
-                                </div>
-                                {/* Duplicate set for infinite loop */}
-                                <div className="flex items-center space-x-8">
-                                    {featuredStores.map(store => (
-                                        <StoreCard key={`second-${store.id}`} store={store} />
-                                    ))}
-                                </div>
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    if (carouselRef.current) {
+                                        carouselRef.current.scrollBy({ left: 240, behavior: 'smooth' });
+                                    }
+                                }}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full shadow-lg transition-all hover:scale-110 flex items-center justify-center"
+                                style={{
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'white'
+                                }}
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+
+                            {/* Scroll Container */}
+                            <div
+                                ref={carouselRef}
+                                className="flex space-x-6 overflow-x-auto hide-scrollbar py-4 px-12 scroll-smooth"
+                                style={{
+                                    scrollbarWidth: 'none',
+                                    msOverflowStyle: 'none'
+                                }}
+                            >
+                                {featuredStores.map(store => (
+                                    <StoreCard key={store.id} store={store} />
+                                ))}
                             </div>
 
-                            {/* Left Gradient Fade */}
+                            {/* Fade Edges */}
                             <div
-                                className="absolute inset-y-0 left-0 w-20 z-10 pointer-events-none"
+                                className="absolute inset-y-0 left-0 w-12 z-10 pointer-events-none"
                                 style={{
                                     background: theme === 'dark'
-                                        ? 'linear-gradient(to right, #1a1917, transparent)'
-                                        : 'linear-gradient(to right, #e8e2d9, transparent)'
+                                        ? 'linear-gradient(to right, #1e293b, transparent)'
+                                        : 'linear-gradient(to right, #ffffff, transparent)'
                                 }}
                             />
 
-                            {/* Right Gradient Fade */}
                             <div
-                                className="absolute inset-y-0 right-0 w-20 z-10 pointer-events-none"
+                                className="absolute inset-y-0 right-0 w-12 z-10 pointer-events-none"
                                 style={{
                                     background: theme === 'dark'
-                                        ? 'linear-gradient(to left, #1a1917, transparent)'
-                                        : 'linear-gradient(to left, #e8e2d9, transparent)'
+                                        ? 'linear-gradient(to left, #1e293b, transparent)'
+                                        : 'linear-gradient(to left, #ffffff, transparent)'
                                 }}
                             />
                         </div>
