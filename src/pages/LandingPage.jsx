@@ -337,11 +337,11 @@ function LandingPage() {
                             />
                         </div>
 
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
+<motion.button
+                            whileHover={{ scale: 1.05, opacity: 1 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowDirectory(true)}
-                            className="font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-md uppercase tracking-widest text-xs"
+                            className="font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-md uppercase tracking-widest text-xs cursor-pointer"
                             style={{
                                 background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'white',
                                 color: 'var(--color-primary)',
