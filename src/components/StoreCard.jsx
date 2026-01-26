@@ -36,12 +36,12 @@ return (
                     <img
                         src={store.logo_url}
                         alt={store.store_name}
-                        className="rounded-full border-2 w-24 h-24 object-contain bg-white p-2 shadow-sm"
+                        className="rounded-full border-2 w-20 h-20 object-contain bg-white p-2 shadow-sm"
                         style={{ borderColor: theme === 'dark' ? '#475569' : '#e2e8f0' }}
                     />
                 ) : (
-                    <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shadow-sm">
-                        <FaStore className="text-4xl text-slate-300 dark:text-slate-500" />
+                    <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shadow-sm">
+                        <FaStore className="text-3xl text-slate-300 dark:text-slate-500" />
                     </div>
                 )}
             </div>
@@ -49,7 +49,7 @@ return (
             {/* Store Name Container - más margen inferior */}
             <div className="flex-grow flex items-center justify-center min-h-0 mb-4">
                 <span
-                    className="text-base font-black text-center px-3 w-full leading-relaxed"
+                    className="text-base font-black text-center px-3 w-full leading-normal"
                     style={{ 
                         color: 'var(--color-text-main)',
                         display: '-webkit-box',
