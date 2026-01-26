@@ -347,8 +347,8 @@ function LandingPage() {
                                 className="absolute inset-y-0 left-0 w-12 z-10 pointer-events-none"
                                 style={{
                                     background: theme === 'dark'
-                                        ? 'linear-gradient(to right, rgba(30, 41, 59, 0.4), transparent)'
-                                        : 'linear-gradient(to right, rgba(255, 255, 255, 0.5), transparent)'
+                                        ? 'linear-gradient(to right, #1a1917, transparent)'
+                                        : 'linear-gradient(to right, #e8e2d9, transparent)'
                                 }}
                             />
 
@@ -356,8 +356,8 @@ function LandingPage() {
                                 className="absolute inset-y-0 right-0 w-12 z-10 pointer-events-none"
                                 style={{
                                     background: theme === 'dark'
-                                        ? 'linear-gradient(to left, rgba(30, 41, 59, 0.4), transparent)'
-                                        : 'linear-gradient(to left, rgba(255, 255, 255, 0.5), transparent)'
+                                        ? 'linear-gradient(to left, #1a1917, transparent)'
+                                        : 'linear-gradient(to left, #e8e2d9, transparent)'
                                 }}
                             />
                         </div>
