@@ -11,10 +11,11 @@ const StoreCard = ({ store }) => {
 return (
         <CardWrapper
             {...cardProps}
-            className="flex-shrink-0 w-72 h-48 rounded-xl shadow-md flex flex-col items-center justify-between p-5 transition-all duration-300 hover:shadow-xl hover:scale-105 relative"
+            className="flex-shrink-0 w-72 h-48 rounded-xl shadow-md backdrop-blur-md flex flex-col items-center justify-between p-5 transition-all duration-300 hover:shadow-xl hover:scale-105 relative"
             style={{
-                backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.8)' : 'white',
-                border: `1px solid ${theme === 'dark' ? '#334155' : '#e2e8f0'}`,
+                backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.5)',
+                border: `1px solid var(--color-border)`,
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
                 cursor: store.coming_soon ? 'default' : 'pointer',
                 opacity: store.coming_soon ? 0.8 : 1
             }}
