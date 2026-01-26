@@ -102,12 +102,27 @@ export const inventoryService = {
     return data || [];
   },
   
-  // Verificar si store tiene stock habilitado
+  // Verificar si store tiene stock habilitado por user_id (admin)
   async checkStoreStockEnabled(userId) {
     const { data, error } = await supabase
       .from('stores')
       .select('enable_stock')
       .eq('user_id', userId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      throw error;
+    }
+    
+    return data?.enable_stock || false;
+  },
+
+  // Verificar si store tiene stock habilitado por store_slug (vista pública)
+  async checkStoreStockEnabledBySlug(storeSlug) {
+    const { data, error } = await supabase
+      .from('stores')
+      .select('enable_stock')
+      .eq('store_slug', storeSlug)
       .single();
     
     if (error && error.code !== 'PGRST116') {

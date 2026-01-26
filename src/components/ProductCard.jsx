@@ -12,6 +12,10 @@ const ProductCard = ({ product }) => {
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
   const { stockEnabled, loading: configLoading } = useStoreConfig();
+  const { inventory } = stockEnabled ? (() => {
+    const { useStock } = require('../modules/inventory/hooks/useStock');
+    return useStock(product.id);
+  })() : { inventory: null };
 
   if (!product) {
     return null;
@@ -25,7 +29,23 @@ const ProductCard = ({ product }) => {
       alert("Por favor, ingresa una cantidad válida.");
       return;
     }
+    
+    // Verificar stock si está habilitado
+    if (stockEnabled && inventory) {
+      const availableQuantity = inventory.quantity;
+      if (availableQuantity < numQuantity) {
+        alert(`Stock insuficiente. Solo hay ${availableQuantity} unidades disponibles.`);
+        return;
+      }
+    }
+    
     addToCart(product, numQuantity);
+  };
+
+  // Verificar si el botón de compra debe estar deshabilitado
+  const isPurchaseDisabled = () => {
+    if (!stockEnabled || !inventory) return false;
+    return inventory.quantity <= 0;
   };
 
   return (
@@ -143,19 +163,25 @@ const ProductCard = ({ product }) => {
                   />
                   <button
                     onClick={handleAddToCart}
+                    disabled={isPurchaseDisabled()}
                     className='font-bold py-2 px-3 rounded-lg transition-all duration-300 w-full'
                     style={{
-                      backgroundColor: 'var(--color-primary)',
-                      color: 'var(--color-primary-text)'
+                      backgroundColor: isPurchaseDisabled() ? '#9ca3af' : 'var(--color-primary)',
+                      color: isPurchaseDisabled() ? '#6b7280' : 'var(--color-primary-text)',
+                      cursor: isPurchaseDisabled() ? 'not-allowed' : 'pointer'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                      if (!isPurchaseDisabled()) {
+                        e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'var(--color-primary)';
+                      if (!isPurchaseDisabled()) {
+                        e.target.style.backgroundColor = 'var(--color-primary)';
+                      }
                     }}
                   >
-                    Agregar
+                    {isPurchaseDisabled() ? 'Agotado' : 'Agregar'}
                   </button>
                 </div>
               </>

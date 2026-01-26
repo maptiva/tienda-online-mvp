@@ -34,26 +34,41 @@ const StockBadge = ({ productId, className = "" }) => {
     return null; // No mostrar nada si no se está trackeando el stock
   }
 
-  const getStockText = () => {
+  const getStockDisplay = () => {
+    const minAlert = inventory?.min_stock_alert || 5;
+    
     if (quantity <= 0) {
-      return "Agotado";
+      return {
+        text: "Agotado",
+        color: "text-red-600 font-semibold",
+        icon: "❌",
+        disabled: true
+      };
     }
-    return `Stock: ${quantity}`;
+    
+    if (quantity <= minAlert) {
+      return {
+        text: `¡Últimas ${quantity} unidades!`,
+        color: "text-orange-500 font-medium",
+        icon: "⚠️",
+        disabled: false
+      };
+    }
+    
+    return {
+      text: "Disponible",
+      color: "text-green-600",
+      icon: "✅",
+      disabled: false
+    };
   };
 
-  const getStockColor = () => {
-    if (quantity <= 0) {
-      return "text-red-600 font-semibold";
-    }
-    if (quantity <= 3) {
-      return "text-yellow-600 font-medium";
-    }
-    return "text-green-600";
-  };
+  const stockDisplay = getStockDisplay();
 
   return (
-    <div className={`text-sm ${getStockColor()} ${className}`}>
-      {getStockText()}
+    <div className={`text-sm ${stockDisplay.color} ${className}`}>
+      <span className="mr-1">{stockDisplay.icon}</span>
+      {stockDisplay.text}
     </div>
   );
 };
