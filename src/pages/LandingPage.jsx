@@ -331,7 +331,7 @@ function LandingPage() {
                             {/* Scroll Container */}
                             <div
                                 ref={carouselRef}
-                                className="flex space-x-8 overflow-x-auto hide-scrollbar py-4 px-12 scroll-smooth"
+                                className="flex space-x-8 overflow-x-auto hide-scrollbar py-6 px-12 scroll-smooth"
                                 style={{
                                     scrollbarWidth: 'none',
                                     msOverflowStyle: 'none'

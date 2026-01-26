@@ -11,7 +11,7 @@ const StoreCard = ({ store }) => {
     return (
         <CardWrapper
             {...cardProps}
-            className="flex-shrink-0 w-72 h-40 rounded-xl shadow-md flex flex-col items-center justify-center p-5 transition-all duration-300 hover:shadow-xl hover:scale-105 relative"
+            className="flex-shrink-0 w-72 h-48 rounded-xl shadow-md flex flex-col items-center justify-between p-4 transition-all duration-300 hover:shadow-xl hover:scale-105 relative"
             style={{
                 backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.8)' : 'white',
                 border: `1px solid ${theme === 'dark' ? '#334155' : '#e2e8f0'}`,
@@ -30,25 +30,37 @@ const StoreCard = ({ store }) => {
                 </span>
             )}
 
-            {store.logo_url ? (
-                <img
-                    src={store.logo_url}
-                    alt={store.store_name}
-                    className="rounded-full mb-3 border-2 w-24 h-24 object-contain bg-white p-2 shadow-sm"
-                    style={{ borderColor: theme === 'dark' ? '#475569' : '#e2e8f0' }}
-                />
-            ) : (
-                <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-3 shadow-sm">
-                    <FaStore className="text-4xl text-slate-300 dark:text-slate-500" />
-                </div>
-            )}
+            {/* Logo Container */}
+            <div className="flex-shrink-0 flex items-center justify-center">
+                {store.logo_url ? (
+                    <img
+                        src={store.logo_url}
+                        alt={store.store_name}
+                        className="rounded-full border-2 w-20 h-20 object-contain bg-white p-2 shadow-sm"
+                        style={{ borderColor: theme === 'dark' ? '#475569' : '#e2e8f0' }}
+                    />
+                ) : (
+                    <div className="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shadow-sm">
+                        <FaStore className="text-3xl text-slate-300 dark:text-slate-500" />
+                    </div>
+                )}
+            </div>
 
-            <span
-                className="text-base font-bold truncate w-full text-center px-2"
-                style={{ color: 'var(--color-text-main)' }}
-            >
-                {store.store_name}
-            </span>
+            {/* Store Name Container - con más espacio */}
+            <div className="flex-grow flex items-center justify-center min-h-0">
+                <span
+                    className="text-sm font-bold text-center px-2 w-full leading-tight"
+                    style={{ 
+                        color: 'var(--color-text-main)',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                    }}
+                >
+                    {store.store_name}
+                </span>
+            </div>
         </CardWrapper>
     );
 };
