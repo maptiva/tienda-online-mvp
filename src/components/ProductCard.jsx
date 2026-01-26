@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
   const { stockEnabled, loading: configLoading } = useStoreConfig();
-  const { inventory } = stockEnabled ? useStock(product.id) : { inventory: null };
+  const { inventory } = useStock(stockEnabled ? product.id : null);
 
   if (!product) {
     return null;

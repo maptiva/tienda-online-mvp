@@ -15,7 +15,7 @@ export const useStock = (productId) => {
 
   // Cargar inventario inicial
   useEffect(() => {
-    if (productId && user?.id) {
+    if (productId && (user?.id || storeName)) {
       loadInventory();
     }
   }, [productId, user?.id]);
@@ -36,7 +36,10 @@ export const useStock = (productId) => {
       setError(null);
 
       const { inventoryService } = await import('../services/inventoryService');
-      const data = await inventoryService.fetchInventory(productId, user.id);
+      
+      // Determinar userId o null para vista pública
+      const targetUserId = user?.id || null;
+      const data = await inventoryService.fetchInventory(productId, targetUserId);
 
       // Actualizar cache
       stockCache.set(cacheKey, {
