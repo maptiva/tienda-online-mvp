@@ -31,7 +31,7 @@ return (
             )}
 
             {/* Logo Container - más margen superior */}
-            <div className="flex-shrink-0 flex items-center justify-center mt-4">
+            <div className="flex-shrink-0 flex items-center justify-center mt-2">
                 {store.logo_url ? (
                     <img
                         src={store.logo_url}
@@ -46,7 +46,7 @@ return (
             </div>
 
             {/* Store Name Container - más margen inferior */}
-            <div className="flex-grow flex items-center justify-center min-h-0 mb-3">
+            <div className="flex-grow flex items-center justify-center min-h-0 mb-2">
                 <span
                     className="text-base font-black text-center px-3 w-full leading-normal"
                     style={{ 
