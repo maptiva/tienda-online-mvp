@@ -182,7 +182,7 @@ function LandingPage() {
                     </motion.div>
 
                     <h1
-                        className="text-5xl md:text-7xl font-black mb-4 tracking-tighter italic"
+                        className="text-5xl md:text-7xl font-black mb-4 tracking-tighter"
                         style={{ color: 'var(--color-text-main)' }}
                     >
                         Clicando
@@ -208,9 +208,9 @@ function LandingPage() {
                     <div
                         className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.5)',
-                            border: `1px solid var(--color-border)`,
-                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+                            backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.8)' : 'rgba(255, 255, 255, 0.5)',
+                            border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'var(--color-border)'}`,
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
                         }}
                     >
                         <motion.div
@@ -224,10 +224,10 @@ function LandingPage() {
                                 className="w-20 h-20 object-contain opacity-90"
                             />
                         </motion.div>
-                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: 'var(--color-text-main)' }}>
+                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)' }}>
                             Catálogo Completo
                         </h3>
-                        <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
+                        <p className="text-sm font-medium leading-relaxed" style={{ color: theme === 'dark' ? '#475569' : 'var(--color-text-light)' }}>
                             Gestiona tus productos con eficiencia y estilo.
                         </p>
                     </div>
@@ -235,9 +235,9 @@ function LandingPage() {
                     <div
                         className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.5)',
-                            border: `1px solid var(--color-border)`,
-                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+                            backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.8)' : 'rgba(255, 255, 255, 0.5)',
+                            border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'var(--color-border)'}`,
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
                         }}
                     >
                         <motion.div
@@ -251,10 +251,10 @@ function LandingPage() {
                                 className="w-20 h-20 object-contain opacity-90"
                             />
                         </motion.div>
-                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: 'var(--color-text-main)' }}>
+                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)' }}>
                             WhatsApp Integrado
                         </h3>
-                        <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
+                        <p className="text-sm font-medium leading-relaxed" style={{ color: theme === 'dark' ? '#475569' : 'var(--color-text-light)' }}>
                             Recibe pedidos directos sin intermediarios.
                         </p>
                     </div>
@@ -262,9 +262,9 @@ function LandingPage() {
                     <div
                         className="group p-8 rounded-3xl backdrop-blur-md transition-all duration-500 text-center"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.5)',
-                            border: `1px solid var(--color-border)`,
-                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+                            backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.8)' : 'rgba(255, 255, 255, 0.5)',
+                            border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'var(--color-border)'}`,
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
                         }}
                     >
                         <motion.div
@@ -278,10 +278,10 @@ function LandingPage() {
                                 className="w-20 h-20 object-contain opacity-90"
                             />
                         </motion.div>
-                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: 'var(--color-text-main)' }}>
+                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)' }}>
                             100% Personalizable
                         </h3>
-                        <p className="text-sm font-medium leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
+                        <p className="text-sm font-medium leading-relaxed" style={{ color: theme === 'dark' ? '#475569' : 'var(--color-text-light)' }}>
                             Tu marca es la protagonista en cada detalle.
                         </p>
                     </div>
@@ -362,12 +362,11 @@ function LandingPage() {
                             whileHover={{ scale: 1.05, opacity: 1 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowDirectory(true)}
-                            className="font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-md uppercase tracking-widest text-sm cursor-pointer"
+                            className="font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-xl uppercase tracking-widest text-sm cursor-pointer"
                             style={{
-                                background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'white',
+                                background: theme === 'dark' ? 'rgba(248, 250, 252, 0.9)' : 'white',
                                 color: 'var(--color-primary)',
-                                border: '1px solid var(--color-primary)',
-                                opacity: 0.8
+                                border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'var(--color-primary)'}`,
                             }}
                         >
                             Ver todas las tiendas
@@ -378,18 +377,18 @@ function LandingPage() {
                 <motion.div variants={itemVariants} className="mb-0">
                     <section className="relative overflow-hidden rounded-[2rem] shadow-2xl p-8 lg:p-12 backdrop-blur-xl"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.4)',
-                            borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.5)',
+                            backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.8)' : 'rgba(255, 255, 255, 0.4)',
+                            borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.5)',
                             borderWidth: '1px'
                         }}
                     >
                         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
                             <div className="space-y-4 max-w-xl text-center lg:text-left">
-                                <h2 className="text-3xl lg:text-4xl font-black italic flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4 lg:gap-3" style={{ color: 'var(--color-text-main)' }}>
+                                <h2 className="text-3xl lg:text-4xl font-black italic flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4 lg:gap-3" style={{ color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)' }}>
                                     <span className="text-5xl lg:text-4xl">🗺️</span>
                                     <span>¿Buscás algo cerca?</span>
                                 </h2>
-                                <p className="text-lg leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
+                                <p className="text-lg leading-relaxed" style={{ color: theme === 'dark' ? '#475569' : 'var(--color-text-light)' }}>
                                     Explorá nuestro mapa interactivo y descubrí todos los comercios adheridos en tu ciudad. ¡Apoyá lo local!
                                 </p>
                             </div>
@@ -432,18 +431,18 @@ function LandingPage() {
                     <div
                         className="p-8 lg:p-12 rounded-[2rem] backdrop-blur-xl transition-all duration-500 shadow-2xl"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.4)',
-                            borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.5)',
+                            backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.8)' : 'rgba(255, 255, 255, 0.4)',
+                            borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.5)',
                             borderWidth: '1px'
                         }}
                     >
                         <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
                             <div className="space-y-4 max-w-xl text-center lg:text-left">
-                                <h2 className="text-3xl lg:text-4xl font-black italic flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4 lg:gap-3" style={{ color: 'var(--color-text-main)' }}>
+                                <h2 className="text-3xl lg:text-4xl font-black italic flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4 lg:gap-3" style={{ color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)' }}>
                                     <span className="text-5xl lg:text-4xl">🚀</span>
                                     <span>¿Querés tu propia tienda?</span>
                                 </h2>
-                                <p className="text-lg leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
+                                <p className="text-lg leading-relaxed" style={{ color: theme === 'dark' ? '#475569' : 'var(--color-text-light)' }}>
                                     Unite a la red comercial más dinámica de la ciudad y potenciá tus ventas con tecnología local.
                                 </p>
                             </div>

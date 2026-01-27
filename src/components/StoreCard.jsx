@@ -8,14 +8,14 @@ const StoreCard = ({ store }) => {
     const CardWrapper = store.coming_soon ? 'div' : Link;
     const cardProps = store.coming_soon ? {} : { to: `/${store.store_slug}` };
 
-return (
+    return (
         <CardWrapper
             {...cardProps}
             className="flex-shrink-0 w-72 h-48 rounded-xl shadow-md backdrop-blur-md flex flex-col items-center justify-between p-5 transition-all duration-300 hover:shadow-xl hover:scale-105 relative"
             style={{
-                backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.5)',
-                border: `1px solid var(--color-border)`,
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
+                backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.8)' : 'rgba(255, 255, 255, 0.5)',
+                border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'var(--color-border)'}`,
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
                 cursor: store.coming_soon ? 'default' : 'pointer',
                 opacity: store.coming_soon ? 0.8 : 1
             }}
@@ -50,8 +50,8 @@ return (
             <div className="flex-grow flex items-center justify-center min-h-0 mb-2">
                 <span
                     className="text-base font-black text-center px-3 w-full leading-normal"
-                    style={{ 
-                        color: 'var(--color-text-main)',
+                    style={{
+                        color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
