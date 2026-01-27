@@ -104,30 +104,32 @@ const ProductCard = ({ product }) => {
             )}
 
             {product.price_on_request ? (
-              // Mostrar solo botón "Consultar Precio"
-              <a
-                href={`https://wa.me/${product.store_whatsapp}?text=${encodeURIComponent(
-                  `Hola! Me interesa el producto "${product.name}" y quisiera consultar el precio.`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className='flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-all duration-300 w-full shadow-md hover:shadow-lg'
-                style={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'var(--color-primary-text)'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'var(--color-primary-darker)';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'var(--color-primary)';
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                <FaWhatsapp size={20} />
-                Consultar Precio
-              </a>
+              // Mostrar solo botón "Consultar Precio" con más espacio
+              <div className="mt-4">
+                <a
+                  href={`https://wa.me/${product.store_whatsapp}?text=${encodeURIComponent(
+                    `Hola! Me interesa el producto "${product.name}" y quisiera consultar el precio.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className='flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-all duration-300 w-full shadow-md hover:shadow-lg'
+                  style={{
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-primary-text)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                    e.target.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'var(--color-primary)';
+                    e.target.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <FaWhatsapp size={20} />
+                  Consultar Precio
+                </a>
+              </div>
             ) : (
               // Mostrar precio y botón agregar (comportamiento normal)
               <>
