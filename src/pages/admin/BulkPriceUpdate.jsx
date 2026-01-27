@@ -65,7 +65,11 @@ const BulkPriceUpdate = () => {
             const matchesSearch =
                 p.name.toLowerCase().includes(searchLower) ||
                 (p.description && p.description.toLowerCase().includes(searchLower)) ||
-                (p.price && p.price.toString().includes(searchLower));
+                (p.price && p.price.toString().includes(searchLower)) ||
+                (p.sku && p.sku.toLowerCase().includes(searchLower)) ||
+                (searchLower.startsWith('#')
+                    ? (p.display_id || p.id).toString() === searchLower.replace('#', '')
+                    : (p.display_id || p.id).toString() === searchLower);
 
             const matchesCategory = selectedCategory === 'all' ||
                 (p.category_id && p.category_id.toString() === selectedCategory);
@@ -467,6 +471,7 @@ const BulkPriceUpdate = () => {
                                         className="w-4 h-4 cursor-pointer"
                                     />
                                 </th>
+                                <th className="py-2 px-4 font-semibold text-left">Ref</th>
                                 <th className="py-2 px-4 font-semibold text-left">Imagen</th>
                                 <th className="py-2 px-4 font-semibold text-left">Producto</th>
                                 <th className="py-2 px-4 font-semibold text-left">Categoría</th>
@@ -489,6 +494,9 @@ const BulkPriceUpdate = () => {
                                                 onChange={() => toggleProduct(product.id)}
                                                 className="w-4 h-4 cursor-pointer"
                                             />
+                                        </td>
+                                        <td className="p-4 text-xs font-mono text-gray-500">
+                                            {product.sku ? product.sku : `#${product.display_id || product.id}`}
                                         </td>
                                         <td className="p-4">
                                             {product.image_url ? (
@@ -598,9 +606,14 @@ const BulkPriceUpdate = () => {
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                                            <h3 className="font-extrabold text-gray-900 text-[15px] leading-tight flex-1">
-                                                {product.name}
-                                            </h3>
+                                            <div className="flex flex-col gap-0.5 flex-1">
+                                                <span className="text-[10px] font-mono text-gray-400 uppercase tracking-tighter">
+                                                    {product.sku ? product.sku : `#${product.display_id || product.id}`}
+                                                </span>
+                                                <h3 className="font-extrabold text-gray-900 text-[15px] leading-tight">
+                                                    {product.name}
+                                                </h3>
+                                            </div>
                                             <span className="text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
                                                 {product.categories?.name}
                                             </span>

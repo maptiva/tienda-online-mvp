@@ -1,5 +1,6 @@
 
 export const formConfig = [
+  { name: 'sku', label: 'Código / SKU (Opcional)', type: 'text', required: false },
   { name: 'name', label: 'Nombre del Producto', type: 'text', required: true },
   { name: 'description', label: 'Descripción', type: 'textarea', required: false },
   { name: 'price', label: 'Precio', type: 'number', required: true },

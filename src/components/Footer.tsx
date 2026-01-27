@@ -257,7 +257,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                             {footerDisclaimer}
                         </p>
                         <p className='text-sm' style={{ color: 'var(--color-text-light)', opacity: 0.9 }}>
-                            © 2025 {displayName}. Todos los derechos reservados
+                            © {new Date().getFullYear()} {displayName}. Todos los derechos reservados
                         </p>
                     </div>
                 </div>

@@ -36,7 +36,9 @@ export const ProductElement = ({ product }: Props) => {
 
     return (
         <tr key={id} className={`text-center py-2 ${!estado ? 'hidden' : ''} border-b border-gray-200 hover:bg-gray-50 transition-colors`}>
-            <td className='py-3 text-lg font-mono text-gray-500'>{id}</td>
+            <td className='py-3 text-sm font-mono text-gray-500'>
+                {product.sku ? product.sku : `#${product.display_id || id}`}
+            </td>
             <td className='py-3'>
                 <div className="flex justify-start">
                     {image_url ? (

@@ -182,17 +182,25 @@ function LandingPage() {
                     </motion.div>
 
                     <h1
-                        className="text-6xl font-black mb-3 tracking-tighter italic"
+                        className="text-5xl md:text-7xl font-black mb-4 tracking-tighter italic"
                         style={{ color: 'var(--color-text-main)' }}
                     >
                         Clicando
                     </h1>
-                    <p
-                        className="text-2xl font-medium tracking-tight"
-                        style={{ color: 'var(--color-text-light)' }}
-                    >
-                        Tu Catálogo Digital Simple y Rápido
-                    </p>
+                    <div className="space-y-3">
+                        <p
+                            className="text-2xl md:text-3xl font-black tracking-tight"
+                            style={{ color: 'var(--color-text-main)' }}
+                        >
+                            Tu Tienda Online Simple y Rápida
+                        </p>
+                        <p
+                            className="text-xs md:text-sm font-black tracking-[0.2em] md:tracking-[0.3em] uppercase opacity-50 px-4 md:px-0"
+                            style={{ color: 'var(--color-text-light)' }}
+                        >
+                            Catálogo Digital • WhatsApp Integrado
+                        </p>
+                    </div>
                 </motion.div>
 
                 {/* Features */}
@@ -287,11 +295,16 @@ function LandingPage() {
                         variants={itemVariants}
                         className="mb-20"
                     >
-                        <h2 className="text-3xl font-black mb-10 italic" style={{ color: 'var(--color-text-main)' }}>
-                            Confían en Nosotros
-                        </h2>
+                        <div className="mb-12">
+                            <h2 className="text-3xl lg:text-4xl font-black italic" style={{ color: 'var(--color-text-main)' }}>
+                                Confían en Nosotros
+                            </h2>
+                            <p className="text-lg font-medium mt-2 opacity-60" style={{ color: 'var(--color-text-light)' }}>
+                                Comercios y emprendedores que ya potencian sus ventas con nuestra plataforma.
+                            </p>
+                        </div>
 
-{/* Robust Carousel Container */}
+                        {/* Robust Carousel Container */}
                         <div className="relative mb-10">
                             {/* Navigation Arrows */}
                             <button
@@ -345,11 +358,11 @@ function LandingPage() {
                             </div>
                         </div>
 
-<motion.button
+                        <motion.button
                             whileHover={{ scale: 1.05, opacity: 1 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowDirectory(true)}
-                            className="font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-md uppercase tracking-widest text-xs cursor-pointer"
+                            className="font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-md uppercase tracking-widest text-sm cursor-pointer"
                             style={{
                                 background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'white',
                                 color: 'var(--color-primary)',
@@ -362,21 +375,19 @@ function LandingPage() {
                     </motion.div>
                 )}
 
-                <motion.div variants={itemVariants} className="mb-20">
-                    <section className="relative overflow-hidden rounded-[2rem] shadow-2xl p-8 lg:p-12"
+                <motion.div variants={itemVariants} className="mb-0">
+                    <section className="relative overflow-hidden rounded-[2rem] shadow-2xl p-8 lg:p-12 backdrop-blur-xl"
                         style={{
-                            backgroundColor: theme === 'dark' ? '#1e293b' : '#ffffff',
-                            borderColor: theme === 'dark' ? '#334155' : '#e2e8f0',
+                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.4)',
+                            borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.5)',
                             borderWidth: '1px'
                         }}
                     >
-                        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 opacity-10 dark:opacity-20 pointer-events-none">
-                            <img alt="Map pattern background" className="object-cover w-full h-full rounded-full grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfPmKHXotDCwxBJAaEHs1aynRQGlO_RDOB9OgZWFQqxxukQOVqfFMsRk5Xsrk_QKhf8h4NqPM4yVTeB2Elgb2CrqJpgFZG2K81g8sJ8uah4aV6KVYr1xZuPuUvz-CsSXC6Sw8IVDa2ifTfbwTg5XkpiIQfIvPxvQkrkZmkQVO0RRUOO1FCnNCA16qK3WuYvAkBIv8-i6Ss4Zng5_oU6v9um1itOBt8iW919VRk69IyYAn6aiMSfRQVDr8g88QenwxZAltvQ32UKas" />
-                        </div>
                         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
                             <div className="space-y-4 max-w-xl text-center lg:text-left">
-                                <h2 className="text-3xl lg:text-4xl font-extrabold flex items-center justify-center lg:justify-start gap-3" style={{ color: 'var(--color-text-main)' }}>
-                                    <span className="text-4xl">🗺️</span> ¿Buscás algo cerca?
+                                <h2 className="text-3xl lg:text-4xl font-black italic flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4 lg:gap-3" style={{ color: 'var(--color-text-main)' }}>
+                                    <span className="text-5xl lg:text-4xl">🗺️</span>
+                                    <span>¿Buscás algo cerca?</span>
                                 </h2>
                                 <p className="text-lg leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
                                     Explorá nuestro mapa interactivo y descubrí todos los comercios adheridos en tu ciudad. ¡Apoyá lo local!
@@ -384,22 +395,19 @@ function LandingPage() {
                             </div>
                             <Link
                                 to="/mapa"
-                                className="text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                                className="text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center justify-center text-center"
                                 style={{
                                     backgroundColor: 'var(--color-primary)',
                                 }}
                             >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                </svg>
                                 Abrir Mapa Interactivo
                             </Link>
                         </div>
                     </section>
                 </motion.div>
 
-                {/* CTA Final */}
-                <motion.div variants={itemVariants} className="space-y-6">
+                {/* CTA Final - Centrado vertical entre secciones */}
+                <motion.div variants={itemVariants} className="py-16 space-y-4">
                     <div className="relative inline-block group">
                         <Link
                             to="/login"
@@ -415,36 +423,42 @@ function LandingPage() {
                         <div className="absolute inset-0 bg-blue-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
                     </div>
 
-                    <p className="text-sm font-medium uppercase tracking-widest text-gray-400 dark:text-gray-500">
-                        Gestión profesional para clientes Clicando
+                    <p className="text-sm font-medium text-gray-400 dark:text-gray-500">
+                        ¿Eres cliente? Accede directamente con tu usuario.
                     </p>
 
                     {/* CTA para nuevos clientes */}
-                    <motion.div
-                        whileHover={{ y: -5 }}
-                        className="mt-12 p-10 rounded-[2.5rem] backdrop-blur-md transition-all duration-500 border-[3px] shadow-2xl"
+                    {/* CTA para nuevos clientes - UNIFICADO CON MAPA */}
+                    <div
+                        className="p-8 lg:p-12 rounded-[2rem] backdrop-blur-xl transition-all duration-500 shadow-2xl"
                         style={{
-                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.2)' : '#F9F7F4',
-                            borderColor: 'var(--color-primary)'
+                            backgroundColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(255, 255, 255, 0.4)',
+                            borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.5)',
+                            borderWidth: '1px'
                         }}
                     >
-                        <h4 className="text-2xl font-black mb-2 italic" style={{ color: 'var(--color-text-main)' }}>
-                            ¿Querés tu propia tienda?
-                        </h4>
-                        <p className="text-gray-500 dark:text-gray-400 font-medium mb-8">
-                            Unite a la red comercial más dinámica de la ciudad.
-                        </p>
+                        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+                            <div className="space-y-4 max-w-xl text-center lg:text-left">
+                                <h2 className="text-3xl lg:text-4xl font-black italic flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4 lg:gap-3" style={{ color: 'var(--color-text-main)' }}>
+                                    <span className="text-5xl lg:text-4xl">🚀</span>
+                                    <span>¿Querés tu propia tienda?</span>
+                                </h2>
+                                <p className="text-lg leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
+                                    Unite a la red comercial más dinámica de la ciudad y potenciá tus ventas con tecnología local.
+                                </p>
+                            </div>
 
-                        <a
-                            href="https://wa.me/5493456533273?text=Hola!%20Me%20interesa%20tener%20mi%20tienda%20online%20con%20Clicando"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-xl hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-xs"
-                        >
-                            <FaWhatsapp className="text-xl" />
-                            Solicitá tu Catálogo
-                        </a>
-                    </motion.div>
+                            <a
+                                href="https://wa.me/5493456533273?text=Hola!%20Me%20interesa%20tener%20mi%20tienda%20online%20con%20Clicando"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 px-10 rounded-2xl transition-all duration-300 shadow-xl hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-sm"
+                            >
+                                <FaWhatsapp className="text-xl" />
+                                Solicitala acá
+                            </a>
+                        </div>
+                    </div>
                 </motion.div>
 
                 {/* Footer */}

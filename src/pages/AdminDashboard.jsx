@@ -19,11 +19,21 @@ function AdminDashboard() {
 
         const searchLower = searchTerm.toLowerCase();
         return products.filter((product) => {
+            const searchLower = searchTerm.toLowerCase();
             const matchesName = product.name.toLowerCase().includes(searchLower);
             const matchesCategory = product.categories?.name?.toLowerCase().includes(searchLower) || false;
-            const matchesId = product.id.toString().includes(searchTerm);
 
-            return matchesName || matchesCategory || matchesId;
+            // Búsqueda por SKU o ID Local (display_id)
+            const matchesSKU = product.sku?.toLowerCase().includes(searchLower) || false;
+
+            // Lógica para ID: Si tiene display_id usamos ese, si no el global (fallback)
+            const idToSearch = product.display_id || product.id;
+
+            const matchesID = searchLower.startsWith('#')
+                ? idToSearch.toString() === searchLower.replace('#', '')
+                : idToSearch.toString().includes(searchLower);
+
+            return matchesName || matchesCategory || matchesSKU || matchesID;
         });
     }, [products, searchTerm]);
 

@@ -161,6 +161,11 @@ const ProductDetail = () => {
         <div className={styles.detailsContainer}>
           <h1 style={{ color: 'var(--color-text-main)' }}>{product.name}</h1>
 
+          {/* Identificador de producto sutil */}
+          <p className="text-sm font-bold uppercase tracking-widest opacity-60 mb-4" style={{ color: 'var(--color-text-light)' }}>
+            {product.sku ? `COD: ${product.sku}` : `REF: #${product.display_id || product.id}`}
+          </p>
+
           {product.price_on_request ? (
             // Mostrar botón "Consultar Precio"
             <a

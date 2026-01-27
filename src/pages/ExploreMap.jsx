@@ -10,6 +10,9 @@ import {
     FaChair, FaShoppingCart, FaLaptop, FaTools, FaBook, FaTag, FaHome, FaGift
 } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
+import MarkerClusterGroup from 'react-leaflet-markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import logoClicandoPng from '../assets/logo-clicando.png';
 import * as FaIcons from 'react-icons/fa';
 import { useShopCategories } from '../hooks/useShopCategories';
@@ -30,7 +33,11 @@ const StoreMarker = ({ store, isSelected, onSelect, metaMap }) => {
             icon={getCategoryIcon(store.category, metaMap)}
             ref={markerRef}
             eventHandlers={{
-                click: onSelect
+                click: () => {
+                    onSelect();
+                    // Abrir popup inmediatamente
+                    setTimeout(() => markerRef.current?.openPopup(), 100);
+                }
             }}
         >
             <Popup>
@@ -62,35 +69,65 @@ const StoreMarker = ({ store, isSelected, onSelect, metaMap }) => {
 };
 
 // Componente para recentrar el mapa suavemente
-const MapRecenter = ({ lat, lng }) => {
+const MapRecenter = ({ lat, lng, isComingSoon }) => {
     const map = useMap();
     useEffect(() => {
-        if (lat && lng) {
-            map.flyTo([lat, lng], 15, { duration: 1.5 });
+        if (lat && lng && !isComingSoon) {
+            map.flyTo([lat, lng], 17, { duration: 1.5 });
         }
-    }, [lat, lng, map]);
+    }, [lat, lng, isComingSoon, map]);
+    return null;
+};
+
+// Componente para ajustar el zoom a los marcadores filtrados
+const MapFitBounds = ({ stores }) => {
+    const map = useMap();
+    useEffect(() => {
+        if (stores && stores.length > 0) {
+            const bounds = L.latLngBounds(stores.map(s => [s.latitude, s.longitude]));
+            map.fitBounds(bounds, { padding: [20, 20], maxZoom: 15 });
+        }
+    }, [stores, map]);
     return null;
 };
 
 const getCategoryIcon = (category, metaMap = null) => {
-    const defaultMeta = { marker: 'blue' };
+    const defaultMeta = { marker: 'blue', emoji: '🏪' };
     const meta = (metaMap && metaMap[category]) || defaultMeta;
 
-    // Normalizar color: Leaflet espera 'grey' pero es común escribir 'gray'
-    let markerColor = meta.marker || 'blue';
-    if (markerColor === 'gray') markerColor = 'grey';
+    // Crear icono personalizado con emoji
+    const iconHtml = `<div style="
+        background-color: ${meta.marker === 'blue' ? '#3b82f6' : meta.marker === 'green' ? '#10b981' : meta.marker === 'red' ? '#ef4444' : meta.marker === 'orange' ? '#f97316' : meta.marker === 'yellow' ? '#eab308' : meta.marker === 'violet' ? '#8b5cf6' : meta.marker === 'grey' ? '#6b7280' : '#3b82f6'};
+        border: 2px solid white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    ">${meta.emoji}</div>`;
 
-    const iconUrl = `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${markerColor}.png`;
-
-    return new L.Icon({
-        iconUrl,
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
+    return L.divIcon({
+        html: iconHtml,
+        className: 'custom-marker',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32], // Centro inferior
+        popupAnchor: [0, -32]
     });
 };
+
+const userLocationIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
 
 const ExploreMap = () => {
     const { theme } = useTheme();
@@ -106,45 +143,91 @@ const ExploreMap = () => {
     const [showFilters, setShowFilters] = useState(false);
 
     // Extraer opciones únicas
+    const categories = [...new Set(stores.map(s => s.category).filter(Boolean))].sort();
     const cities = [...new Set(stores.map(s => s.city).filter(Boolean))].sort();
+
+    // Mapa de iconos a emojis para el SELECT nativo (que no soporta SVGs)
+    const iconToEmoji = {
+        FaTshirt: '👕',
+        FaUtensils: '🍴',
+        FaBirthdayCake: '🎂',
+        FaGamepad: '🎮',
+        FaPaw: '🐾',
+        FaChair: '🪑',
+        FaShoppingCart: '🛒',
+        FaLaptop: '💻',
+        FaTools: '🛠️',
+        FaBook: '📚',
+        FaTag: '🏷️',
+        FaHome: '🏠',
+        FaGift: '🎁',
+        // Nuevos mapeos solicitados (con variaciones posibles para asegurar que coincida con DB)
+        FaHeartbeat: '🧴', // Farmacia
+        FaMedkit: '🧴',
+        FaClinicMedical: '🧴',
+        FaPlus: '🧴',
+        FaFirstAid: '🧴',
+        FaPills: '🧴',
+        FaPrescriptionBottle: '🧴',
+
+        FaPaintBrush: '🏺', // Artesanías
+        FaPalette: '🏺',
+        FaHandPaper: '🏺',
+        FaMagic: '🏺',
+        FaGem: '🏺',
+    };
 
     // Mapeo dinámico de categorías para UI externa
     const categoryMetaMap = useMemo(() => {
         const map = {};
         shopCategories.forEach(cat => {
+            // Decidir emoji: Primero ver si hay override manual por ID, sino buscar por icono
+            let emoji = iconToEmoji[cat.icon_name] || '🏷️';
+
+            // Overrides manuales para corregir datos genéricos de la BD
+            if (cat.id === 'Farmacia') emoji = '🧴';
+            if (cat.id === 'Artesanías') emoji = '🏺';
+
+            // Usamos ID como clave porque las tiendas guardan el ID (ej: "Juguetería") NO la label ("Jugueterías")
             map[cat.id] = {
                 label: cat.label,
                 icon: FaIcons[cat.icon_name] || FaIcons.FaTag,
-                marker: cat.marker_color
+                marker: cat.marker_color,
+                emoji: emoji
             };
         });
         return map;
     }, [shopCategories]);
 
-    const filteredStores = stores.map(s => ({
-        ...s,
-        category: (s.category === 'Veterinaria' || s.category === 'Petshop') ? 'Pet Shop' : (s.category || 'Otros')
-    })).filter(store => {
-        const matchesSearch = store.store_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            store.address?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = !selectedCategory || store.category === selectedCategory;
-        const matchesCity = !selectedCity || store.city === selectedCity;
-        return matchesSearch && matchesCategory && matchesCity;
-    }).sort((a, b) => {
-        const getWeight = (s) => {
-            if (s.coming_soon) return 3;
-            if (s.is_demo) return 2;
-            return 1;
-        };
-        return getWeight(a) - getWeight(b);
-    });
+    const filteredStores = useMemo(() => {
+        return stores.map(s => ({
+            ...s,
+            category: (s.category === 'Veterinaria' || s.category === 'Petshop') ? 'Pet Shop' : (s.category || 'Otros')
+        })).filter(store => {
+            const matchesSearch = store.store_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                store.address?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesCategory = !selectedCategory || store.category === selectedCategory;
+            const matchesCity = !selectedCity || store.city === selectedCity;
+            return matchesSearch && matchesCategory && matchesCity;
+        }).sort((a, b) => {
+            const getWeight = (s) => {
+                if (s.coming_soon) return 3;
+                if (s.is_demo) return 2;
+                return 1;
+            };
+            return getWeight(a) - getWeight(b);
+        });
+    }, [stores, searchTerm, selectedCategory, selectedCity]);
 
+    // Scroll to selected store in the list
     useEffect(() => {
-        if (selectedCity && filteredStores.length > 0) {
-            const cityStore = filteredStores.find(s => s.city === selectedCity);
-            if (cityStore) setSelectedStore(cityStore);
+        if (selectedStore) {
+            const element = document.getElementById(`store-${selectedStore.id}`);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
-    }, [selectedCity]);
+    }, [selectedStore]);
 
     if (storesLoading || categoriesLoading) return <div className="h-screen flex items-center justify-center bg-gray-50">Cargando mapa...</div>;
 
@@ -167,10 +250,24 @@ const ExploreMap = () => {
             </div>
             <div className="flex-1 divide-y overflow-y-auto pb-24">
                 {filteredStores.map(store => {
-                    const meta = categoryMetaMap[store.category] || { label: store.category, icon: FaIcons.FaTag };
+                    // Buscar metadatos: coincidencia exacta por ID (store.category debería ser el ID)
+                    // Si falla, intentamos fuzzy match por si acaso
+                    let meta = categoryMetaMap[store.category];
+
+                    if (!meta) {
+                        const matchingKey = Object.keys(categoryMetaMap).find(key =>
+                            key.toLowerCase() === store.category?.toLowerCase() ||
+                            categoryMetaMap[key].label.toLowerCase() === store.category?.toLowerCase()
+                        );
+                        if (matchingKey) meta = categoryMetaMap[matchingKey];
+                    }
+
+                    // Fallback visual
+                    meta = meta || { label: store.category, icon: FaIcons.FaTag, emoji: '🏷️' };
                     return (
                         <div
                             key={store.id}
+                            id={`store-${store.id}`}
                             className={`p-4 transition-colors ${store.coming_soon ? 'opacity-60 cursor-default' : 'cursor-pointer'}`}
                             style={{
                                 backgroundColor: selectedStore?.id === store.id ? 'var(--color-background-light)' : 'transparent',
@@ -201,11 +298,7 @@ const ExploreMap = () => {
                                         <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                                             <span className="text-[10px] font-bold px-1.5 py-1 rounded border flex items-center gap-1.5 uppercase tracking-tighter truncate"
                                                 style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-light)', borderColor: 'var(--color-border)' }}>
-                                                {(() => {
-                                                    const IconComp = meta.icon || FaTag;
-                                                    return <IconComp size={12} />;
-                                                })()}
-                                                {store.category || 'Tienda'}
+                                                {meta.emoji} {meta.label}
                                             </span>
                                             <span className="text-[10px] font-bold uppercase tracking-tighter truncate" style={{ color: 'var(--color-primary)' }}>
                                                 {store.city}
@@ -283,13 +376,11 @@ const ExploreMap = () => {
                                     }}
                                 >
                                     <option value="">📂 Todos los rubros</option>
-                                    {shopCategories.map(cat => {
-                                        return (
-                                            <option key={cat.id} value={cat.id}>
-                                                {cat.label}
-                                            </option>
-                                        );
-                                    })}
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat}>
+                                            {(categoryMetaMap[cat] || {}).emoji || '🏷️'} {cat}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -377,7 +468,10 @@ const ExploreMap = () => {
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >
                             <option value="">Todos los Rubros</option>
-                            {shopCategories.map(cat => <option key={cat.id} value={cat.id}>{cat.label}</option>)}
+                            {shopCategories.map(cat => {
+                                const meta = categoryMetaMap[cat.id];
+                                return <option key={cat.id} value={cat.id}>{meta?.emoji} {cat.label}</option>;
+                            })}
                         </select>
                         <select
                             className="p-2.5 border-2 rounded-xl text-xs font-bold outline-none"
@@ -515,17 +609,40 @@ const ExploreMap = () => {
                             {/* Zoom controls for desktop only, mobile uses gestures and our custom buttons */}
                         </div>
                         {selectedStore && (
-                            <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} />
+                            <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} isComingSoon={selectedStore.coming_soon} />
                         )}
-                        {filteredStores.map(store => (
+                        <MapFitBounds stores={filteredStores} />
+                        {/* <MarkerClusterGroup> */}
+                            {filteredStores.filter(store => store.id !== selectedStore?.id).map(store => (
+                                <StoreMarker
+                                    key={store.id}
+                                    store={store}
+                                    isSelected={false}
+                                    onSelect={() => setSelectedStore(store)}
+                                    metaMap={categoryMetaMap}
+                                />
+                            ))}
+                        {/* </MarkerClusterGroup> */}
+                        {selectedStore && !selectedStore.isUserLocation && (
                             <StoreMarker
-                                key={store.id}
-                                store={store}
-                                isSelected={selectedStore?.id === store.id}
-                                onSelect={() => setSelectedStore(store)}
+                                store={selectedStore}
+                                isSelected={true}
+                                onSelect={() => setSelectedStore(null)}
                                 metaMap={categoryMetaMap}
                             />
-                        ))}
+                        )}
+                        {selectedStore?.isUserLocation && (
+                            <Marker
+                                position={[selectedStore.latitude, selectedStore.longitude]}
+                                icon={userLocationIcon}
+                            >
+                                <Popup>
+                                    <div className="text-center">
+                                        <p className="font-bold">Tu ubicación</p>
+                                    </div>
+                                </Popup>
+                            </Marker>
+                        )}
                     </MapContainer>
                 </div>
             </main>
