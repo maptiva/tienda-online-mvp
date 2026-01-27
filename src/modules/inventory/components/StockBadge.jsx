@@ -6,8 +6,12 @@ const StockBadge = ({ productId, className = "" }) => {
 
   if (loading) {
     return (
-      <div className={`text-sm text-gray-500 ${className}`}>
-        Cargando stock...
+      <div className={`text-sm ${className}`}>
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 bg-gray-300 rounded-full animate-pulse"></div>
+          <div className="h-2 w-8 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-2 w-2 bg-gray-300 rounded-full animate-pulse"></div>
+        </div>
       </div>
     );
   }
@@ -22,8 +26,12 @@ const StockBadge = ({ productId, className = "" }) => {
 
   if (!inventory) {
     return (
-      <div className={`text-sm text-gray-400 ${className}`}>
-        Sin stock configurado
+      <div className={`text-sm ${className}`}>
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 bg-gray-300 rounded-full animate-pulse"></div>
+          <div className="h-2 w-16 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-2 w-2 bg-gray-300 rounded-full animate-pulse"></div>
+        </div>
       </div>
     );
   }

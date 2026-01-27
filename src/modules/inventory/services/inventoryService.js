@@ -2,18 +2,10 @@ import { supabase } from '../../../services/supabase';
 
 export const inventoryService = {
   // Obtener inventario de un producto
-  async fetchInventory(productId, userId = null) {
+  async fetchInventory(productId, userId) {
+    // Si no hay userId (vista pública), no retornar inventario
     if (!userId) {
-      // Vista pública: no hay user_id, retornar stock simulado basado en store
-      return {
-        id: null,
-        product_id: productId,
-        quantity: 0, // Default para pruebas
-        reserved_quantity: 0,
-        min_stock_alert: 5,
-        allow_backorder: false,
-        track_stock: true
-      };
+      return null;
     }
 
     const { data, error } = await supabase

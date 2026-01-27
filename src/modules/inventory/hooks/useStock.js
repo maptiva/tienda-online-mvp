@@ -15,10 +15,10 @@ export const useStock = (productId) => {
 
   // Cargar inventario inicial
   useEffect(() => {
-    if (productId && user?.id) {
+    if (productId) {
       loadInventory();
     }
-  }, [productId, user?.id]);
+  }, [productId]);
 
   const loadInventory = async () => {
     // Revisar cache primero
