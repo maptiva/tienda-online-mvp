@@ -328,38 +328,21 @@ function LandingPage() {
                                 </svg>
                             </button>
 
-                            {/* Scroll Container */}
+                            {/* Scroll Container with CSS Mask */}
                             <div
                                 ref={carouselRef}
                                 className="flex space-x-8 overflow-x-auto hide-scrollbar py-6 px-12 scroll-smooth"
                                 style={{
                                     scrollbarWidth: 'none',
-                                    msOverflowStyle: 'none'
+                                    msOverflowStyle: 'none',
+                                    maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+                                    WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)'
                                 }}
                             >
                                 {featuredStores.map(store => (
                                     <StoreCard key={store.id} store={store} />
                                 ))}
                             </div>
-
-                            {/* Fade Edges */}
-                            <div
-                                className="absolute inset-y-0 left-0 w-12 z-10 pointer-events-none"
-                                style={{
-                                    background: theme === 'dark'
-                                        ? 'linear-gradient(to right, #1a1917, transparent)'
-                                        : 'linear-gradient(to right, #e8e2d9, transparent)'
-                                }}
-                            />
-
-                            <div
-                                className="absolute inset-y-0 right-0 w-12 z-10 pointer-events-none"
-                                style={{
-                                    background: theme === 'dark'
-                                        ? 'linear-gradient(to left, #1a1917, transparent)'
-                                        : 'linear-gradient(to left, #e8e2d9, transparent)'
-                                }}
-                            />
                         </div>
 
 <motion.button
