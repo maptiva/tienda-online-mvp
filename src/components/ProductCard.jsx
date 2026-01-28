@@ -3,12 +3,17 @@ import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { FaWhatsapp } from 'react-icons/fa';
+import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
+import StockBadge from '../modules/inventory/components/StockBadge';
+import { useStock } from '../modules/inventory/hooks/useStock';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { storeName } = useParams();
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
+  const { stockEnabled, loading: configLoading } = useStoreConfig();
+  const { inventory } = useStock(stockEnabled ? product.id : null);
 
   if (!product) {
     return null;
@@ -22,7 +27,23 @@ const ProductCard = ({ product }) => {
       alert("Por favor, ingresa una cantidad válida.");
       return;
     }
+    
+    // Verificar stock si está habilitado
+    if (stockEnabled && inventory) {
+      const availableQuantity = inventory.quantity;
+      if (availableQuantity < numQuantity) {
+        alert(`Stock insuficiente. Solo hay ${availableQuantity} unidades disponibles.`);
+        return;
+      }
+    }
+    
     addToCart(product, numQuantity);
+  };
+
+  // Verificar si el botón de compra debe estar deshabilitado
+  const isPurchaseDisabled = () => {
+    if (!stockEnabled || !inventory) return false;
+    return inventory.quantity <= 0;
   };
 
   return (
@@ -75,31 +96,40 @@ const ProductCard = ({ product }) => {
           </p>
 
           <div>
+            {/* Stock Badge - Mostrar solo si está habilitado para esta tienda */}
+            {stockEnabled && (
+              <div className="mb-2 flex justify-center">
+                <StockBadge productId={product.id} className="text-xs" />
+              </div>
+            )}
+
             {product.price_on_request ? (
-              // Mostrar botón "Consultar Precio"
-              <a
-                href={`https://wa.me/${product.store_whatsapp}?text=${encodeURIComponent(
-                  `Hola! Me interesa el producto "${product.name}" y quisiera consultar el precio.`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className='flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-all duration-300 w-full shadow-md hover:shadow-lg'
-                style={{
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'var(--color-primary-text)'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'var(--color-primary-darker)';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'var(--color-primary)';
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                <FaWhatsapp size={20} />
-                Consultar Precio
-              </a>
+              // Mostrar solo botón "Consultar Precio" con más espacio
+              <div className="mt-4">
+                <a
+                  href={`https://wa.me/${product.store_whatsapp}?text=${encodeURIComponent(
+                    `Hola! Me interesa el producto "${product.name}" y quisiera consultar el precio.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className='flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-lg transition-all duration-300 w-full shadow-md hover:shadow-lg'
+                  style={{
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-primary-text)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                    e.target.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'var(--color-primary)';
+                    e.target.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <FaWhatsapp size={20} />
+                  Consultar Precio
+                </a>
+              </div>
             ) : (
               // Mostrar precio y botón agregar (comportamiento normal)
               <>
@@ -133,19 +163,25 @@ const ProductCard = ({ product }) => {
                   />
                   <button
                     onClick={handleAddToCart}
+                    disabled={isPurchaseDisabled()}
                     className='font-bold py-2 px-3 rounded-lg transition-all duration-300 w-full'
                     style={{
-                      backgroundColor: 'var(--color-primary)',
-                      color: 'var(--color-primary-text)'
+                      backgroundColor: isPurchaseDisabled() ? '#9ca3af' : 'var(--color-primary)',
+                      color: isPurchaseDisabled() ? '#6b7280' : 'var(--color-primary-text)',
+                      cursor: isPurchaseDisabled() ? 'not-allowed' : 'pointer'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                      if (!isPurchaseDisabled()) {
+                        e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'var(--color-primary)';
+                      if (!isPurchaseDisabled()) {
+                        e.target.style.backgroundColor = 'var(--color-primary)';
+                      }
                     }}
                   >
-                    Agregar
+                    {isPurchaseDisabled() ? 'Agotado' : 'Agregar'}
                   </button>
                 </div>
               </>
