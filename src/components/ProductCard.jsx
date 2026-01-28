@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
   const { stockEnabled, loading: configLoading } = useStoreConfig();
-  const { inventory } = useStock(stockEnabled ? product.id : null);
+  const { inventory } = useStock(stockEnabled ? product.id : null, storeName);
 
   if (!product) {
     return null;
@@ -27,7 +27,7 @@ const ProductCard = ({ product }) => {
       alert("Por favor, ingresa una cantidad válida.");
       return;
     }
-    
+
     // Verificar stock si está habilitado
     if (stockEnabled && inventory) {
       const availableQuantity = inventory.quantity;
@@ -36,7 +36,7 @@ const ProductCard = ({ product }) => {
         return;
       }
     }
-    
+
     addToCart(product, numQuantity);
   };
 
@@ -99,7 +99,7 @@ const ProductCard = ({ product }) => {
             {/* Stock Badge - Mostrar solo si está habilitado para esta tienda */}
             {stockEnabled && (
               <div className="mb-2 flex justify-center">
-                <StockBadge productId={product.id} className="text-xs" />
+                <StockBadge productId={product.id} storeSlug={storeName} className="text-xs" />
               </div>
             )}
 

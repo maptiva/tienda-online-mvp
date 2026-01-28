@@ -7,6 +7,9 @@ import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import SEO from './shared/SEO';
 import { FaWhatsapp } from 'react-icons/fa';
+import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
+import StockBadge from '../modules/inventory/components/StockBadge';
+import { useStock } from '../modules/inventory/hooks/useStock';
 
 const ProductDetail = () => {
   const { store } = useOutletContext();
@@ -17,6 +20,10 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const { storeName } = useParams();
+  const { stockEnabled } = useStoreConfig();
+  const { inventory } = useStock(product?.id, storeName);
 
   // Bloquear scroll cuando el modal está abierto
   useEffect(() => {
@@ -67,6 +74,14 @@ const ProductDetail = () => {
       alert("Por favor, ingresa una cantidad válida.");
       return;
     }
+    // Verificar stock si está habilitado
+    if (stockEnabled && inventory) {
+      if (inventory.quantity < numQuantity) {
+        alert(`Stock insuficiente. Solo hay ${inventory.quantity} unidades disponibles.`);
+        return;
+      }
+    }
+
     addToCart(product, numQuantity);
   };
 
@@ -166,6 +181,13 @@ const ProductDetail = () => {
             {product.sku ? `COD: ${product.sku}` : `REF: #${product.display_id || product.id}`}
           </p>
 
+          {/* Stock Badge */}
+          {stockEnabled && (
+            <div className="mb-6 flex justify-start">
+              <StockBadge productId={product.id} storeSlug={storeName} className="text-sm scale-110 origin-left" />
+            </div>
+          )}
+
           {product.price_on_request ? (
             // Mostrar botón "Consultar Precio"
             <a
@@ -237,19 +259,25 @@ const ProductDetail = () => {
                 />
                 <button
                   onClick={handleAddToCart}
+                  disabled={stockEnabled && inventory?.quantity <= 0}
                   className='font-bold py-2 px-6 rounded-lg transition-all duration-300'
                   style={{
-                    backgroundColor: 'var(--color-primary)',
-                    color: 'var(--color-primary-text)'
+                    backgroundColor: (stockEnabled && inventory?.quantity <= 0) ? '#9ca3af' : 'var(--color-primary)',
+                    color: (stockEnabled && inventory?.quantity <= 0) ? '#6b7280' : 'var(--color-primary-text)',
+                    cursor: (stockEnabled && inventory?.quantity <= 0) ? 'not-allowed' : 'pointer'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                    if (!(stockEnabled && inventory?.quantity <= 0)) {
+                      e.target.style.backgroundColor = 'var(--color-primary-darker)';
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'var(--color-primary)';
+                    if (!(stockEnabled && inventory?.quantity <= 0)) {
+                      e.target.style.backgroundColor = 'var(--color-primary)';
+                    }
                   }}
                 >
-                  Agregar al Pedido
+                  {stockEnabled && inventory?.quantity <= 0 ? 'Agotado' : 'Agregar al Pedido'}
                 </button>
               </div>
             </>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useStock } from '../hooks/useStock';
 
-const StockBadge = ({ productId, className = "" }) => {
-  const { inventory, loading, error } = useStock(productId);
+const StockBadge = ({ productId, storeSlug = null, className = "" }) => {
+  const { inventory, loading, error } = useStock(productId, storeSlug);
 
   if (loading) {
     return (
@@ -36,43 +36,43 @@ const StockBadge = ({ productId, className = "" }) => {
 
   const getStockText = () => {
     const minAlert = inventory?.min_stock_alert || 5;
-    
+
     if (quantity <= 0) {
       return "Agotado";
     }
-    
+
     if (quantity <= minAlert) {
       return `¡Últimas ${quantity} unidades!`;
     }
-    
+
     return "Disponible";
   };
 
   const getStockColor = () => {
     const minAlert = inventory?.min_stock_alert || 5;
-    
+
     if (quantity <= 0) {
       return "text-red-600 font-semibold";
     }
-    
+
     if (quantity <= minAlert) {
       return "text-orange-500 font-medium";
     }
-    
+
     return "text-green-600";
   };
 
   const getStockIcon = () => {
     const minAlert = inventory?.min_stock_alert || 5;
-    
+
     if (quantity <= 0) {
       return "❌";
     }
-    
+
     if (quantity <= minAlert) {
       return "⚠️";
     }
-    
+
     return "✅";
   };
 

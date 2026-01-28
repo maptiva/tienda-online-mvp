@@ -4,21 +4,23 @@ import { useAuth } from '../../../context/AuthContext';
 // Stock cache simple en memoria
 const stockCache = new Map();
 
-export const useStock = (productId) => {
+export const useStock = (productId, storeSlug = null) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [inventory, setInventory] = useState(null);
   const [logs, setLogs] = useState([]);
 
-  const cacheKey = user?.id ? `${user?.id}-${productId}` : `public-${productId}`;
+  // La cache debe ser sensible tanto al producto como a la tienda (slug)
+  const cacheKey = user?.id ? `admin-${user.id}-${productId}` : `public-${storeSlug || 'none'}-${productId}`;
 
   // Cargar inventario inicial
   useEffect(() => {
     if (productId) {
       loadInventory();
     }
-  }, [productId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId, user?.id, storeSlug]);
 
   const loadInventory = async () => {
     // Revisar cache primero
@@ -36,7 +38,7 @@ export const useStock = (productId) => {
       setError(null);
 
       const { inventoryService } = await import('../services/inventoryService');
-      const data = await inventoryService.fetchInventory(productId, user?.id);
+      const data = await inventoryService.fetchInventory(productId, user?.id, storeSlug);
 
       // Actualizar cache
       stockCache.set(cacheKey, {
@@ -64,9 +66,9 @@ export const useStock = (productId) => {
 
       const { inventoryService } = await import('../services/inventoryService');
       const result = await inventoryService.adjustStock(
-        productId, 
-        user.id, 
-        quantity, 
+        productId,
+        user.id,
+        quantity,
         reason
       );
 
@@ -76,12 +78,12 @@ export const useStock = (productId) => {
           ...inventory,
           quantity: result.new_quantity
         };
-        
+
         stockCache.set(cacheKey, {
           data: updatedInventory,
           timestamp: Date.now()
         });
-        
+
         setInventory(updatedInventory);
         return result;
       } else {
