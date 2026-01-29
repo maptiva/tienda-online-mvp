@@ -31,8 +31,10 @@ export const useClients = () => {
                 .select(`
                     id,
                     store_name,
+                    store_slug,
                     is_demo,
                     client_id,
+                    enable_stock,
                     subscriptions (
                         id,
                         plan_type,
@@ -77,7 +79,7 @@ export const useClients = () => {
         try {
             const { data, error: storeError } = await supabase
                 .from('stores')
-                .select('id, store_name, user_id, client_id')
+                .select('id, store_name, user_id, client_id, enable_stock')
                 .eq('is_demo', false)
 
             if (storeError) throw storeError;
@@ -112,7 +114,10 @@ export const useClients = () => {
 
                 const { error: storeError } = await supabase
                     .from('stores')
-                    .update({ client_id: newClient.id })
+                    .update({ 
+                        client_id: newClient.id,
+                        enable_stock: clientData.enable_stock === true
+                    })
                     .eq('id', storeIdNum);
 
                 if (storeError) throw storeError;
@@ -151,7 +156,10 @@ export const useClients = () => {
 
                 const { error: storeError } = await supabase
                     .from('stores')
-                    .update({ client_id: id })
+                    .update({ 
+                        client_id: id,
+                        enable_stock: clientData.enable_stock === true
+                    })
                     .eq('id', storeIdNum);
 
                 if (storeError) throw storeError;

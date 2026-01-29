@@ -8,24 +8,56 @@ import StockAdjustment from '../components/StockAdjustment';
 import { FiPackage, FiAlertCircle, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 const InventoryPage = () => {
-  const { products, loading: productsLoading, refreshProducts } = useProducts();
+  const { user } = useAuth();
+  const { products, loading: productsLoading } = useProducts();
   const { stockEnabled, loading: configLoading } = useStoreConfig();
+  const [inventoryData, setInventoryData] = useState([]);
+  const [loadingInventory, setLoadingInventory] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  // Cargar datos extendidos de inventario
+  useEffect(() => {
+    if (user?.id && stockEnabled) {
+      loadInventory();
+    }
+  }, [user?.id, stockEnabled]);
+
+  const loadInventory = async () => {
+    try {
+      setLoadingInventory(true);
+      const data = await inventoryService.fetchUserInventory(user.id);
+      setInventoryData(data);
+    } catch (error) {
+      console.error('Error loading full inventory:', error);
+    } finally {
+      setLoadingInventory(false);
+    }
+  };
+
+  // Calcular métricas
+  const stats = useMemo(() => {
+    return {
+      total: inventoryData.length,
+      outOfStock: inventoryData.filter(i => i.quantity <= 0).length,
+      lowStock: inventoryData.filter(i => i.quantity > 0 && i.quantity <= i.min_stock_alert).length,
+      healthy: inventoryData.filter(i => i.quantity > i.min_stock_alert).length
+    };
+  }, [inventoryData]);
+
   const filteredProducts = useMemo(() => {
-    if (!products) return [];
-    if (!searchTerm) return products;
+    if (!inventoryData) return [];
+    if (!searchTerm) return inventoryData;
 
     const searchLower = searchTerm.toLowerCase();
-    return products.filter((product) => {
+    return inventoryData.filter((product) => {
       const matchesName = product.name.toLowerCase().includes(searchLower);
       const matchesSKU = product.sku?.toLowerCase().includes(searchLower) || false;
       const idToSearch = product.display_id || product.id;
       const matchesID = idToSearch.toString().includes(searchLower);
       return matchesName || matchesSKU || matchesID;
     });
-  }, [products, searchTerm]);
+  }, [inventoryData, searchTerm]);
 
   if (productsLoading || configLoading) return <Loading message="Cargando Inventario..." />;
 
@@ -35,7 +67,7 @@ const InventoryPage = () => {
         <FiPackage className="mx-auto text-6xl text-gray-300 mb-4" />
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Motor de Stock Desactivado</h2>
         <p className="text-gray-600 mb-6">Debes activar el control de stock en la configuración de la tienda para usar este panel.</p>
-        <button 
+        <button
           onClick={() => window.location.href = '/admin/settings'}
           className="px-6 py-2 bg-[#5FAFB8] text-white rounded-lg font-bold hover:opacity-90 transition-all"
         >
@@ -57,11 +89,54 @@ const InventoryPage = () => {
       </div>
 
       <div className="mb-6">
-        <SearchBar 
-          searchTerm={searchTerm} 
-          setSearchTerm={setSearchTerm} 
+        <SearchBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
           placeholder="Buscar por nombre, SKU o REF #..."
         />
+      </div>
+
+      {/* Stats Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center gap-4">
+          <div className="bg-blue-100 p-3 rounded-lg text-blue-600">
+            <FiPackage size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Total Productos</p>
+            <p className="text-xl font-black text-gray-800">{stats.total}</p>
+          </div>
+        </div>
+
+        <div className="bg-red-50 p-4 rounded-xl border border-red-100 flex items-center gap-4">
+          <div className="bg-red-100 p-3 rounded-lg text-red-600">
+            <FiXCircle size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-red-400 tracking-wider">Agotados</p>
+            <p className="text-xl font-black text-red-800">{stats.outOfStock}</p>
+          </div>
+        </div>
+
+        <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-center gap-4">
+          <div className="bg-orange-100 p-3 rounded-lg text-orange-600">
+            <FiAlertCircle size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-orange-400 tracking-wider">Stock Bajo</p>
+            <p className="text-xl font-black text-orange-800">{stats.lowStock}</p>
+          </div>
+        </div>
+
+        <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 flex items-center gap-4">
+          <div className="bg-emerald-100 p-3 rounded-lg text-emerald-600">
+            <FiCheckCircle size={20} />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">Stock Saludable</p>
+            <p className="text-xl font-black text-emerald-800">{stats.healthy}</p>
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-6">
@@ -79,8 +154,8 @@ const InventoryPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredProducts.map((product) => (
-                  <tr 
-                    key={product.id} 
+                  <tr
+                    key={product.id}
                     className={`hover:bg-white transition-colors cursor-pointer ${selectedProduct?.id === product.id ? 'bg-white ring-2 ring-[#5FAFB8] ring-inset' : ''}`}
                     onClick={() => setSelectedProduct(product)}
                   >
@@ -104,7 +179,7 @@ const InventoryPage = () => {
                       <StockBadge productId={product.id} />
                     </td>
                     <td className="p-4">
-                      <button 
+                      <button
                         className="text-xs font-bold uppercase tracking-wider text-[#5FAFB8] hover:text-[#4a8a91] transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -132,7 +207,7 @@ const InventoryPage = () => {
                     <FiXCircle size={20} />
                   </button>
                 </div>
-                
+
                 <div className="mb-4 flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   {selectedProduct.image_url && <img src={selectedProduct.image_url} className="w-12 h-12 rounded object-cover border" alt="" />}
                   <div>
@@ -141,12 +216,11 @@ const InventoryPage = () => {
                   </div>
                 </div>
 
-                <StockAdjustment 
-                  productId={selectedProduct.id} 
+                <StockAdjustment
+                  productId={selectedProduct.id}
                   onSuccess={() => {
-                    // No necesitamos refrescar productos porque StockAdjustment usa el hook useStock
-                    // que ya invalida la cache.
-                  }} 
+                    loadInventory(); // Recargar métricas tras ajuste
+                  }}
                 />
               </div>
             </div>

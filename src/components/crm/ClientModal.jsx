@@ -6,6 +6,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
         contact_email: '',
         contact_phone: '',
         notes: '',
+        enable_stock: false,
         billing_info: { cuit: '', address: '' }
     });
     const [stores, setStores] = useState([]);
@@ -20,6 +21,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                 contact_email: editingClient.contact_email || '',
                 contact_phone: editingClient.contact_phone || '',
                 notes: editingClient.notes || '',
+                enable_stock: editingClient.stores?.[0]?.enable_stock || false,
                 billing_info: editingClient.billing_info || { cuit: '', address: '' }
             });
             // Si tiene tienda, seleccionarla
@@ -35,6 +37,7 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                 contact_email: '',
                 contact_phone: '',
                 notes: '',
+                enable_stock: false,
                 billing_info: { cuit: '', address: '' }
             });
             setSelectedStoreId('');
@@ -157,6 +160,29 @@ const ClientModal = ({ isOpen, onClose, onSubmit, getRealStores, editingClient =
                                     })}
                                 />
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Master Switches */}
+                    <div className="mt-8 pt-6 border-t">
+                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Configuración del Servicio</h3>
+                        <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">📦</span>
+                                <div>
+                                    <p className="text-sm font-black text-gray-800">Motor de Stock Inteligente</p>
+                                    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tight">Habilita tableros de inventario y validación de compra</p>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={formData.enable_stock}
+                                    onChange={(e) => setFormData({ ...formData, enable_stock: e.target.checked })}
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5FAFB8]"></div>
+                            </label>
                         </div>
                     </div>
 
