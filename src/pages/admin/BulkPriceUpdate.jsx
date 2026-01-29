@@ -383,6 +383,7 @@ const BulkPriceUpdate = () => {
                                     className="bg-white border p-1 rounded-lg flex-1 md:flex-none md:w-44 min-w-0 font-black text-center outline-none ring-2 ring-transparent focus:ring-blue-400 transition-all text-lg md:text-xl h-[42px]"
                                     value={amount}
                                     onChange={(e) => setAmount(Number(e.target.value))}
+                                    onFocus={(e) => e.target.select()}
                                     placeholder="0"
                                 />
                             </div>

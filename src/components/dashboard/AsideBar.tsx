@@ -3,6 +3,7 @@ import { BiLogOut } from 'react-icons/bi'
 import { MdShoppingCart } from 'react-icons/md'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useStoreConfig } from '../../modules/inventory/hooks/useStoreConfig'
 import { isSuperAdmin } from '../../utils/authRoles'
 
 interface AsideBarProps {
@@ -13,6 +14,7 @@ interface AsideBarProps {
 export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) => {
     const navigate = useNavigate();
     const { signOut, user } = useAuth();
+    const { stockEnabled } = useStoreConfig();
     const location = useLocation();
     const isMaster = isSuperAdmin(user);
 
@@ -78,7 +80,14 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
                     className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">📊</span>
-                    <span>Inventario</span>
+                    <div className="flex items-center gap-2">
+                        <span>Inventario</span>
+                        {!stockEnabled && (
+                            <span className="text-[10px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-md font-black flex items-center gap-1">
+                                🔒 <span className="hidden md:inline">SOLICITAR</span>
+                            </span>
+                        )}
+                    </div>
                 </NavLink>
 
                 <NavLink
