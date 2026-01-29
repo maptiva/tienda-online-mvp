@@ -3,8 +3,10 @@ import { useCart } from '../context/CartContext';
 import styles from './CartModal.module.css';
 import { MdOutlineDelete } from 'react-icons/md';
 import { useTheme } from '../context/ThemeContext';
+import Swal from 'sweetalert2';
+import { inventoryService } from '../modules/inventory/services/inventoryService';
 
-const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
+const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled }) => {
   const { cart, removeFromCart, clearCart } = useCart();
   const { theme } = useTheme();
   const [name, setName] = useState('');
@@ -13,19 +15,34 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
 
   if (!isOpen) return null;
 
-  const handleWhatsAppOrder = () => {
+  const handleWhatsAppOrder = async () => {
     if (cart.length === 0) {
-      alert('Tu carrito está vacío.');
+      Swal.fire({
+        icon: 'info',
+        title: 'Carrito vacío',
+        text: 'Tu carrito está vacío.',
+        confirmButtonColor: 'var(--color-primary)'
+      });
       return;
     }
 
     if (!name || !phone) {
-      alert('Por favor, completa tu nombre y teléfono.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Datos incompletos',
+        text: 'Por favor, completa tu nombre y teléfono.',
+        confirmButtonColor: 'var(--color-primary)'
+      });
       return;
     }
 
     if (!whatsappNumber) {
-      alert('No hay número de WhatsApp configurado para esta tienda.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de configuración',
+        text: 'No hay número de WhatsApp configurado para esta tienda.',
+        confirmButtonColor: 'var(--color-primary)'
+      });
       return;
     }
 
@@ -53,6 +70,22 @@ const CartModal = ({ isOpen, onClose, whatsappNumber }) => {
     message += `
 
 *Total:* $${total.toFixed(2)}`;
+
+    // Si el stock está habilitado, descontar antes de redirigir
+    if (stockEnabled && storeSlug) {
+      try {
+        const itemsToProcess = cart.map(item => ({
+          product_id: item.product.id,
+          quantity: item.quantity
+        }));
+
+        await inventoryService.processPublicCartSale(storeSlug, itemsToProcess, `Pedido de ${name}`);
+      } catch (error) {
+        console.error('Error al descontar stock:', error);
+        // Continuamos con el pedido de todas formas para no perder la venta,
+        // pero lo logueamos.
+      }
+    }
 
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');

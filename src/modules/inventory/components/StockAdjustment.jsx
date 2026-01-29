@@ -14,12 +14,28 @@ const StockAdjustment = ({ productId, onSuccess }) => {
 
     try {
       await adjustStock(quantity, reason || `Ajuste ${type === 'increase' ? 'entrada' : 'salida'}`);
+
+      const Swal = (await import('sweetalert2')).default;
+      Swal.fire({
+        icon: 'success',
+        title: 'Stock actualizado',
+        text: `Se ha registrado el ajuste de ${Math.abs(adjustment)} unidades.`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+
       setAdjustment(0);
       setReason('');
       onSuccess?.();
     } catch (error) {
       console.error('Error adjusting stock:', error);
-      alert('Error al ajustar stock: ' + error.message);
+      const Swal = (await import('sweetalert2')).default;
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al ajustar stock',
+        text: error.message,
+        confirmButtonColor: '#5FAFB8'
+      });
     }
   };
 

@@ -10,6 +10,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import StockBadge from '../modules/inventory/components/StockBadge';
 import { useStock } from '../modules/inventory/hooks/useStock';
+import Swal from 'sweetalert2';
 
 const ProductDetail = () => {
   const { store } = useOutletContext();
@@ -71,13 +72,23 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     const numQuantity = parseInt(quantity, 10);
     if (isNaN(numQuantity) || numQuantity < 1) {
-      alert("Por favor, ingresa una cantidad válida.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Cantidad inválida',
+        text: 'Por favor, ingresa una cantidad válida.',
+        confirmButtonColor: 'var(--color-primary)'
+      });
       return;
     }
     // Verificar stock si está habilitado
     if (stockEnabled && inventory) {
       if (inventory.quantity < numQuantity) {
-        alert(`Stock insuficiente. Solo hay ${inventory.quantity} unidades disponibles.`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Stock insuficiente',
+          text: `Solo hay ${inventory.quantity} unidades disponibles.`,
+          confirmButtonColor: 'var(--color-primary)'
+        });
         return;
       }
     }

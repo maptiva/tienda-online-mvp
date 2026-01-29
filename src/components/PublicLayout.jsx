@@ -6,6 +6,7 @@ import WhatsAppButton from './WhatsAppButton';
 import CartModal from './CartModal';
 import CategoriaList from './public/CategoriaList';
 import { useStoreByName } from '../hooks/useStoreByName';
+import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import SEO from './shared/SEO';
 
 const PublicLayout = () => {
@@ -13,6 +14,7 @@ const PublicLayout = () => {
   const { storeName } = useParams();
   const location = useLocation();
   const { store, loading, error } = useStoreByName(storeName);
+  const { stockEnabled } = useStoreConfig();
 
   // Verificar si estamos en la página de lista de productos
   const isProductListPage = location.pathname === `/${storeName}` || location.pathname === `/${storeName}/`;
@@ -73,6 +75,8 @@ const PublicLayout = () => {
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         whatsappNumber={store.whatsapp_number}
+        storeSlug={storeName}
+        stockEnabled={stockEnabled}
       />
     </div>
   );

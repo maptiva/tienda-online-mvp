@@ -68,6 +68,18 @@ export const inventoryService = {
     return data;
   },
 
+  // Procesar venta pública (sin login)
+  async processPublicCartSale(storeSlug, items, orderReference = null) {
+    const { data, error } = await supabase.rpc('process_public_cart_sale', {
+      p_store_slug: storeSlug,
+      p_items: items,
+      p_order_reference: orderReference
+    });
+
+    if (error) throw error;
+    return data;
+  },
+
   // Ajustar stock (entrada/salida manual)
   async adjustStock(productId, userId, quantityChange, reason, createdBy = null) {
     // Ejecutar como transacción usando RPC
@@ -83,17 +95,16 @@ export const inventoryService = {
     return data;
   },
 
-  // Procesar venta con validación de stock
-  async processSaleTransaction(productId, userId, quantity, orderId = null) {
-    const { data, error } = await supabase.rpc('process_sale_with_stock_validation', {
-      p_product_id: productId,
+  // Procesar venta masiva desde carrito
+  async processCartSale(userId, items, orderReference = null) {
+    const { data, error } = await supabase.rpc('process_cart_items_sale', {
+      p_items: items,
       p_user_id: userId,
-      p_quantity: quantity,
-      p_order_id: orderId
+      p_order_reference: orderReference
     });
 
     if (error) throw error;
-    return data.success;
+    return data;
   },
 
   // Obtener inventario completo con productos

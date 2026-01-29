@@ -8,6 +8,7 @@ import { Loading } from '../../../components/dashboard/Loading';
 import SearchBar from '../../../components/SearchBar';
 import StockBadge from '../components/StockBadge';
 import StockAdjustment from '../components/StockAdjustment';
+import Swal from 'sweetalert2';
 import { FiPackage, FiAlertCircle, FiCheckCircle, FiXCircle, FiArrowLeft } from 'react-icons/fi';
 
 const InventoryPage = () => {
@@ -49,7 +50,9 @@ const InventoryPage = () => {
         quantity: stockInfo?.quantity ?? 0,
         min_stock_alert: stockInfo?.min_stock_alert ?? 5,
         track_stock: stockInfo?.track_stock ?? true,
-        inventory_id: stockInfo?.id
+        inventory_id: stockInfo?.id,
+        // Usar imagen de producto o placeholder
+        thumbnail: product.image_url || null
       };
     });
   }, [products, inventoryData]);
