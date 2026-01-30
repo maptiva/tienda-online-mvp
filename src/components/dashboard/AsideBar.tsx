@@ -133,6 +133,14 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
                                 <span className="text-sm">Gestión Clientes</span>
                             </NavLink>
                             <NavLink
+                                to={'/admin/crm/leads'}
+                                onClick={handleNavClick}
+                                className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                            >
+                                <span className="text-xl">🔥</span>
+                                <span className="text-sm">Leads</span>
+                            </NavLink>
+                            <NavLink
                                 to={'/admin/crm/payments'}
                                 onClick={handleNavClick}
                                 className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}

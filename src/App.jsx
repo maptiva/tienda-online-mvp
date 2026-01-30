@@ -23,6 +23,7 @@ import ExploreMap from './pages/ExploreMap';
 import SuperAdminRoute from './router/SuperAdminRoute';
 import CRMDashboard from './pages/admin/crm/Dashboard';
 import Clients from './pages/admin/crm/Clients';
+import Leads from './pages/admin/crm/Leads';
 import Payments from './pages/admin/crm/Payments';
 import BulkPriceUpdate from './pages/admin/BulkPriceUpdate';
 import InventoryPage from './modules/inventory/pages/InventoryPage';
@@ -61,6 +62,7 @@ function App() {
           <Route path="crm" element={<SuperAdminRoute><Outlet /></SuperAdminRoute>}>
             <Route index element={<CRMDashboard />} />
             <Route path="clients" element={<Clients />} />
+            <Route path="leads" element={<Leads />} />
             <Route path="payments" element={<Payments />} />
           </Route>
         </Route>
