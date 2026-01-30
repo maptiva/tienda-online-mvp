@@ -101,7 +101,7 @@ BEGIN
   END IF;
   
   -- Validar que haya items
-  IF json_array_length(p_items) = 0 THEN
+  IF jsonb_array_length(p_items) = 0 THEN
     RETURN json_build_object('success', false, 'error', 'Carrito vacío');
   END IF;
   
@@ -117,7 +117,7 @@ BEGIN
       
       -- Si no existe inventario, error
       IF NOT FOUND THEN
-        results := results || json_build_object(
+        results := results || jsonb_build_object(
           'product_id', item_record.product_id,
           'success', false,
           'error', 'Producto sin inventario configurado',
@@ -129,7 +129,7 @@ BEGIN
       
       -- Validar stock disponible
       IF current_inventory.quantity < item_record.quantity AND NOT current_inventory.allow_backorder THEN
-        results := results || json_build_object(
+        results := results || jsonb_build_object(
           'product_id', item_record.product_id,
           'success', false,
           'error', 'Stock insuficiente',
@@ -162,7 +162,7 @@ BEGIN
       );
       
       -- Agregar resultado exitoso
-      results := results || json_build_object(
+      results := results || jsonb_build_object(
         'product_id', item_record.product_id,
         'success', true,
         'previous_quantity', current_inventory.quantity,
@@ -172,7 +172,7 @@ BEGIN
       
     EXCEPTION
       WHEN OTHERS THEN
-        results := results || json_build_object(
+        results := results || jsonb_build_object(
           'product_id', item_record.product_id,
           'success', false,
           'error', SQLERRM
@@ -182,14 +182,14 @@ BEGIN
   END LOOP;
   
   -- Determinar resultado general
-  RETURN json_build_object(
+  RETURN jsonb_build_object(
     'success', (error_count = 0),
-    'processed_items', json_array_length(p_items),
-    'successful_items', (json_array_length(p_items) - error_count),
+    'processed_items', jsonb_array_length(p_items),
+    'successful_items', (jsonb_array_length(p_items) - error_count),
     'failed_items', error_count,
     'results', results,
     'order_reference', p_order_reference
-  );
+  )::json;
 END;
 $$;
 

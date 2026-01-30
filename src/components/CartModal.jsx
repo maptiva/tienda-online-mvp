@@ -15,7 +15,17 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
 
   if (!isOpen) return null;
 
-  const handleWhatsAppOrder = async () => {
+  const handleWhatsAppOrder = async (retriesLeft = 1) => {
+    const isDev = import.meta.env.MODE !== 'production';
+    if (isDev) console.debug('🔍 [CART DEBUG]: handleWhatsAppOrder iniciado', { 
+      cartLength: cart.length,
+      cartItems: cart.map(item => ({
+        name: item.product.name,
+        id: item.product.id,
+        quantity: item.quantity
+      }))
+    });
+
     if (cart.length === 0) {
       Swal.fire({
         icon: 'info',
@@ -46,51 +56,120 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
       return;
     }
 
-    let message = `Hola, me gustaría hacer el siguiente pedido:
-
-*Nombre:* ${name}
-*Teléfono:* ${phone}`;
+    let message = `Hola, me gustaría hacer el siguiente pedido:\n\n*Nombre:* ${name}\n*Teléfono:* ${phone}`;
 
     if (address) {
-      message += `
-*Dirección:* ${address}`;
+      message += `\n*Dirección:* ${address}`;
     }
 
-    message += `
-
-*Pedido:*`;
+    message += `\n\n*Pedido:*`;
 
     cart.forEach(item => {
       const productRef = item.product.sku ? item.product.sku : `#${item.product.display_id || item.product.id}`;
-      message += `
-- ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(item.product.price * item.quantity).toFixed(2)}`;
+      message += `\n- ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(item.product.price * item.quantity).toFixed(2)}`;
     });
 
     const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    message += `
-
-*Total:* $${total.toFixed(2)}`;
+    message += `\n\n*Total:* $${total.toFixed(2)}`;
 
     // Si el stock está habilitado, descontar antes de redirigir
+    if (isDev) console.debug('🔍 [STOCK DEBUG]: Verificando si se procesa stock', {
+      stockEnabled,
+      storeSlug,
+      shouldProcess: !!(stockEnabled && storeSlug)
+    });
+
     if (stockEnabled && storeSlug) {
+      if (isDev) console.debug('🔍 [STOCK DEBUG]: Iniciando procesamiento de stock', {
+        stockEnabled,
+        storeSlug,
+        cartSize: cart.length
+      });
+
       try {
         const itemsToProcess = cart.map(item => ({
           product_id: item.product.id,
           quantity: item.quantity
         }));
 
-        await inventoryService.processPublicCartSale(storeSlug, itemsToProcess, `Pedido de ${name}`);
+        if (isDev) console.debug('🔍 [STOCK DEBUG]: Items a procesar:', itemsToProcess);
+        if (isDev) console.debug('🔍 [STOCK DEBUG]: Llamando a processPublicCartSale...');
+
+        const result = await inventoryService.processPublicCartSale(storeSlug, itemsToProcess, `Pedido de ${name}`);
+        if (isDev) console.debug('🔍 [STOCK DEBUG]: Resultado del procesamiento:', result);
+
+        if (!result.success) {
+          if (isDev) console.error('🔥 [STOCK ERROR]: Procesamiento fallido');
+
+          const resArray = Array.isArray(result.results) ? result.results : (result.results ? JSON.parse(result.results) : []);
+          const failedItems = resArray.filter(item => !item.success);
+          const errorMessage = failedItems.map(item => {
+            const cartItem = cart.find(c => c.product.id === item.product_id);
+            const productName = cartItem ? cartItem.product.name : `Producto #${item.product_id}`;
+            return `• ${productName}: ${item.error}`;
+          }).join('\n');
+
+          const swalRes = await Swal.fire({
+            icon: 'warning',
+            title: '⚠️ Problemas con el Stock',
+            html: `<div style="text-align: left; white-space: pre-line; font-size:14px;">\n              <strong>No pudimos reservar algunos productos:</strong><br><br>\n              ${errorMessage}\n            </div>`,
+            width: '500px',
+            confirmButtonColor: 'var(--color-primary)',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar pedido',
+            confirmButtonText: 'Continuar de todas formas'
+          });
+
+          if (swalRes.isConfirmed) {
+            proceedToWhatsApp();
+          }
+          return;
+        }
+
+        if (isDev) console.debug('✅ [STOCK SUCCESS]: Stock descontado correctamente');
+
+        await Swal.fire({
+          icon: 'success',
+          title: '✅ Stock Reservado',
+          text: 'Tu stock ha sido reservado correctamente. Ahora serás redirigido a WhatsApp.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+
       } catch (error) {
-        console.error('Error al descontar stock:', error);
-        // Continuamos con el pedido de todas formas para no perder la venta,
-        // pero lo logueamos.
+        if (isDev) console.error('🔥 [STOCK CRITICAL ERROR]:', error);
+
+        const swalRes = await Swal.fire({
+          icon: 'error',
+          title: 'Error del Sistema',
+          text: 'Hubo un error al reservar tu stock. Por favor, intenta nuevamente.',
+          confirmButtonColor: 'var(--color-primary)',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar',
+          confirmButtonText: 'Intentar de nuevo'
+        });
+
+        if (swalRes.isConfirmed) {
+          if (retriesLeft > 0) {
+            await handleWhatsAppOrder(retriesLeft - 1);
+          } else {
+            await Swal.fire({icon: 'error', title: 'No se pudo reservar stock', text: 'Por favor intenta más tarde o contacta al vendedor.'});
+          }
+        }
+        return;
       }
     }
 
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    onClose();
-    clearCart();
+    // Función auxiliar para continuar a WhatsApp
+    const proceedToWhatsApp = () => {
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      onClose();
+      clearCart();
+    };
+
+    // Si no hay stock habilitado o se procesó correctamente, continuar con WhatsApp (una sola llamada)
+    proceedToWhatsApp();
   };
 
   const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
