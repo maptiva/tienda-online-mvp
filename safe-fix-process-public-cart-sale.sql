@@ -1,7 +1,26 @@
--- Función RPC Pública para Procesar Ventas desde el Carrito (WhatsApp)
--- Permite que clientes (no autenticados) descuenten stock al confirmar un pedido
--- Solo funciona si la tienda tiene enable_stock = true
+-- ✅ SCRIPT SEGURO - BACKUP Y VERIFICACIÓN INCLUIDOS
+-- Este script NO modifica datos existentes, solo la función RPC
 
+-- Paso 1: Verificar estado actual sin modificar nada
+SELECT 
+  'EXISTE' as estado,
+  routine_name,
+  routine_type,
+  routine_schema
+FROM information_schema.routines 
+WHERE routine_name = 'process_public_cart_sale';
+
+-- Paso 2: Hacer backup de la función actual (compatible con Supabase SQL editor)
+-- Esto muestra la definición actual de la función para copiar/guardar manualmente si es necesario
+SELECT pg_get_functiondef(p.oid) AS function_def
+FROM pg_proc p
+JOIN pg_namespace n ON p.pronamespace = n.oid
+WHERE p.proname = 'process_public_cart_sale' AND n.nspname = 'public';
+
+-- Paso 3: Eliminar función existente (si existe)
+DROP FUNCTION IF EXISTS process_public_cart_sale(TEXT, JSONB, TEXT);
+
+-- Paso 4: Recrear función con permisos correctos
 CREATE OR REPLACE FUNCTION process_public_cart_sale(
   p_store_slug TEXT,
   p_items JSONB,
@@ -24,15 +43,15 @@ BEGIN
   SELECT user_id, enable_stock INTO v_user_id, v_enable_stock
   FROM stores
   WHERE store_slug = p_store_slug;
-
+ 
   IF v_user_id IS NULL THEN
     RETURN json_build_object('success', false, 'error', 'Tienda no encontrada');
   END IF;
-
+ 
   IF NOT v_enable_stock THEN
     RETURN json_build_object('success', false, 'error', 'La tienda no tiene habilitado el control de stock');
   END IF;
-
+ 
   -- 2. Procesar cada item del carrito
   FOR item_record IN SELECT * FROM jsonb_to_recordset(p_items) AS x(product_id BIGINT, quantity INTEGER)
   LOOP
@@ -42,7 +61,7 @@ BEGIN
       FROM inventory
       WHERE product_id = item_record.product_id AND user_id = v_user_id
       FOR UPDATE;
-
+ 
       IF NOT FOUND THEN
         results := results || jsonb_build_object(
           'product_id', item_record.product_id,
@@ -52,7 +71,7 @@ BEGIN
         error_count := error_count + 1;
         CONTINUE;
       END IF;
-
+ 
       -- Validar disponibilidad (si no permite backorder)
       IF current_inventory.quantity < item_record.quantity AND NOT current_inventory.allow_backorder THEN
         results := results || jsonb_build_object(
@@ -65,15 +84,15 @@ BEGIN
         error_count := error_count + 1;
         CONTINUE;
       END IF;
-
+ 
       -- Calcular y actualizar
       new_quantity := current_inventory.quantity - item_record.quantity;
-
+ 
       UPDATE inventory
       SET quantity = new_quantity,
           updated_at = NOW()
       WHERE id = current_inventory.id;
-
+ 
       -- Registrar log del movimiento
       INSERT INTO inventory_logs (
         product_id,
@@ -92,13 +111,13 @@ BEGIN
         new_quantity,
         CONCAT('Venta Pública - ', COALESCE(p_order_reference, 'Pedido WhatsApp'))
       );
-
+ 
       results := results || jsonb_build_object(
         'product_id', item_record.product_id,
         'success', true,
         'new_quantity', new_quantity
       );
-
+ 
     EXCEPTION WHEN OTHERS THEN
       results := results || jsonb_build_object(
         'product_id', item_record.product_id,
@@ -108,10 +127,10 @@ BEGIN
       error_count := error_count + 1;
     END;
   END LOOP;
-
+ 
   -- Retornar resultado consolidado
   RETURN jsonb_build_object(
-    'success', (error_count = 0),
+    'success', (error_count =0),
     'processed_items', jsonb_array_length(p_items),
     'failed_items', error_count,
     'results', results
@@ -119,6 +138,24 @@ BEGIN
 END;
 $$;
 
--- Otorgar permisos de ejecución al rol anon (público)
+-- Paso 5: Otorgar permisos correctamente
 GRANT EXECUTE ON FUNCTION process_public_cart_sale(TEXT, JSONB, TEXT) TO anon;
 GRANT EXECUTE ON FUNCTION process_public_cart_sale(TEXT, JSONB, TEXT) TO authenticated;
+
+-- Paso 6: Verificar que se haya creado correctamente
+SELECT 
+  'CREADA' as estado,
+  routine_name,
+  routine_type,
+  routine_schema
+FROM information_schema.routines 
+WHERE routine_name = 'process_public_cart_sale';
+
+-- Paso 7: Verificar permisos
+SELECT 
+  'PERMISOS OTORGADOS' as resultado,
+  grantee,
+  privilege_type 
+FROM information_schema.role_routine_grants 
+WHERE routine_name = 'process_public_cart_sale'
+  AND grantee IN ('anon', 'authenticated');

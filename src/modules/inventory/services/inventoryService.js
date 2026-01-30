@@ -1,5 +1,7 @@
 import { supabase } from '../../../services/supabase';
 
+const isDev = import.meta.env.MODE !== 'production';
+
 export const inventoryService = {
   // Obtener inventario de un producto
   async fetchInventory(productId, userId, storeSlug = null) {
@@ -70,14 +72,32 @@ export const inventoryService = {
 
   // Procesar venta pública (sin login)
   async processPublicCartSale(storeSlug, items, orderReference = null) {
-    const { data, error } = await supabase.rpc('process_public_cart_sale', {
-      p_store_slug: storeSlug,
-      p_items: items,
-      p_order_reference: orderReference
+    if (isDev) console.debug('🔍 [SERVICE DEBUG]: Llamando a processPublicCartSale', {
+      storeSlug,
+      items,
+      orderReference
     });
 
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.rpc('process_public_cart_sale', {
+        p_store_slug: storeSlug,
+        p_items: items,
+        p_order_reference: orderReference
+      });
+
+      if (isDev) console.debug('🔍 [SERVICE DEBUG]: Respuesta de Supabase', { data, error });
+
+      if (error) {
+        console.error('🔥 [SERVICE ERROR]: Error en RPC call', error);
+        throw error;
+      }
+
+      if (isDev) console.debug('✅ [SERVICE SUCCESS]: Respuesta exitosa', data);
+      return data;
+    } catch (error) {
+      console.error('🔥 [SERVICE CRITICAL]: Error completo en processPublicCartSale', error);
+      throw error;
+    }
   },
 
   // Ajustar stock (entrada/salida manual)
