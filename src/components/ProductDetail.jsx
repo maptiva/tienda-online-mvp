@@ -203,7 +203,7 @@ const ProductDetail = () => {
             // Mostrar botón "Consultar Precio"
             <a
               href={`https://wa.me/${store?.whatsapp_number}?text=${encodeURIComponent(
-                `Hola! Me interesa el producto "${product.name}" y quisiera consultar el precio.`
+                `Hola! Me interesa el producto "${product.name}" (REF: ${product.sku ? product.sku : '#' + (product.display_id || product.id)}) y quisiera consultar el precio.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"

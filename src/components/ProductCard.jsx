@@ -119,7 +119,7 @@ const ProductCard = ({ product }) => {
               <div className="mt-4">
                 <a
                   href={`https://wa.me/${product.store_whatsapp}?text=${encodeURIComponent(
-                    `Hola! Me interesa el producto "${product.name}" y quisiera consultar el precio.`
+                    `Hola! Me interesa el producto "${product.name}" (REF: ${product.sku ? product.sku : '#' + (product.display_id || product.id)}) y quisiera consultar el precio.`
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
