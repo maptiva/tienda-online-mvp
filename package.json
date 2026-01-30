@@ -9,7 +9,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "storage-clean": "node scripts/cleanup-storage.js"
+    "storage-clean": "node scripts/cleanup-storage.js",
+    "test:inventory": "node tests/ci-public-cart-sale.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",
