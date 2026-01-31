@@ -20,6 +20,7 @@ function StoreSettings() {
     contact_phone: '',
     instagram_url: '',
     facebook_url: '',
+    tiktok_url: '',
     whatsapp_number: '',
     whatsapp_message: 'Hola, estoy interesado en sus productos.',
     latitude: null, // New field
@@ -514,6 +515,21 @@ function StoreSettings() {
             placeholder="https://facebook.com/mitienda"
           />
         </div>
+
+        {/* TikTok */}
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            URL de TikTok
+          </label>
+          <input
+            type="url"
+            name="tiktok_url"
+            value={storeData.tiktok_url}
+            onChange={handleInputChange}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="https://www.tiktok.com/@mitienda"
+          />
+        </div> 
 
         {/* WhatsApp Message */}
         <div>

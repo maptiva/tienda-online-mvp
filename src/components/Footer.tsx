@@ -7,7 +7,8 @@ import { IoCall } from 'react-icons/io5' // Filled icon
 import { IoTime } from 'react-icons/io5' // Filled icon
 import { IoMap, IoStorefront } from 'react-icons/io5'
 import { FaInstagram, FaFacebook, FaStore } from 'react-icons/fa'
-import StoreDirectory from './StoreDirectory'
+import { SiTiktok } from 'react-icons/si'
+import StoreDirectory from './StoreDirectory' 
 import StoreMap from './StoreMap' // Import StoreMap
 import { Link } from 'react-router-dom'
 
@@ -19,6 +20,7 @@ interface FooterProps {
         business_hours?: string;
         instagram_url?: string;
         facebook_url?: string;
+        tiktok_url?: string;
         latitude?: number;
         longitude?: number;
         show_map?: boolean;
@@ -47,6 +49,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
     const displayHours = storeData?.business_hours || 'Lun-Sab: 9:00 - 20:00';
     const displayInstagram = storeData?.instagram_url;
     const displayFacebook = storeData?.facebook_url;
+    const displayTikTok = storeData?.tiktok_url; 
 
     return (
         <>
@@ -118,7 +121,7 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
 
 
                                 {/* Redes Sociales */}
-                                {(displayInstagram || displayFacebook) && (
+                                {(displayInstagram || displayFacebook || displayTikTok) && (
                                     <div className='flex gap-4 mt-4'>
                                         {displayInstagram && (
                                             <a
@@ -140,6 +143,17 @@ const Footer: React.FC<FooterProps> = ({ storeName, storeData }) => {
                                                 style={{ color: 'var(--color-primary)' }}
                                             >
                                                 <FaFacebook size={24} />
+                                            </a>
+                                        )}
+                                        {displayTikTok && (
+                                            <a
+                                                href={displayTikTok}
+                                                target='_blank'
+                                                rel='noopener noreferrer'
+                                                className='transition-opacity hover:opacity-70'
+                                                style={{ color: 'var(--color-primary)' }}
+                                            >
+                                                <SiTiktok size={24} />
                                             </a>
                                         )}
                                     </div>
