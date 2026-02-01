@@ -62,5 +62,16 @@ export const leadsService = {
     await this.updateLead(leadId, { status: 'CONVERTED' });
 
     return client;
+  },
+
+  // Importar leads masivamente
+  async importLeads(leadsArray) {
+    const { data, error } = await supabase
+      .from('leads')
+      .insert(leadsArray)
+      .select();
+
+    if (error) throw error;
+    return data;
   }
 };

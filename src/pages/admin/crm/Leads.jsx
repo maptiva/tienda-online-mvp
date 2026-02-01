@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { leadsService } from '../../../modules/crm/services/leadsService';
 import { supabase } from '../../../services/supabase';
 import Swal from 'sweetalert2';
-import { FiUserPlus, FiPhone, FiMail, FiCalendar, FiCheckCircle, FiXCircle, FiMoreVertical, FiSearch, FiFilter } from 'react-icons/fi';
+import { FiUserPlus, FiPhone, FiMail, FiCalendar, FiCheckCircle, FiXCircle, FiMoreVertical, FiSearch, FiFilter, FiUpload } from 'react-icons/fi';
 import { Loading } from '../../../components/dashboard/Loading'; // Reutilizando componente de carga
 
 const LeadStatusBadge = ({ status }) => {
@@ -114,6 +114,90 @@ const Leads = () => {
         setIsModalOpen(true);
     };
 
+    const fileInputRef = useRef(null);
+
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const text = event.target.result;
+            const rows = text.split('\n');
+            const leadsToImport = [];
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i].trim();
+                if (!row) continue;
+
+                // Handle potential different line endings or slight format variations if needed
+                // Using simple split by semicolon as requested
+                const parts = row.split(';');
+                if (parts.length >= 2) {
+                    const fullName = parts[0].trim();
+                    const phone = parts[1].trim();
+
+                    if (fullName && phone) {
+                    // Extract contact person's name and business name from full name
+                    let business_name = fullName;
+                    let contact_name = 'Importado CSV';
+                    
+                    const words = fullName.split(' ');
+                    if (words.length > 1) {
+                        const firstName = words[0];
+                        // Normalize for comparison without accents
+                        const normalizeString = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+                        
+                        // Common business words that should NOT be treated as contact names
+                        const businessWords = ['tienda', 'libreria', 'distribuidora', 'heladeria', 'jugueteria', 'veterinaria', 'pintureria', 'papeleria'];
+                        // Common first names
+                        const commonNames = ['noelia', 'juan', 'ruben', 'rosario', 'carina', 'karen', 'paula', 'jesica', 'marilin', 'laura', 'ariana', 'ivan', 'emanuel', 'ana', 'luciano', 'sebastian', 'gustavo', 'clarisa', 'adriana', 'natalia', 'carla', 'delfina', 'ursula', 'mauricio', 'veronica', 'manuela', 'matias', 'elsa'];
+                        
+                        const normalizedFirstName = normalizeString(firstName);
+                        
+                        if (firstName.length >= 3 && firstName.length <= 15 && 
+                            /^[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü]*$/.test(firstName) &&
+                            !businessWords.includes(normalizedFirstName) &&
+                            commonNames.includes(normalizedFirstName)) {
+                            contact_name = firstName;
+                            business_name = words.slice(1).join(' ').trim();
+                        }
+                    }
+                        
+                        leadsToImport.push({
+                            business_name: business_name,
+                            phone: phone,
+                            name: contact_name,
+                            source: 'Otro',
+                            status: 'NEW'
+                        });
+                    }
+                }
+            }
+
+            if (leadsToImport.length > 0) {
+                try {
+                    setLoading(true);
+                    await leadsService.importLeads(leadsToImport);
+                    Swal.fire('Importado', `${leadsToImport.length} leads importados correctamente`, 'success');
+                    fetchLeads();
+                } catch (error) {
+                    console.error('Error importing leads:', error);
+                    Swal.fire('Error', 'Hubo un error al importar los leads', 'error');
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                Swal.fire('Atención', 'No se encontraron leads válidos en el archivo (Formato: Nombre;Teléfono)', 'warning');
+            }
+
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        };
+        reader.readAsText(file);
+    };
+
     const handleDelete = async (id) => {
         const result = await Swal.fire({
             title: '¿Estás seguro?',
@@ -194,12 +278,28 @@ const Leads = () => {
 
             {/* Action Bar - Button Left */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                <button
-                    onClick={() => openModal()}
-                    className="bg-emerald-500 text-white p-2 px-6 rounded-xl font-bold shadow-lg shadow-emerald-100 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-sm uppercase tracking-wider h-fit"
-                >
-                    <FiUserPlus className="text-lg" /> + Nuevo Lead
-                </button>
+                {/* Hidden File Input */}
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept=".csv,.txt"
+                    className="hidden"
+                />
+                <div className="flex gap-4">
+                    <button
+                        onClick={() => openModal()}
+                        className="bg-emerald-500 text-white p-2 px-6 rounded-xl font-bold shadow-lg shadow-emerald-100 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-sm uppercase tracking-wider h-fit"
+                    >
+                        <FiUserPlus className="text-lg" /> + Nuevo Lead
+                    </button>
+                    <button
+                        onClick={() => fileInputRef.current.click()}
+                        className="bg-blue-500 text-white p-2 px-6 rounded-xl font-bold shadow-lg shadow-blue-100 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-sm uppercase tracking-wider h-fit"
+                    >
+                        <FiUpload className="text-lg" /> Importar CSV
+                    </button>
+                </div>
             </div>
 
             {/* Filters */}
