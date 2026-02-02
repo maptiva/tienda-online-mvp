@@ -29,14 +29,10 @@ pnpm-debug.log*
 # Scratch directory for agent
 /jules-scratch
 
-# Documentation and session files (keep only README.md and sql/)
-RESUMEN*.md
-PROGRESO*.md
-PROXIMOS_PASOS.md
-PROYECTO_COMPLETADO.md
-PRUEBA_MULTI_TENANT.md
-IMPLEMENTATION_SUMMARY.md
-INSTRUCCIONES*.md
+# Documentation and session files (keep only README.md)
+*.md
+!README.md
+!/docs/README.md
 
 # Prompt and solution files
 prompt*.txt
