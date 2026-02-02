@@ -249,9 +249,10 @@ const Leads = () => {
         }
     };
 
-    const filteredLeads = leads.filter(lead => {
+const filteredLeads = leads.filter(lead => {
         const matchesSearch = transform(lead.name).includes(transform(searchTerm)) ||
-            transform(lead.email).includes(transform(searchTerm));
+            transform(lead.email).includes(transform(searchTerm)) ||
+            transform(lead.business_name).includes(transform(searchTerm));
         const matchesStatus = statusFilter === 'ALL' || lead.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
@@ -308,7 +309,7 @@ const Leads = () => {
                     <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         type="text"
-                        placeholder="Buscar por nombre o email..."
+                        placeholder="Buscar por contacto, email o negocio..."
                         className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5FAFB8]/50"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
