@@ -85,7 +85,11 @@ const MapFitBounds = ({ stores }) => {
     useEffect(() => {
         if (stores && stores.length > 0) {
             const bounds = L.latLngBounds(stores.map(s => [s.latitude, s.longitude]));
-            map.fitBounds(bounds, { padding: [20, 20], maxZoom: 15 });
+            // Mayor padding en modo móvil para evitar que marcadores queden tapados por la UI
+            const isMobile = window.innerWidth < 768;
+            const padding = isMobile ? [120, 60] : [20, 20];
+            const maxZoom = isMobile ? 14 : 15; // Zoom más lejano en móvil
+            map.fitBounds(bounds, { padding, maxZoom });
         }
     }, [stores, map]);
     return null;
