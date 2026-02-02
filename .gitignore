@@ -14,6 +14,8 @@ pnpm-debug.log*
 .env
 .env*.local
 .env.production.backup
+.env.development
+.env.production
 
 # Editor directories and files
 .vscode
@@ -49,3 +51,11 @@ supabase/.temp
 
 # Temporary images/screenshots
 captura*.png
+
+# Database files (sensitive schema and migrations)
+*.sql
+/sql/
+schema.sql
+migration_*.sql
+check-*.sql
+*-fix-process*.sql
