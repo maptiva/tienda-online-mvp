@@ -55,3 +55,11 @@ schema.sql
 migration_*.sql
 check-*.sql
 *-fix-process*.sql
+
+# Data files (sensitive customer and business information)
+*.csv
+leads.csv
+*leads*.csv
+*data*.csv
+*import*.csv
+*export*.csv
