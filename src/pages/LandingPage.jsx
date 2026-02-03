@@ -23,11 +23,11 @@ function LandingPage() {
         const fetchFeaturedStores = async () => {
             const { data, error } = await supabase
                 .from('stores')
-                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, created_at')
-                .limit(20); // Simplified query to avoid filter issues
+                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, created_at, category, short_description, is_open')
+                .limit(20);
 
             if (error) {
-                console.error("Error fetching featured stores:", error);
+                console.error("Error cargando tiendas destacadas:", error);
                 return;
             }
 
@@ -63,7 +63,7 @@ function LandingPage() {
                         return 0;
                     });
 
-                setFeaturedStores(sortedData.slice(0, 12));
+                setFeaturedStores(sortedData.slice(0, 20));
             }
         };
         fetchFeaturedStores();
@@ -343,8 +343,9 @@ function LandingPage() {
 
                             {/* Scroll Container with CSS Mask */}
                             <div
+                                id="featured-stores-carousel"
                                 ref={carouselRef}
-                                className="flex space-x-8 overflow-x-auto hide-scrollbar py-6 px-12 scroll-smooth"
+                                className="flex space-x-8 overflow-x-auto hide-scrollbar py-12 px-12 scroll-smooth"
                                 style={{
                                     scrollbarWidth: 'none',
                                     msOverflowStyle: 'none',
