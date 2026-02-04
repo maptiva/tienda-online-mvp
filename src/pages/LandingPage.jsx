@@ -295,7 +295,7 @@ function LandingPage() {
                         variants={itemVariants}
                         className="mb-20"
                     >
-                        <div className="mb-12">
+                        <div className="mb-4">
                             <h2 className="text-3xl lg:text-4xl font-black italic" style={{ color: 'var(--color-text-main)' }}>
                                 Confían en Nosotros
                             </h2>
@@ -345,7 +345,7 @@ function LandingPage() {
                             <div
                                 id="featured-stores-carousel"
                                 ref={carouselRef}
-                                className="flex space-x-8 overflow-x-auto hide-scrollbar py-12 px-12 scroll-smooth"
+                                className="flex space-x-8 overflow-x-auto hide-scrollbar pt-4 pb-12 px-12 scroll-smooth"
                                 style={{
                                     scrollbarWidth: 'none',
                                     msOverflowStyle: 'none',
