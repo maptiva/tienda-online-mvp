@@ -23,6 +23,7 @@ function StoreSettings() {
     tiktok_url: '',
     whatsapp_number: '',
     whatsapp_message: 'Hola, estoy interesado en sus productos.',
+    short_description: '', // New field for Carousel
     latitude: null, // New field
     longitude: null, // New field
     city: '', // New field for GIS
@@ -324,6 +325,28 @@ function StoreSettings() {
           )}
         </div>
 
+        {/* Short Description (Slogan) */}
+        <div>
+          <label className="block text-sm font-medium mb-2 flex justify-between">
+            <span>Slogan / Breve Descripción</span>
+            <span className={`text-xs ${storeData.short_description?.length >= 50 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+              {storeData.short_description?.length || 0}/50
+            </span>
+          </label>
+          <input
+            type="text"
+            name="short_description"
+            value={storeData.short_description || ''}
+            onChange={handleInputChange}
+            maxLength={50}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            placeholder="Ej: Los mejores budines caseros de la zona."
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Esta frase aparecerá en el carrusel de la página principal.
+          </p>
+        </div>
+
         {/* Address */}
         <div>
           <label className="block text-sm font-medium mb-2">
@@ -529,7 +552,7 @@ function StoreSettings() {
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             placeholder="https://www.tiktok.com/@mitienda"
           />
-        </div> 
+        </div>
 
         {/* WhatsApp Message */}
         <div>
