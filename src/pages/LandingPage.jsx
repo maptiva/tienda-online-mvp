@@ -224,10 +224,10 @@ function LandingPage() {
                                 className="w-20 h-20 object-contain opacity-90"
                             />
                         </motion.div>
-                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)' }}>
+                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: '#475569' }}>
                             Catálogo Completo
                         </h3>
-                        <p className="text-sm font-medium leading-relaxed" style={{ color: theme === 'dark' ? '#475569' : 'var(--color-text-light)' }}>
+                        <p className="text-sm font-medium leading-relaxed" style={{ color: '#475569' }}>
                             Gestiona tus productos con eficiencia y estilo.
                         </p>
                     </div>
@@ -251,10 +251,10 @@ function LandingPage() {
                                 className="w-20 h-20 object-contain opacity-90"
                             />
                         </motion.div>
-                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)' }}>
+                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: '#475569' }}>
                             WhatsApp Integrado
                         </h3>
-                        <p className="text-sm font-medium leading-relaxed" style={{ color: theme === 'dark' ? '#475569' : 'var(--color-text-light)' }}>
+                        <p className="text-sm font-medium leading-relaxed" style={{ color: '#475569' }}>
                             Recibe pedidos directos sin intermediarios.
                         </p>
                     </div>
@@ -278,10 +278,10 @@ function LandingPage() {
                                 className="w-20 h-20 object-contain opacity-90"
                             />
                         </motion.div>
-                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: theme === 'dark' ? '#0f172a' : 'var(--color-text-main)' }}>
+                        <h3 className="font-black mb-2 text-lg uppercase tracking-tight" style={{ color: '#475569' }}>
                             100% Personalizable
                         </h3>
-                        <p className="text-sm font-medium leading-relaxed" style={{ color: theme === 'dark' ? '#475569' : 'var(--color-text-light)' }}>
+                        <p className="text-sm font-medium leading-relaxed" style={{ color: '#475569' }}>
                             Tu marca es la protagonista en cada detalle.
                         </p>
                     </div>

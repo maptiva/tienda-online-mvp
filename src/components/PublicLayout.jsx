@@ -3,6 +3,7 @@ import { Outlet, useParams, useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import WhatsAppButton from './WhatsAppButton';
+import ClicandoBrandButton from './ClicandoBrandButton';
 import CartModal from './CartModal';
 import CategoriaList from './public/CategoriaList';
 import { useStoreByName } from '../hooks/useStoreByName';
@@ -71,6 +72,7 @@ const PublicLayout = () => {
         phoneNumber={store.whatsapp_number}
         customMessage={store.whatsapp_message}
       />
+      {isProductListPage && <ClicandoBrandButton />}
       <CartModal
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}

@@ -31,24 +31,30 @@ const Header = ({ storeData, onCartClick }) => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-28">
 
-          {/* Izquierda: Logo + Nombre */}
-          <Link
-            to={`/${storeName}`}
-            className="flex items-center gap-3 flex-1 min-w-0 mr-4"
-            onClick={() => window.scrollTo(0, 0)}
-          >
-            <img
-              src={displayLogo}
-              className="h-24 w-24 object-contain flex-shrink-0"
-              alt={displayStoreName}
-            />
-            <span
-              className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight"
-              style={{ color: 'var(--color-text-main)' }}
+          {/* Izquierda: Clicando Logo + Tienda Logo + Nombre */}
+          <div className="flex items-center gap-3 flex-1 min-w-0 mr-4">
+            {/* Contenedor para el botón de Clicando en Desktop */}
+            <div id="clicando-brand-button-container" className="hidden md:flex md:items-center"></div>
+            
+            {/* Link de la Tienda */}
+            <Link
+              to={`/${storeName}`}
+              className="flex items-center gap-3"
+              onClick={() => window.scrollTo(0, 0)}
             >
-              {displayStoreName}
-            </span>
-          </Link>
+              <img
+                src={displayLogo}
+                className="h-24 w-24 object-contain flex-shrink-0"
+                alt={displayStoreName}
+              />
+              <span
+                className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight"
+                style={{ color: 'var(--color-text-main)' }}
+              >
+                {displayStoreName}
+              </span>
+            </Link>
+          </div>
 
           {/* Centro: SearchBar (solo desktop) */}
           <div className="hidden md:block flex-1 max-w-xl mx-8">

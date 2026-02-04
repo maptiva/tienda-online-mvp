@@ -66,12 +66,12 @@ const StoreCard = ({ store }) => {
                 <div className="space-y-1 mb-4">
                     <h3
                         className="text-xl font-black tracking-tight leading-tight"
-                        style={{ color: 'var(--color-text-main)' }}
+                        style={{ color: '#475569' }} // Same dark gray as description
                     >
                         {store.store_name}
                     </h3>
                     <div className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-widest opacity-60">
-                        <span style={{ color: '#64748b' }}>{category}</span>
+                        <span style={{ color: '#475569' }}>{category}</span>
                         <span className="w-1 h-1 rounded-full bg-gray-300" />
                         <span className={isOpen ? 'text-emerald-500' : 'text-rose-500'} title="Sincronización automática en desarrollo">
                             {isOpen ? '🟢 Abierto' : '🔴 Cerrado'} <span className="text-[8px] opacity-70">(Beta)</span>
