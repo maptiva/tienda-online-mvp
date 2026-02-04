@@ -85,10 +85,10 @@ const MapFitBounds = ({ stores }) => {
     useEffect(() => {
         if (stores && stores.length > 0) {
             const bounds = L.latLngBounds(stores.map(s => [s.latitude, s.longitude]));
-            // Mayor padding en modo móvil para evitar que marcadores queden tapados por la UI
+            // Ajuste de padding y zoom para móvil: más cerca y con menos margen innecesario
             const isMobile = window.innerWidth < 768;
-            const padding = isMobile ? [120, 60] : [20, 20];
-            const maxZoom = isMobile ? 14 : 15; // Zoom más lejano en móvil
+            const padding = isMobile ? [80, 40] : [20, 20];
+            const maxZoom = isMobile ? 16 : 15; // Permitimos zoom más cercano en móvil
             map.fitBounds(bounds, { padding, maxZoom });
         }
     }, [stores, map]);
@@ -617,15 +617,15 @@ const ExploreMap = () => {
                         )}
                         <MapFitBounds stores={filteredStores} />
                         {/* <MarkerClusterGroup> */}
-                            {filteredStores.filter(store => store.id !== selectedStore?.id).map(store => (
-                                <StoreMarker
-                                    key={store.id}
-                                    store={store}
-                                    isSelected={false}
-                                    onSelect={() => setSelectedStore(store)}
-                                    metaMap={categoryMetaMap}
-                                />
-                            ))}
+                        {filteredStores.filter(store => store.id !== selectedStore?.id).map(store => (
+                            <StoreMarker
+                                key={store.id}
+                                store={store}
+                                isSelected={false}
+                                onSelect={() => setSelectedStore(store)}
+                                metaMap={categoryMetaMap}
+                            />
+                        ))}
                         {/* </MarkerClusterGroup> */}
                         {selectedStore && !selectedStore.isUserLocation && (
                             <StoreMarker
