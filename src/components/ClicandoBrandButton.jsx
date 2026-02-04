@@ -37,11 +37,31 @@ const usePortalContainer = (isDesktop) => {
 // --- Sub-components ---
 const MobileButton = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = React.useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <div
+      ref={containerRef}
       className={`${styles.mobileContainer} ${isOpen ? styles.open : ''}`}
-      onClick={() => setIsOpen(!isOpen)} // This will always fire, toggling the state
+      onClick={() => setIsOpen(!isOpen)}
     >
       <div className={styles.handle}>
         <FaChevronRight className={styles.chevron} />
@@ -52,12 +72,8 @@ const MobileButton = () => {
         title="Volver a Clicando"
         onClick={(e) => {
           if (!isOpen) {
-            // If the drawer is closed, this click's only job is to open it.
-            // The parent div's onClick handles the state change.
-            // We prevent the Link's default navigation behavior.
             e.preventDefault();
           } else {
-            // If the drawer is already open, proceed with navigation.
             window.scrollTo(0, 0);
           }
         }}
