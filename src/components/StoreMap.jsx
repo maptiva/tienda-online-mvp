@@ -68,12 +68,23 @@ const StoreMap = ({ latitude, longitude, storeName, address, draggable = false, 
         );
     }
 
+    // Constraint logic: calculate small bounds around the point to allow enough room for popups
+    const boundsOffset = 0.006; // ~600 meters, balanced to prevent losing marker but allow popups
+    const bounds = [
+        [lat - boundsOffset, lng - boundsOffset],
+        [lat + boundsOffset, lng + boundsOffset]
+    ];
+
     return (
         <div className="w-full h-full rounded-lg overflow-hidden shadow-sm border border-gray-200 z-0 relative">
             <MapContainer
                 center={[lat, lng]}
                 zoom={15}
-                scrollWheelZoom={draggable} // Only allow zoom with scroll if we are in "edit" mode
+                minZoom={!draggable ? 13 : 1} // Constraint only if not draggable
+                maxBounds={!draggable ? bounds : null} // Constraint only if not draggable
+                maxBoundsViscosity={1.0} // Hard limit at the edges
+                scrollWheelZoom={draggable}
+                dragging={true} // Keep dragging enabled as requested ("que se mueva")
                 style={{ height: '100%', width: '100%' }}
             >
                 <TileLayer
