@@ -7,7 +7,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
     FaArrowLeft, FaFilter, FaList, FaMap, FaSearch, FaTimes,
     FaTshirt, FaUtensils, FaBirthdayCake, FaGamepad, FaPaw,
-    FaChair, FaShoppingCart, FaLaptop, FaTools, FaBook, FaTag, FaHome, FaGift
+    FaChair, FaShoppingCart, FaLaptop, FaTools, FaBook, FaTag, FaHome, FaGift,
+    FaPencilRuler
 } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
@@ -80,18 +81,32 @@ const MapRecenter = ({ lat, lng, isComingSoon }) => {
 };
 
 // Componente para ajustar el zoom a los marcadores filtrados
-const MapFitBounds = ({ stores }) => {
+const MapFitBounds = ({ stores, selectedCity }) => {
     const map = useMap();
     useEffect(() => {
         if (stores && stores.length > 0) {
-            const bounds = L.latLngBounds(stores.map(s => [s.latitude, s.longitude]));
+            let storesToFit = stores;
+
+            // Si no hay ciudad seleccionada o término de búsqueda, priorizamos Chajarí para que se vea el "músculo" local
+            if (!selectedCity) {
+                const chajariStores = stores.filter(s =>
+                    s.city?.toLowerCase() === 'chajarí' ||
+                    s.city?.toLowerCase() === 'chajari'
+                );
+                // Si hay tiendas en Chajarí, enfocamos el zoom inicial ahí
+                if (chajariStores.length > 0) {
+                    storesToFit = chajariStores;
+                }
+            }
+
+            const bounds = L.latLngBounds(storesToFit.map(s => [s.latitude, s.longitude]));
             // Ajuste de padding y zoom para móvil: más cerca y con menos margen innecesario
             const isMobile = window.innerWidth < 768;
             const padding = isMobile ? [80, 40] : [20, 20];
             const maxZoom = isMobile ? 16 : 15; // Permitimos zoom más cercano en móvil
             map.fitBounds(bounds, { padding, maxZoom });
         }
-    }, [stores, map]);
+    }, [stores, map, selectedCity]);
     return null;
 };
 
@@ -101,7 +116,7 @@ const getCategoryIcon = (category, metaMap = null) => {
 
     // Crear icono personalizado con emoji
     const iconHtml = `<div style="
-        background-color: ${meta.marker === 'blue' ? '#3b82f6' : meta.marker === 'green' ? '#10b981' : meta.marker === 'red' ? '#ef4444' : meta.marker === 'orange' ? '#f97316' : meta.marker === 'yellow' ? '#eab308' : meta.marker === 'violet' ? '#8b5cf6' : meta.marker === 'grey' ? '#6b7280' : '#3b82f6'};
+        background-color: ${meta.marker === 'blue' ? '#3b82f6' : meta.marker === 'green' ? '#10b981' : meta.marker === 'red' ? '#ef4444' : meta.marker === 'orange' ? '#f97316' : meta.marker === 'yellow' ? '#eab308' : meta.marker === 'violet' ? '#8b5cf6' : meta.marker === 'grey' ? '#6b7280' : meta.marker === 'cyan' ? '#38bdf8' : '#3b82f6'};
         border: 2px solid white;
         border-radius: 50%;
         width: 32px;
@@ -179,6 +194,7 @@ const ExploreMap = () => {
         FaHandPaper: '🏺',
         FaMagic: '🏺',
         FaGem: '🏺',
+        FaPencilRuler: '📚', // Librería / Útiles
     };
 
     // Mapeo dinámico de categorías para UI externa
@@ -615,7 +631,7 @@ const ExploreMap = () => {
                         {selectedStore && (
                             <MapRecenter lat={selectedStore.latitude} lng={selectedStore.longitude} isComingSoon={selectedStore.coming_soon} />
                         )}
-                        <MapFitBounds stores={filteredStores} />
+                        <MapFitBounds stores={filteredStores} selectedCity={selectedCity} />
                         {/* <MarkerClusterGroup> */}
                         {filteredStores.filter(store => store.id !== selectedStore?.id).map(store => (
                             <StoreMarker
