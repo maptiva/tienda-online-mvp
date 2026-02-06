@@ -20,13 +20,19 @@ export const useProductStore = create(
                 const entry = get().productsCache[userId];
                 if (!entry) return null;
 
-                // Si los datos tienen más de 5 minutos, los consideramos "viejos" para el Stock
+                // Calculamos si están vencidos (5 min)
                 const isStale = Date.now() - entry.timestamp > 5 * 60 * 1000;
-                return isStale ? null : entry.data;
+
+                // IMPORTANTE: Devolvemos la data igual, pero avisamos si es vieja
+                return {
+                    data: entry.data,
+                    isStale
+                };
             },
 
             hasProducts: (userId) => {
-                return !!get().getProducts(userId);
+                const entry = get().productsCache[userId];
+                return !!entry;
             },
 
             findProduct: (productId) => {

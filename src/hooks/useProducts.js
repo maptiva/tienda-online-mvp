@@ -10,14 +10,15 @@ export const useProducts = (userId = null) => {
   const targetId = userId || user?.id;
 
   const { getProducts, setProducts } = useProductStore();
-  const cachedProducts = targetId ? getProducts(targetId) : null;
+  const cacheEntry = targetId ? getProducts(targetId) : null;
+  const cachedProducts = cacheEntry?.data;
+  const isStale = cacheEntry?.isStale;
 
-  // Estado de carga inicial: solo cargando si NO hay cache Y tenemos un ID objetivo
+  // Estado de carga inicial: solo cargando si NO hay nada (ni siquiera cache viejo)
   const [loading, setLoading] = useState(!cachedProducts && !!targetId);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Si no tenemos targetId, no mostramos spinner
     if (!targetId) {
       setLoading(false);
       return;
@@ -25,7 +26,7 @@ export const useProducts = (userId = null) => {
 
     const fetchProducts = async () => {
       try {
-        // Solo activamos loading visual si realmente no hay nada que mostrar (ni cache)
+        // Solo activamos loading visual si realmente no hay nada que mostrar
         if (!cachedProducts) {
           setLoading(true);
         }
@@ -38,7 +39,6 @@ export const useProducts = (userId = null) => {
 
         if (fetchError) throw fetchError;
 
-        // Actualizamos el cache global (Store)
         setProducts(targetId, data || []);
         setError(null);
       } catch (err) {
@@ -49,13 +49,22 @@ export const useProducts = (userId = null) => {
       }
     };
 
-    // Estrategia: "Sentido común"
-    // Siempre intentamos traer datos frescos en segundo plano para que el Admin 
-    // vea sus cambios, pero el usuario ve el cache instantáneamente.
+    // 1. Fetch inicial (o revalidación si es stale)
     fetchProducts();
 
-  }, [targetId, setProducts]); // Quitamos cachedProducts de dependencias para evitar loops
+    // 2. Focus Revalidation: escuchamos cuando la ventana vuelve a estar activa (ej: al despertar PC)
+    const handleFocus = () => {
+      const currentEntry = getProducts(targetId);
+      if (currentEntry?.isStale) {
+        fetchProducts();
+      }
+    };
 
-  // Devolvemos lo del cache si existe, o array vacío
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+
+  }, [targetId, setProducts]);
+
+  // Devolvemos lo del cache (aunque sea viejo/stale) para que la UI no parpadee en blanco
   return { products: cachedProducts || [], loading, error };
 };
