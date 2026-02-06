@@ -9,8 +9,8 @@ export const useProducts = (userId = null) => {
   // Determinar el ID objetivo (Tienda pública o usuario logueado)
   const targetId = userId || user?.id;
 
-  const { productsCache, setProducts } = useProductStore();
-  const cachedProducts = targetId ? productsCache[targetId] : null;
+  const { getProducts, setProducts } = useProductStore();
+  const cachedProducts = targetId ? getProducts(targetId) : null;
 
   // Estado de carga inicial: solo cargando si NO hay cache Y tenemos un ID objetivo
   const [loading, setLoading] = useState(!cachedProducts && !!targetId);

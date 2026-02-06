@@ -32,6 +32,7 @@ pnpm-debug.log*
 # Documentation and session files (keep only README.md)
 *.md
 !README.md
+/docs/
 !/docs/README.md
 
 # Prompt and solution files

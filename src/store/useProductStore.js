@@ -5,36 +5,42 @@ export const useProductStore = create(
     persist(
         (set, get) => ({
             productsCache: {},
-            lastFetch: {},
 
             setProducts: (userId, products) => set((state) => ({
                 productsCache: {
                     ...state.productsCache,
-                    [userId]: products
+                    [userId]: {
+                        data: products,
+                        timestamp: Date.now()
+                    }
                 }
             })),
 
             getProducts: (userId) => {
-                return get().productsCache[userId];
+                const entry = get().productsCache[userId];
+                if (!entry) return null;
+
+                // Si los datos tienen más de 5 minutos, los consideramos "viejos" para el Stock
+                const isStale = Date.now() - entry.timestamp > 5 * 60 * 1000;
+                return isStale ? null : entry.data;
             },
 
             hasProducts: (userId) => {
-                return !!get().productsCache[userId];
+                return !!get().getProducts(userId);
             },
 
             findProduct: (productId) => {
                 const cache = get().productsCache;
-                // Buscamos en todas las tiendas guardadas (arrays de productos)
                 for (const userId in cache) {
-                    const product = cache[userId]?.find(p => p.id === parseInt(productId));
+                    const products = cache[userId]?.data;
+                    const product = products?.find(p => p.id === parseInt(productId));
                     if (product) return product;
                 }
                 return null;
             }
         }),
         {
-            name: 'product-storage', // key in localStorage
-            // Opcional: podemos filtrar qué guardar si solo queremos el cache y no todo
+            name: 'product-storage',
             partialize: (state) => ({ productsCache: state.productsCache }),
         }
     )
