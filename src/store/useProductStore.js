@@ -47,6 +47,7 @@ export const useProductStore = create(
         }),
         {
             name: 'product-storage',
+            version: 1, // Cambiamos la versión para forzar el reinicio en navegadores con data vieja
             partialize: (state) => ({ productsCache: state.productsCache }),
         }
     )
