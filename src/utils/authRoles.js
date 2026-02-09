@@ -1,9 +1,9 @@
 /**
  * Lista de emails autorizados para acceder al CRM y funciones de Super Admin.
- * Puedes agregar más emails aquí para socios o co-administradores en el futuro.
+ * Los emails reales deben configurarse en variables de entorno para producción.
  */
 export const SUPER_ADMIN_EMAILS = [
-    'maptiva.sig.app@gmail.com'
+    'admin@example.com'
 ];
 
 /**

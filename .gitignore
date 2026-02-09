@@ -1,8 +1,9 @@
 # Dependencies
 /node_modules
 
-# Vite build output
+# Vite build output and cache
 /dist
+.vite/
 
 # Log files
 npm-debug.log*
@@ -10,7 +11,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Environment variables
+# Environment variables (ALL env files except templates)
 .env
 .env*.local
 .env.production.backup
@@ -26,8 +27,9 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-# Scratch directory for agent
+# Agent/AI tool directories
 /jules-scratch
+.opencode/
 
 # Documentation and session files (keep only README.md)
 *.md
@@ -53,6 +55,7 @@ captura*.png
 *.sql
 /sql/
 schema.sql
+schema_sql.json
 migration_*.sql
 check-*.sql
 *-fix-process*.sql
