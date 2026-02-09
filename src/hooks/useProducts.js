@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useProductStore } from '../store/useProductStore';
+import { productSchema } from '../schemas/product.schema';
+import { safeValidate } from '../utils/zodHelpers';
 
 export const useProducts = (userId = null) => {
   const { user } = useAuth();
@@ -39,7 +41,16 @@ export const useProducts = (userId = null) => {
 
         if (fetchError) throw fetchError;
 
-        setProducts(targetId, data || []);
+        // Validar datos de productos con Zod
+        const validatedData = (data || []).map((item, index) => {
+          const result = safeValidate(productSchema, item, `products[${index}]`);
+          if (!result.success && result.error) {
+            console.warn(`Producto inválido en índice ${index}:`, result.formattedErrors);
+          }
+          return result.success ? result.data : item;
+        });
+
+        setProducts(targetId, validatedData);
         setError(null);
       } catch (err) {
         console.error("Error fetching products:", err);

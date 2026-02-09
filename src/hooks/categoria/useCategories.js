@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase"
 import { useAuth } from "../../context/AuthContext";
+import { categorySchema } from "../../schemas/category.schema";
+import { safeValidate } from "../../utils/zodHelpers";
 
 export const useCategories = () => {
     const { user } = useAuth();
@@ -25,7 +27,16 @@ export const useCategories = () => {
 
                 if (fetchError) throw fetchError;
 
-                setCategories(data)
+                // Validar datos de categorías con Zod
+                const validatedData = (data || []).map((item, index) => {
+                    const result = safeValidate(categorySchema, item, `categories[${index}]`);
+                    if (!result.success && result.error) {
+                        console.warn(`Categoría inválida en índice ${index}:`, result.formattedErrors);
+                    }
+                    return result.success ? result.data : item;
+                });
+
+                setCategories(validatedData);
             } catch (err) {
                 setError(err);
             } finally {
