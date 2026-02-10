@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase"
 import { useAuth } from "../../context/AuthContext";
-import { categorySchema } from "../../schemas/category.schema";
+import { categorySchema, type Category } from "../../schemas/category.schema";
 import { safeValidate } from "../../utils/zodHelpers";
 
-export const useCategories = () => {
+/**
+ * Tipo de retorno del hook useCategories
+ */
+export interface UseCategoriesReturn {
+    categories: Category[];
+    loading: boolean;
+    error: Error | null;
+}
+
+export const useCategories = (): UseCategoriesReturn => {
     const { user } = useAuth();
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         if (!user) {
@@ -34,11 +43,11 @@ export const useCategories = () => {
                         console.warn(`Categoría inválida en índice ${index}:`, result.formattedErrors);
                     }
                     return result.success ? result.data : item;
-                });
+                }) as Category[];
 
                 setCategories(validatedData);
             } catch (err) {
-                setError(err);
+                setError(err instanceof Error ? err : new Error('Error desconocido'));
             } finally {
                 setLoading(false)
             }
