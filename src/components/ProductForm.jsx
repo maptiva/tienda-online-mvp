@@ -12,8 +12,11 @@ import Swal from 'sweetalert2';
 function ProductForm() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, impersonatedUser } = useAuth();
   const [formData, setFormData] = useState({});
+
+  // Determinar el ID objetivo (Usuario impersonado o logueado)
+  const targetId = impersonatedUser || user?.id;
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,9 +61,9 @@ function ProductForm() {
       try {
         let query = supabase.from('categories').select('*');
 
-        // Filtrar categorías por user_id del usuario autenticado
-        if (user) {
-          query = query.eq('user_id', user.id);
+        // Filtrar categorías por el ID objetivo (contempla impersonación)
+        if (targetId) {
+          query = query.eq('user_id', targetId);
         }
 
         const { data, error } = await query;
@@ -284,7 +287,7 @@ function ProductForm() {
       const { id, ...updateData } = finalFormData;
       // Convertir gallery_images a formato PostgreSQL array si es necesario (supabase js suele manejar array js bien)
 
-      const dataToSave = productId ? updateData : { ...finalFormData, user_id: user.id };
+      const dataToSave = productId ? updateData : { ...finalFormData, user_id: targetId };
 
       let operation;
       if (productId) {

@@ -34,6 +34,7 @@ export const useClients = () => {
                     store_slug,
                     is_demo,
                     client_id,
+                    user_id,
                     enable_stock,
                     subscriptions (
                         id,
@@ -114,7 +115,7 @@ export const useClients = () => {
 
                 const { error: storeError } = await supabase
                     .from('stores')
-                    .update({ 
+                    .update({
                         client_id: newClient.id,
                         enable_stock: clientData.enable_stock === true
                     })
@@ -156,7 +157,7 @@ export const useClients = () => {
 
                 const { error: storeError } = await supabase
                     .from('stores')
-                    .update({ 
+                    .update({
                         client_id: id,
                         enable_stock: clientData.enable_stock === true
                     })

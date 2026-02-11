@@ -14,13 +14,16 @@ export interface UseCategoriesReturn {
 }
 
 export const useCategories = (): UseCategoriesReturn => {
-    const { user } = useAuth();
+    const { user, impersonatedUser } = useAuth();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
 
+    // Determinar el ID objetivo (Usuario impersonado o logueado)
+    const targetId = impersonatedUser || user?.id;
+
     useEffect(() => {
-        if (!user) {
+        if (!targetId) {
             setLoading(false);
             return;
         }
@@ -31,7 +34,7 @@ export const useCategories = (): UseCategoriesReturn => {
                 const { data, error: fetchError } = await supabase
                     .from('categories')
                     .select('*')
-                    .eq('user_id', user.id)
+                    .eq('user_id', targetId)
                     .order('name', { ascending: true });
 
                 if (fetchError) throw fetchError;
@@ -53,7 +56,7 @@ export const useCategories = (): UseCategoriesReturn => {
             }
         }
         fetchCategories()
-    }, [user]);
+    }, [targetId]);
 
     return { categories, loading, error }
 }

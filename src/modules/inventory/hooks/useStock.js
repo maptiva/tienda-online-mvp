@@ -5,14 +5,17 @@ import { useAuth } from '../../../context/AuthContext';
 const stockCache = new Map();
 
 export const useStock = (productId, storeSlug = null) => {
-  const { user } = useAuth();
+  const { user, impersonatedUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [inventory, setInventory] = useState(null);
   const [logs, setLogs] = useState([]);
 
+  // Determinar el ID objetivo (Usuario impersonado o logueado)
+  const targetId = impersonatedUser || user?.id;
+
   // La cache debe ser sensible tanto al producto como a la tienda (slug)
-  const cacheKey = user?.id ? `admin-${user.id}-${productId}` : `public-${storeSlug || 'none'}-${productId}`;
+  const cacheKey = targetId ? `admin-${targetId}-${productId}` : `public-${storeSlug || 'none'}-${productId}`;
 
   // Cargar inventario inicial
   useEffect(() => {
@@ -20,7 +23,7 @@ export const useStock = (productId, storeSlug = null) => {
       loadInventory();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId, user?.id, storeSlug]);
+  }, [productId, targetId, storeSlug]);
 
   const loadInventory = async () => {
     // Revisar cache primero

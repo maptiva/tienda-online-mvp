@@ -12,7 +12,10 @@ const BulkPriceUpdate = () => {
     const { categories, loading: categoriesLoading } = useCategories();
     // Necesitamos acceso directo al store y usuario para actualizar la UI sin recargar
     const { setProducts } = useProductStore();
-    const { user } = useAuth();
+    const { user, impersonatedUser } = useAuth();
+
+    // Determinar el ID objetivo (Usuario impersonado o logueado)
+    const targetId = impersonatedUser || user?.id;
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
@@ -231,7 +234,7 @@ const BulkPriceUpdate = () => {
             setUpdateMessage({ type: 'success', text: `¡Visibilidad actualizada con éxito!` });
 
             // Actualización optimista del Store para reflejar cambios sin recargar
-            if (user?.id) {
+            if (targetId) {
                 const updatedProductsList = products.map(p => {
                     const update = updates.find(u => u.id === p.id);
                     if (update) {
@@ -241,7 +244,7 @@ const BulkPriceUpdate = () => {
                     }
                     return p;
                 });
-                setProducts(user.id, updatedProductsList);
+                setProducts(targetId, updatedProductsList);
             }
 
             setTimeout(() => setUpdateMessage(null), 5000);

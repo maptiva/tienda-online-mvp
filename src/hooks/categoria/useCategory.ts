@@ -5,9 +5,11 @@ import { useCategoryState } from "../../store/useCategoryStore";
 import { useAuth } from "../../context/AuthContext";
 
 export const useCategory = () => {
-    const { user } = useAuth();
+    const { user, impersonatedUser } = useAuth();
     const { categories, categoryActive, getCategories, activeCategory, limpiarCategories, clearCategoryActive, addCategory, deleteCategory, updateCategory } = useCategoryState();
 
+    // Determinar el ID objetivo (Usuario impersonado o logueado)
+    const targetId = impersonatedUser || user?.id;
 
     const limpiarCategoryActive = async () => {
         clearCategoryActive()
@@ -22,10 +24,10 @@ export const useCategory = () => {
     };
 
     const startAddCategory = async (category: Omit<Categoria, 'id'>) => {
-        // Agregar user_id al crear categoría
+        // Agregar user_id al crear categoría (respetando impersonación)
         const categoryWithUser = {
             ...category,
-            user_id: user?.id
+            user_id: targetId
         };
 
         const { data, error } = await supabase
@@ -53,14 +55,19 @@ export const useCategory = () => {
     };
 
     const startGetCategories = async () => {
+        if (!targetId) return;
+
         let query = supabase.from('categories').select();
 
-        // Filtrar por user_id si hay usuario autenticado
-        if (user) {
-            query = query.eq('user_id', user.id);
-        }
+        // Filtrar por user_id (puede ser el real o el impersonado)
+        query = query.eq('user_id', targetId);
 
         const { data, error } = await query;
+
+        if (error) {
+            console.error('Error fetching categories:', error);
+            return;
+        }
 
         getCategories(data as Categoria[])
     };

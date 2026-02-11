@@ -15,10 +15,10 @@ export interface UseProductsReturn {
 }
 
 export const useProducts = (userId?: string): UseProductsReturn => {
-    const { user } = useAuth();
+    const { user, impersonatedUser } = useAuth();
 
-    // Determinar el ID objetivo (Tienda pública o usuario logueado)
-    const targetId = userId || user?.id;
+    // Determinar el ID objetivo (Tienda pública, usuario impersonado o logueado)
+    const targetId = userId || impersonatedUser || user?.id;
 
     const { getProducts, setProducts } = useProductStore();
     const cacheEntry = targetId ? getProducts(targetId) : null;

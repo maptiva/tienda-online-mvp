@@ -13,7 +13,7 @@ import { FiPackage, FiAlertCircle, FiCheckCircle, FiXCircle, FiArrowLeft } from 
 
 const InventoryPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, impersonatedUser } = useAuth();
   const { products, loading: productsLoading } = useProducts();
   const { stockEnabled, loading: configLoading } = useStoreConfig();
   const [inventoryData, setInventoryData] = useState([]);
@@ -21,17 +21,20 @@ const InventoryPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  // Determinar el ID objetivo (Usuario impersonado o logueado)
+  const targetId = impersonatedUser || user?.id;
+
   // Cargar datos extendidos de inventario
   useEffect(() => {
-    if (user?.id && stockEnabled) {
+    if (targetId && stockEnabled) {
       loadInventory();
     }
-  }, [user?.id, stockEnabled]);
+  }, [targetId, stockEnabled]);
 
   const loadInventory = async () => {
     try {
       setLoadingInventory(true);
-      const data = await inventoryService.fetchUserInventory(user.id);
+      const data = await inventoryService.fetchUserInventory(targetId);
       setInventoryData(data);
     } catch (error) {
       console.error('Error loading full inventory:', error);

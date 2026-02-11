@@ -4,12 +4,16 @@ import { usePayments } from '../../../hooks/crm/usePayments';
 import ClientModal from '../../../components/crm/ClientModal';
 import PaymentModal from '../../../components/crm/PaymentModal';
 import Swal from 'sweetalert2';
-import { FaSearch, FaUserPlus } from 'react-icons/fa';
+import { FaUserPlus } from 'react-icons/fa';
 import SearchBar from '../../../components/SearchBar';
+import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Clients = () => {
     const { clients, loading: clientsLoading, error, fetchClients, getRealStores, createClient, updateClient, archiveClient, reactivateClient } = useClients();
     const { registerPayment, loading: paymentLoading } = usePayments();
+    const { setImpersonatedUser, impersonatedUser, isMaster } = useAuth();
+    const navigate = useNavigate();
 
     const [isClientModalOpen, setIsClientModalOpen] = useState(false);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -17,6 +21,22 @@ const Clients = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const [showArchived, setShowArchived] = useState(false);
+
+    const handleImpersonate = (userId, storeName) => {
+        setImpersonatedUser(userId);
+        Swal.fire({
+            title: `¡Modo Gestión Activo!`,
+            text: `Ahora estás viendo y editando la tienda de ${storeName}.`,
+            icon: 'info',
+            confirmButtonText: 'Ir al Panel Admin',
+            showCancelButton: true,
+            cancelButtonText: 'Quedarme aquí'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                navigate('/admin');
+            }
+        });
+    };
 
     useEffect(() => {
         fetchClients(showArchived);
@@ -222,10 +242,15 @@ const Clients = () => {
                                                 <div className="flex flex-wrap gap-2">
                                                     {client.stores && client.stores.length > 0 ? (
                                                         client.stores.map(store => (
-                                                            <div key={store.id} className="flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-1 rounded-full shadow-sm">
-                                                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                                                <span className="text-xs font-bold text-gray-700">{store.store_name}</span>
-                                                            </div>
+                                                            <button
+                                                                key={store.id}
+                                                                onClick={() => isMaster && handleImpersonate(store.user_id, store.store_name)}
+                                                                className={`flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-1 rounded-full shadow-sm transition-all ${isMaster ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 cursor-pointer group/store' : ''}`}
+                                                                title={isMaster ? 'Gestionar esta tienda' : ''}
+                                                            >
+                                                                <span className={`w-2 h-2 rounded-full ${isMaster ? 'bg-blue-500 group-hover/store:bg-white' : 'bg-blue-500'}`}></span>
+                                                                <span className="text-xs font-bold text-gray-700 group-hover/store:text-white">{store.store_name}</span>
+                                                            </button>
                                                         ))
                                                     ) : (
                                                         <span className="text-xs text-gray-300 italic font-medium">
@@ -356,10 +381,14 @@ const Clients = () => {
                                             <div className="flex flex-wrap gap-2">
                                                 {client.stores && client.stores.length > 0 ? (
                                                     client.stores.map(store => (
-                                                        <div key={store.id} className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
-                                                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                                            <span className="text-xs font-bold text-blue-700">{store.store_name}</span>
-                                                        </div>
+                                                        <button
+                                                            key={store.id}
+                                                            onClick={() => isMaster && handleImpersonate(store.user_id, store.store_name)}
+                                                            className={`flex items-center gap-1.5 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full transition-all ${isMaster ? 'hover:bg-blue-600 hover:text-white cursor-pointer group/mobile-store' : ''}`}
+                                                        >
+                                                            <span className={`w-2 h-2 rounded-full ${isMaster ? 'bg-blue-500 group-hover/mobile-store:bg-white' : 'bg-blue-500'}`}></span>
+                                                            <span className={`text-xs font-bold ${isMaster ? 'text-blue-700 group-hover/mobile-store:text-white' : 'text-blue-700'}`}>{store.store_name}</span>
+                                                        </button>
                                                     ))
                                                 ) : (
                                                     <span className="text-xs text-gray-300 italic">Sin tiendas vinculadas</span>

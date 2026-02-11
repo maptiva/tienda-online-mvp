@@ -6,24 +6,27 @@ import { useParams } from 'react-router-dom';
 const storeConfigCache = new Map();
 
 export const useStoreConfig = () => {
-  const { user } = useAuth();
+  const { user, impersonatedUser } = useAuth();
   const { storeName } = useParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [stockEnabled, setStockEnabled] = useState(false);
 
+  // Determinar el ID objetivo (Usuario impersonado o logueado)
+  const targetId = impersonatedUser || user?.id;
+
   useEffect(() => {
     // Para vista pública: usar storeName cuando no hay usuario logueado
-    // Para vista admin: usar user.id cuando hay usuario logueado
-    if (storeName || user?.id) {
+    // Para vista admin: usar targetId (que contempla impersonación)
+    if (storeName || targetId) {
       loadStoreConfig();
     }
-  }, [storeName, user?.id]);
+  }, [storeName, targetId]);
 
   const loadStoreConfig = async () => {
-    // Priorizar storeName para vista pública, user.id para admin
-    const cacheKey = storeName || user.id;
-    
+    // Priorizar storeName para vista pública, targetId para admin
+    const cacheKey = storeName || targetId;
+
     // Revisar cache primero (30 segundos para vista pública)
     if (storeConfigCache.has(cacheKey)) {
       const cached = storeConfigCache.get(cacheKey);
@@ -39,7 +42,7 @@ export const useStoreConfig = () => {
       setError(null);
 
       const { inventoryService } = await import('../services/inventoryService');
-      
+
       // Usar store_slug para vista pública, user_id para admin
       let enabled;
       if (storeName) {

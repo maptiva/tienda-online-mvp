@@ -16,12 +16,14 @@ const getSuperAdminEmails = () => {
 
 export const SUPER_ADMIN_EMAILS = getSuperAdminEmails();
 
+import { User } from '@supabase/supabase-js';
+
 /**
  * Función para verificar si un usuario tiene permisos de Super Admin.
- * @param {object} user - El objeto usuario de Supabase Auth.
+ * @param {User | null} user - El objeto usuario de Supabase Auth.
  * @returns {boolean}
  */
-export const isSuperAdmin = (user) => {
+export const isSuperAdmin = (user: User | null): boolean => {
     if (!user || !user.email) return false;
     return SUPER_ADMIN_EMAILS.includes(user.email);
 };
