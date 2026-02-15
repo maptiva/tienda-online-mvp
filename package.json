@@ -13,7 +13,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:inventory": "node tests/ci-public-cart-sale.js"
+    "test:inventory": "node tests/ci-public-cart-sale.js",
+    "check:rls": "node scripts/check-rls.js",
+    "lint:migrations": "node scripts/lint-migrations.js",
+    "test:security": "node tests/test-public-security.js",
+    "validate:all": "npm run lint:migrations && npm run check:rls && npm run test:security && npm run build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",
@@ -43,6 +47,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
+    "dotenv": "^17.3.1",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",

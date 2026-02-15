@@ -1,0 +1,47 @@
+PS C:\Users\ALE\Desktop\TRABAJOS EN SOLIDO\MAPTIVA\tienda-online-mvp> npm install -g supabase
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn cleanup Failed to remove some directories [
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\ALE\\AppData\\Roaming\\npm\\node_modules\\supabase',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\ALE\AppData\Roaming\npm\node_modules\supabase\node_modules\minizlib'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\ALE\\AppData\\Roaming\\npm\\node_modules\\supabase\\node_modules\\minizlib' 
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\ALE\\AppData\\Roaming\\npm\\node_modules\\supabase\\node_modules\\@isaacs',  
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\ALE\AppData\Roaming\npm\node_modules\supabase\node_modules\@isaacs'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\ALE\\AppData\\Roaming\\npm\\node_modules\\supabase\\node_modules\\@isaacs'  
+npm warn cleanup     }
+npm warn cleanup   ]
+npm warn cleanup ]
+npm error code 1
+npm error path C:\Users\ALE\AppData\Roaming\npm\node_modules\supabase
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node scripts/postinstall.js
+npm error node:internal/modules/run_main:122
+npm error     triggerUncaughtException(
+npm error     ^
+npm error Installing Supabase CLI as a global module is not supported.
+npm error Please use one of the supported package managers: https://github.com/supabase/cli#install-the-cli
+npm error
+npm error (Use `node --trace-uncaught ...` to show where the exception was thrown)
+npm error
+npm error Node.js v22.13.1
+npm error A complete log of this run can be found in: C:\Users\ALE\AppData\Local\npm-cache\_logs\2025-12-13T03_11_16_045Z-debug-0.log
+PS C:\Users\ALE\Desktop\TRABAJOS EN SOLIDO\MAPTIVA\tienda-online-mvp> supabase --version
+supabase : El término 'supabase' no se reconoce como nombre de un cmdlet, función, archivo de script o programa 
+ejecutable. Compruebe si escribió correctamente el nombre o, si incluyó una ruta de acceso, compruebe que dicha 
+ruta es correcta e inténtelo de nuevo.
+En línea: 1 Carácter: 1
++ supabase --version
++ ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (supabase:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+PS C:\Users\ALE\Desktop\TRABAJOS EN SOLIDO\MAPTIVA\tienda-online-mvp> 

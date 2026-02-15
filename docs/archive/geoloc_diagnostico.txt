@@ -1,0 +1,296 @@
+📍 Plan: Geolocalización con Geocodificación Automática
+⚠️ PROBLEMA BLOQUEANTE ENCONTRADO
+Antes de implementar geolocalización, DEBE resolverse el problema de guardado en 
+
+StoreSettings.jsx
+:
+
+Error Actual
+duplicate key value violates unique constraint "stores_store_name_key"
+duplicate key value violates unique constraint "stores_store_slug_key"
+Causa Raíz
+La tabla stores tiene registros duplicados/corruptos
+El upsert no funciona correctamente porque user_id no es la clave primaria
+Las restricciones UNIQUE en store_name y store_slug causan conflictos
+Solución Requerida (ANTES de geolocalización)
+Opción A: Limpiar base de datos
+
+-- 1. Ver registros duplicados
+SELECT * FROM stores ORDER BY user_id, created_at;
+-- 2. Eliminar duplicados (mantener solo el más reciente por user_id)
+DELETE FROM stores 
+WHERE id NOT IN (
+  SELECT MAX(id) 
+  FROM stores 
+  GROUP BY user_id
+);
+Opción B: Cambiar lógica de upsert
+
+// En StoreSettings.jsx - handleSubmit
+const { error: upsertError } = await supabase
+  .from('stores')
+  .upsert(dataToSave, {
+    onConflict: 'user_id',  // Requiere que user_id sea UNIQUE constraint
+    ignoreDuplicates: false
+  });
+Opción C: Volver a UPDATE manual (más seguro)
+
+// Primero buscar store por user_id
+const { data: existing } = await supabase
+  .from('stores')
+  .select('id')
+  .eq('user_id', user.id)
+  .maybeSingle();  // No falla si no existe
+if (existing) {
+  // UPDATE solo los campos que cambiaron
+  await supabase
+    .from('stores')
+    .update(dataToSave)
+    .eq('id', existing.id);  // Usar ID, no user_id
+} else {
+  // INSERT nuevo
+  await supabase
+    .from('stores')
+    .insert(dataToSave);
+}
+🗺️ IMPLEMENTACIÓN DE GEOLOCALIZACIÓN (Después de resolver el guardado)
+1. Base de Datos (YA HECHO ✅)
+Script: 
+
+sql/17_add_geolocation.sql
+
+ALTER TABLE stores 
+ADD COLUMN IF NOT EXISTS latitude DECIMAL(10, 8),
+ADD COLUMN IF NOT EXISTS longitude DECIMAL(11, 8),
+ADD COLUMN IF NOT EXISTS show_map BOOLEAN DEFAULT false;
+Estado: ✅ Ejecutado en Supabase
+
+2. Dependencias (YA INSTALADO ✅)
+npm install react-leaflet leaflet
+Estado: ✅ Instalado
+
+3. Componente StoreMap (YA CREADO ✅)
+Archivo: 
+
+src/components/StoreMap.jsx
+
+Características implementadas:
+
+✅ Mapa interactivo con Leaflet
+✅ Marcador arrastrable (prop draggable)
+✅ Zoom con rueda del mouse (scrollWheelZoom={true})
+✅ Callback onPositionChange para actualizar coordenadas
+✅ Popup con nombre y dirección de tienda
+Uso:
+
+<StoreMap
+  latitude={-34.6037}
+  longitude={-58.3816}
+  storeName="Mi Tienda"
+  address="Av. Corrientes 1234"
+  draggable={true}  // Solo en preview del admin
+  onPositionChange={(newPos) => {
+    // Actualizar coordenadas cuando se arrastra
+    setCoords(newPos);
+  }}
+/>
+4. Formulario Admin (StoreSettings.jsx)
+Cambios a realizar:
+
+4.1. Agregar estado para geocoding
+const [geocoding, setGeocoding] = useState(false);
+const [showMapPreview, setShowMapPreview] = useState(false);
+4.2. Función de geocodificación (Nominatim - GRATIS)
+const handleGeocode = async () => {
+  if (!storeData.address) {
+    Swal.fire('Error', 'Ingresa una dirección completa', 'warning');
+    return;
+  }
+  setGeocoding(true);
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(storeData.address)}&limit=1`
+    );
+    const data = await response.json();
+    if (data && data.length > 0) {
+      const { lat, lon } = data[0];
+      setStoreData(prev => ({
+        ...prev,
+        latitude: parseFloat(lat),
+        longitude: parseFloat(lon)
+      }));
+      setShowMapPreview(true);
+      Swal.fire('¡Ubicación encontrada!', 'Verifica el marcador', 'success');
+    } else {
+      Swal.fire('No encontrado', 'Intenta ser más específico', 'warning');
+    }
+  } catch (error) {
+    Swal.fire('Error', 'Problema al buscar dirección', 'error');
+  } finally {
+    setGeocoding(false);
+  }
+};
+4.3. UI del formulario
+{/* Sección Ubicación */}
+<div className="border-t pt-6 mt-6">
+  <h3>📍 Ubicación de la Tienda</h3>
+  
+  {/* Botón Geocodificar */}
+  <button
+    type="button"
+    onClick={handleGeocode}
+    disabled={geocoding || !storeData.address}
+  >
+    {geocoding ? 'Buscando...' : '🔍 Buscar en Mapa'}
+  </button>
+  <p className="text-xs">
+    Primero completa "Dirección", luego haz clic aquí
+  </p>
+  {/* Preview del mapa (solo después de geocodificar) */}
+  {showMapPreview && storeData.latitude && storeData.longitude && (
+    <div className="mb-4">
+      <p>Vista previa:</p>
+      <div className="h-64">
+        <StoreMap
+          latitude={storeData.latitude}
+          longitude={storeData.longitude}
+          storeName={storeData.store_name}
+          address={storeData.address}
+          draggable={true}
+          onPositionChange={(newPos) => {
+            setStoreData(prev => ({
+              ...prev,
+              latitude: newPos.latitude,
+              longitude: newPos.longitude
+            }));
+          }}
+        />
+      </div>
+      <p className="text-xs">
+        📌 {storeData.latitude?.toFixed(6)}, {storeData.longitude?.toFixed(6)}
+      </p>
+      <p className="text-xs text-blue-600">
+        💡 Arrastra el marcador para ajustar
+      </p>
+    </div>
+  )}
+  {/* Toggle mostrar mapa */}
+  <label>
+    <input
+      type="checkbox"
+      checked={storeData.show_map}
+      onChange={(e) => setStoreData(prev => ({...prev, show_map: e.target.checked}))}
+    />
+    Mostrar mapa en mi tienda
+  </label>
+</div>
+5. Integración en ProductList (YA HECHO ✅)
+Archivo: 
+
+src/components/ProductList.jsx
+
+Código agregado:
+
+{/* Mapa de ubicación - solo si está habilitado */}
+{store?.show_map && store?.latitude && store?.longitude && (
+  <div className="mt-12 mb-8">
+    <h2>📍 Nuestra Ubicación</h2>
+    
+    {/* Desktop: Mapa interactivo */}
+    <div className="hidden md:block h-[300px]">
+      <StoreMap
+        latitude={store.latitude}
+        longitude={store.longitude}
+        storeName={store.store_name}
+        address={store.address}
+      />
+    </div>
+    {/* Móvil: Botón a Google Maps */}
+    <div className="md:hidden">
+      <a
+        href={`https://www.google.com/maps?q=${store.latitude},${store.longitude}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        📍 Ver Ubicación en Mapa
+      </a>
+    </div>
+    {store.address && <p>{store.address}</p>}
+  </div>
+)}
+📋 CHECKLIST DE IMPLEMENTACIÓN
+Pre-requisitos
+ CRÍTICO: Resolver problema de guardado en StoreSettings
+ Limpiar registros duplicados en base de datos
+ Verificar que UPDATE funciona correctamente
+ Probar guardar cambios sin errores
+Implementación
+ Ejecutar SQL migration (17_add_geolocation.sql)
+ Instalar react-leaflet y leaflet
+ Crear componente StoreMap con marcador arrastrable
+ Agregar geocodificación a StoreSettings
+ Agregar preview de mapa en StoreSettings
+ Integrar mapa en ProductList (responsive)
+ Probar flujo completo:
+Ingresar dirección
+Geocodificar
+Ajustar marcador
+Guardar
+Ver en tienda pública
+Testing
+ Probar geocodificación con direcciones de Argentina
+ Probar arrastrar marcador y verificar coordenadas
+ Probar zoom con rueda del mouse
+ Verificar responsive (desktop vs móvil)
+ Verificar que toggle show_map funciona
+🎯 FLUJO DE USUARIO FINAL
+Usuario va a Configuración → Ubicación
+Completa campo "Dirección" (ej: "Av. Corrientes 1234, Buenos Aires, Argentina")
+Click en "🔍 Buscar en Mapa"
+Sistema geocodifica y muestra preview del mapa
+Usuario arrastra el marcador si no está exacto
+Usuario hace zoom con rueda del mouse para verificar
+Activa "Mostrar mapa en mi tienda"
+Click en "Guardar Configuración"
+El mapa aparece en la tienda pública (footer)
+🚨 NOTAS IMPORTANTES
+Nominatim (OpenStreetMap) es GRATIS pero tiene límites de rate:
+
+Máximo 1 request por segundo
+Incluir User-Agent en headers (buena práctica)
+Google Places Autocomplete es mejor pero CUESTA DINERO:
+
+Autocomplete de direcciones
+Más preciso
+Requiere API Key y billing habilitado
+Alternativa futura: Implementar geocoding con caché:
+
+Guardar resultados de geocoding
+Evitar requests repetidos
+Mejorar performance
+📝 ARCHIVOS MODIFICADOS
+✅ 
+
+sql/17_add_geolocation.sql
+ (ejecutado)
+✅ 
+
+src/components/StoreMap.jsx
+ (creado)
+✅ 
+
+src/components/ProductList.jsx
+ (integrado)
+⏸️ 
+
+src/pages/StoreSettings.jsx
+ (pendiente - bloqueado por error de guardado)
+✅ 
+
+package.json
+ (dependencias instaladas)
+🔄 PRÓXIMOS PASOS
+PRIMERO: Resolver error de guardado en StoreSettings
+SEGUNDO: Implementar geocodificación en formulario
+TERCERO: Testing completo
+CUARTO: Deploy a producción

@@ -1,24 +1,39 @@
+# Documentation (Specific MD files)
+*.md
+!README.md
+!DEVELOPMENT_WORKFLOWS.md
+!FUNCIONALIDADES_VIGENTES.md
+!PLAN*.md
+!GUIA*.md
+!INSTRUCTIVO*.md
+!AUDIT_REPORT.md
+!STOCK*.md
+!reporte-motor-stock.md
+
+# Supabase structural migrations (KEEP THESE)
+!supabase/migrations/*.sql
+
+# Database utilities and reports (KEEP THESE)
+!sql/*.sql
+!sql/archive/*.sql
+
+# Database files to ignore (local schema and data)
+schema.sql
+schema_sql.json
+leads.csv
+*.csv
+*.xlsx
+/dist/
+*.log
+
 # Dependencies
 /node_modules
-
-# Vite build output and cache
-/dist
 .vite/
-
-# Log files
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Environment variables (ALL env files except templates)
 .env
 .env*.local
-.env.production.backup
 .env.development
 .env.production
-
-# Editor directories and files
 .vscode
 .idea
 *.suo
@@ -26,44 +41,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
-
-# Agent/AI tool directories
 /jules-scratch
 .opencode/
-
-# Documentation and session files (keep only README.md)
-*.md
-!README.md
-/docs/
-!/docs/README.md
-
-# Prompt and solution files
-prompt*.txt
-solucion*.txt
-*.txt
-!public/robots.txt
-CART.txt
-Plan_SaaS.txt
-
-# Supabase local development files
 supabase/.temp
-
-# Temporary images/screenshots
 captura*.png
-
-# Database files (sensitive schema and migrations)
-*.sql
-/sql/
-schema.sql
-schema_sql.json
-migration_*.sql
-check-*.sql
-*-fix-process*.sql
-
-# Data files (sensitive customer and business information)
-*.csv
-leads.csv
-*leads*.csv
-*data*.csv
-*import*.csv
-*export*.csv

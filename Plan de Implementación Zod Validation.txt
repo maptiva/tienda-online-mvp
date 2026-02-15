@@ -1,0 +1,101 @@
+Plan de Implementación: Zod Validation (Fase 2)
+Implementación de validación en runtime usando Zod para proteger la aplicación contra datos corruptos o inesperados.
+
+🎯 Objetivo
+Agregar una capa de validación de tipos en runtime que:
+
+Valide respuestas de Supabase antes de usarlas
+Proteja contra datos corruptos o mal formateados
+Proporcione mensajes de error claros cuando los datos no cumplan el schema
+Sirva como documentación viva de las estructuras de datos
+📋 Cambios Propuestos
+1. Instalación de Dependencias
+bash
+npm install zod
+2. Estructura de Schemas
+Crear src/schemas/ con los siguientes archivos:
+
+product.schema.js
+Validación para productos:
+
+
+id
+, name, price, stock, image_url
+category (relación con categorías)
+user_id (owner)
+Campos opcionales: description, is_active
+category.schema.js
+Validación para categorías:
+
+
+id
+, name, user_id
+Campos opcionales: description, order
+store.schema.js
+Validación para datos de tiendas:
+
+
+id
+, store_name, user_id
+Campos opcionales: logo_url, address, city, category
+Campos de contacto: contact_phone, instagram_url, etc.
+cart.schema.js
+Validación para items del carrito:
+
+productId, quantity, price
+Validaciones: quantity > 0, price >= 0
+3. Integración en Hooks
+Modificar hooks existentes para usar validación:
+
+
+useProducts.js
+
+javascript
+import { productSchema } from '../schemas/product.schema';
+// Validar respuesta de Supabase
+const validatedData = data.map(item => productSchema.parse(item));
+useCategories.js
+
+javascript
+import { categorySchema } from '../schemas/category.schema';
+const validatedData = data.map(item => categorySchema.parse(item));
+4. Manejo de Errores de Validación
+Crear helper en src/utils/zodHelpers.js:
+
+javascript
+export function safeValidate(schema, data) {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    console.error('Validation error:', result.error);
+    return { data: null, error: result.error };
+  }
+  return { data: result.data, error: null };
+}
+🧪 Plan de Testing
+Crear tests para schemas:
+
+src/schemas/__tests__/product.schema.test.js
+src/schemas/__tests__/category.schema.test.js
+Tests deben cubrir:
+
+✅ Datos válidos pasan la validación
+❌ Datos inválidos fallan con mensaje claro
+⚠️ Campos opcionales funcionan correctamente
+🔢 Validaciones numéricas (price >= 0, stock >= 0)
+📊 Priorización
+Alto Impacto (Implementar primero):
+
+product.schema.js - Los productos son el core del negocio
+cart.schema.js - Protege el flujo de compra
+Medio Impacto: 3. category.schema.js - Menos crítico pero importante 4. store.schema.js - Datos de configuración
+
+⚠️ Consideraciones
+Performance: Zod es rápido pero validar arrays grandes puede tener impacto. Usar safeParse en producción.
+Backward Compatibility: Los schemas deben ser flexibles con campos opcionales para no romper datos existentes.
+Error Messages: Personalizar mensajes de error para que sean user-friendly.
+✅ Criterios de Éxito
+ Zod instalado y configurado
+ Schemas creados para Product, Category, Store, Cart
+ Hooks principales usando validación
+ Tests pasando para todos los schemas
+ Documentación actualizada en CODE_QUALITY_PLAN.md

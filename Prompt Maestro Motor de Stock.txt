@@ -1,0 +1,27 @@
+Prompt Maestro: Motor de Stock Escalable y Modular
+Objetivo: Diseñar e implementar un módulo de gestión de inventario (Stock Engine) para una plataforma SaaS de e-commerce multi-tenant. Este módulo debe funcionar de manera independiente pero integrada, permitiendo gestionar el stock de productos con precisión y escalabilidad.
+Requerimientos de Arquitectura:
+Modularidad ("Bloque Aislado"):
+El sistema de stock debe ser un módulo separado de la lógica principal de productos. No queremos simplemente añadir un campo "cantidad" a la tabla de productos.
+Debe tener sus propias tablas en la base de datos y sus propios componentes en el frontend.
+La comunicación con el resto de la app debe ser a través de una API interna o hooks claros (ej: useStock(productId)).
+Modelo de Datos (Supabase):
+Necesitamos una tabla dedicada (inventory) que vincule product_id con quantity.
+Crucial: Implementar un sistema de "Movimientos de Stock" (inventory_logs). Cada cambio en el stock (venta, reposición, ajuste, devolución) debe quedar registrado con fecha, tipo de movimiento y usuario responsable. Esto es vital para auditoría y escalabilidad.
+Soportar el concepto de "Stock Reservado" (opcional pero deseable para el futuro): cuando alguien inicia una compra pero no la finaliza inmediatamente.
+Lógica de Negocio:
+Validación: Impedir ventas si el stock es insuficiente (configuración opcional: "permitir venta sin stock" vs "bloquear").
+Actualización Atómica: Asegurar que si dos personas compran el último producto al mismo tiempo, el sistema maneje la concurrencia correctamente (evitar condiciones de carrera).
+Alertas: Sistema básico para notificar bajo stock.
+Frontend (React - Panel de Administración):
+Una nueva pestaña o sección "Inventario" dentro del panel de administración.
+Vista rápida de stock actual con indicadores visuales (semáforo: verde/amarillo/rojo).
+Funcionalidad para "Ajuste Rápido" de stock (+/-) y "Carga Masiva" (reposición).
+Historial de movimientos visible por producto ("¿Quién bajó el stock de esto?").
+Frontend (Tienda Pública):
+Mostrar disponibilidad en tiempo real ("Quedan 3 unidades").
+Deshabilitar botón de compra si stock = 0.
+Desarrollo Local:
+Instrucciones para crear este módulo en un entorno local aislado primero, simulando la conexión con la app principal, para iterar rápido sin riesgos.
+Entregable Esperado:
+Un plan de implementación técnica detallado (tablas SQL, estructura de componentes React, lógica de hooks) y el código inicial para el módulo de inventario básico.
