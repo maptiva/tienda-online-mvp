@@ -42,8 +42,8 @@ const CategoriaPage = () => {
     }
 
     return (
-        <div className='w-full min-h-0 md:h-[calc(100vh-4rem)]'>
-            <div className="bg-white shadow-lg border border-gray-100 rounded-xl flex flex-col overflow-hidden h-full p-4 md:p-8">
+        <div className='w-full flex-1 flex flex-col min-h-0'>
+            <div className="bg-white shadow-lg border border-gray-100 rounded-xl flex flex-col overflow-y-auto custom-scrollbar flex-1 min-h-0 p-4 md:p-8">
                 <h1 className='text-2xl md:text-3xl border-b border-gray-300 pb-3 mb-3 font-bold'>Categorías</h1>
 
                 {/* Buscador */}

@@ -156,7 +156,7 @@ const Clients = () => {
     if (clientsLoading && clients.length === 0) return <div className="p-10 text-center text-gray-400">Accediendo a la red maestra...</div>;
 
     return (
-        <div className="px-4 md:pt-0 md:px-8 max-w-7xl mx-auto flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-4rem)]">
+        <div className="px-4 md:pt-0 md:px-8 max-w-7xl mx-auto flex flex-col flex-1 min-h-0">
             <div className="mb-2 flex justify-between items-end border-b border-white pb-1 mt-0">
                 <div>
                     <h1 className="text-2xl md:text-4xl font-black text-gray-800 tracking-tighter italic leading-none">
@@ -211,7 +211,7 @@ const Clients = () => {
                     {/* ... (this tool call needs the actual content to be safe) ... */}
                     <div className="hidden md:block overflow-x-auto border-t border-gray-100 flex-1 overflow-y-auto custom-scrollbar shadow-inner bg-gray-50/20">
                         <table className="w-full text-left border-separate border-spacing-0">
-                            <thead className="sticky top-0 z-10">
+                            <thead className="sticky top-0 z-[40] bg-gray-100 shadow-sm">
                                 <tr className="bg-gray-100 border-b border-gray-300 italic">
                                     <th className="px-8 py-4 text-xs font-black text-gray-500 uppercase tracking-widest border-b border-gray-200">Identidad</th>
                                     <th className="px-8 py-4 text-xs font-black text-gray-500 uppercase tracking-widest border-b border-gray-200">Tiendas Vinculadas</th>

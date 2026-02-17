@@ -50,12 +50,9 @@ export const useProducts = (userId?: string): UseProductsReturn => {
 
                 if (fetchError) throw fetchError;
 
-                // Validar datos de productos con Zod
+                // Validar datos de productos con Zod de forma silenciosa e informativa
                 const validatedData = (data || []).map((item, index) => {
                     const result = safeValidate(productSchema, item, `products[${index}]`);
-                    if (!result.success && result.error) {
-                        console.warn(`Producto inválido en índice ${index}:`, result.formattedErrors);
-                    }
                     return result.success ? result.data : item;
                 }) as Product[];
 

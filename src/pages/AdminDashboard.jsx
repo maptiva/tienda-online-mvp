@@ -40,7 +40,7 @@ function AdminDashboard() {
     if (loading) return <Loading message='Productos' />;
 
     return (
-        <div className='w-full border-collapse shadow-xl bg-white p-4 md:p-8 rounded-xl md:h-[calc(100vh-4rem)] flex flex-col overflow-hidden'>
+        <div className='w-full border-collapse shadow-xl bg-white p-4 md:p-8 rounded-xl flex flex-col flex-1 min-h-0'>
             <h1 className='text-2xl md:text-3xl border-b border-gray-300 pb-3 mb-3 font-bold'>Panel de Administración</h1>
 
             {/* Buscador */}
@@ -69,10 +69,10 @@ function AdminDashboard() {
             </div>
 
             {/* Vista Desktop - Tabla */}
-            <div className='mt-6 overflow-x-auto hidden md:flex flex-col flex-1 border border-gray-100 rounded-lg shadow-sm'>
+            <div className='mt-4 overflow-hidden hidden md:flex flex-col flex-1 border border-gray-100 rounded-lg shadow-sm bg-white'>
                 <div className='overflow-y-auto flex-1 custom-scrollbar'>
-                    <table className='w-full'>
-                        <thead className='bg-gray-300 border-b border-gray-500 sticky top-0'>
+                    <table className='w-full border-separate border-spacing-0'>
+                        <thead className='bg-gray-300 sticky top-0 z-[40] shadow-sm'>
                             <tr>
                                 <th className="py-2 px-4">ID</th>
                                 <th className="py-2 px-4 text-left">Imagen</th>
@@ -100,8 +100,8 @@ function AdminDashboard() {
             </div>
 
             {/* Vista Mobile - Cards */}
-            <div className='mt-5 md:hidden'>
-                <div className='flex flex-col gap-3 max-h-[500px] overflow-y-auto'>
+            <div className='mt-5 md:hidden flex-1 min-h-0 flex flex-col'>
+                <div className='flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3'>
                     {filteredProducts.length > 0 ? (
                         filteredProducts.map((product) => (
                             <ProductCard key={product.id} product={product} />

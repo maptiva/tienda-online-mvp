@@ -138,32 +138,32 @@ const Leads = () => {
                     const phone = parts[1].trim();
 
                     if (fullName && phone) {
-                    // Extract contact person's name and business name from full name
-                    let business_name = fullName;
-                    let contact_name = 'Importado CSV';
-                    
-                    const words = fullName.split(' ');
-                    if (words.length > 1) {
-                        const firstName = words[0];
-                        // Normalize for comparison without accents
-                        const normalizeString = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-                        
-                        // Common business words that should NOT be treated as contact names
-                        const businessWords = ['tienda', 'libreria', 'distribuidora', 'heladeria', 'jugueteria', 'veterinaria', 'pintureria', 'papeleria'];
-                        // Common first names
-                        const commonNames = ['noelia', 'juan', 'ruben', 'rosario', 'carina', 'karen', 'paula', 'jesica', 'marilin', 'laura', 'ariana', 'ivan', 'emanuel', 'ana', 'luciano', 'sebastian', 'gustavo', 'clarisa', 'adriana', 'natalia', 'carla', 'delfina', 'ursula', 'mauricio', 'veronica', 'manuela', 'matias', 'elsa'];
-                        
-                        const normalizedFirstName = normalizeString(firstName);
-                        
-                        if (firstName.length >= 3 && firstName.length <= 15 && 
-                            /^[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü]*$/.test(firstName) &&
-                            !businessWords.includes(normalizedFirstName) &&
-                            commonNames.includes(normalizedFirstName)) {
-                            contact_name = firstName;
-                            business_name = words.slice(1).join(' ').trim();
+                        // Extract contact person's name and business name from full name
+                        let business_name = fullName;
+                        let contact_name = 'Importado CSV';
+
+                        const words = fullName.split(' ');
+                        if (words.length > 1) {
+                            const firstName = words[0];
+                            // Normalize for comparison without accents
+                            const normalizeString = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+                            // Common business words that should NOT be treated as contact names
+                            const businessWords = ['tienda', 'libreria', 'distribuidora', 'heladeria', 'jugueteria', 'veterinaria', 'pintureria', 'papeleria'];
+                            // Common first names
+                            const commonNames = ['noelia', 'juan', 'ruben', 'rosario', 'carina', 'karen', 'paula', 'jesica', 'marilin', 'laura', 'ariana', 'ivan', 'emanuel', 'ana', 'luciano', 'sebastian', 'gustavo', 'clarisa', 'adriana', 'natalia', 'carla', 'delfina', 'ursula', 'mauricio', 'veronica', 'manuela', 'matias', 'elsa'];
+
+                            const normalizedFirstName = normalizeString(firstName);
+
+                            if (firstName.length >= 3 && firstName.length <= 15 &&
+                                /^[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü]*$/.test(firstName) &&
+                                !businessWords.includes(normalizedFirstName) &&
+                                commonNames.includes(normalizedFirstName)) {
+                                contact_name = firstName;
+                                business_name = words.slice(1).join(' ').trim();
+                            }
                         }
-                    }
-                        
+
                         leadsToImport.push({
                             business_name: business_name,
                             phone: phone,
@@ -249,7 +249,7 @@ const Leads = () => {
         }
     };
 
-const filteredLeads = leads.filter(lead => {
+    const filteredLeads = leads.filter(lead => {
         const matchesSearch = transform(lead.name).includes(transform(searchTerm)) ||
             transform(lead.email).includes(transform(searchTerm)) ||
             transform(lead.business_name).includes(transform(searchTerm));
@@ -264,7 +264,7 @@ const filteredLeads = leads.filter(lead => {
     if (loading) return <Loading message="Cargando Leads..." />;
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="p-6 max-w-7xl mx-auto flex flex-col flex-1 overflow-y-auto custom-scrollbar">
             {/* Header style based on Clients.jsx */}
             <div className="mb-2 flex justify-between items-end border-b border-white pb-1 mt-0">
                 <div>

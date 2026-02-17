@@ -10,10 +10,10 @@ const CategoriaList = ({ categories }: Props) => {
     return (
         <div className='mt-5 flex-1 flex flex-col overflow-hidden'>
             {/* Vista Desktop - Tabla */}
-            <div className='hidden md:flex flex-col flex-1 overflow-x-auto border border-gray-200 rounded-lg'>
-                <div className="overflow-y-auto flex-1">
-                    <table className='w-full'>
-                        <thead className='bg-gray-300 border-b border-gray-500 sticky top-0'>
+            <div className='hidden md:flex flex-col flex-1 overflow-hidden border border-gray-200 rounded-lg bg-white'>
+                <div className="overflow-y-auto flex-1 custom-scrollbar">
+                    <table className='w-full border-separate border-spacing-0'>
+                        <thead className='bg-gray-300 sticky top-0 z-[40] shadow-sm'>
                             <tr>
                                 <th className="py-2 px-4 font-semibold text-center w-20">ID</th>
                                 <th className="py-2 px-4 text-left font-semibold">Nombre de Categoría</th>

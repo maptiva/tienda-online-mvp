@@ -1,15 +1,41 @@
-/* Desktop Layout */
-.admin-content {
-  flex-grow: 1;
+:root {
+  --admin-page-padding: 2rem;
+}
+
+.admin-root-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   width: 100%;
 }
 
 .admin-wrapper {
   display: flex;
+  flex: 1;
   gap: 20px;
-  padding: 2rem;
-  min-height: 100vh;
+  padding: var(--admin-page-padding);
+  min-height: 0;
+  overflow: hidden;
   position: relative;
+}
+
+/* Desktop Layout */
+.admin-content {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  /* Forzamos scroll interno en componentes para evitar el salto */
+}
+
+@media (max-width: 1023px) {
+  .admin-content {
+    overflow-y: hidden;
+    /* Forzamos scroll interno también en móvil */
+  }
 }
 
 /* Mobile Overlay for Menu */
@@ -108,5 +134,36 @@
 
   .admin-content {
     padding-top: 4.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+
+  /* Cabeceras de tabla persistentes */
+  .admin-content table thead {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  .admin-content table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #d1d5db;
+    /* bg-gray-300 fallback */
+    z-index: 40;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 1023px) {
+  .has-master-banner .hamburger-button {
+    top: calc(var(--master-banner-height, 0px) + 1rem);
+    z-index: 10001;
+  }
+
+  .has-master-banner .mobile-overlay {
+    top: var(--master-banner-height, 0px);
+    z-index: 9999;
   }
 }

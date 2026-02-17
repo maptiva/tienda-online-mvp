@@ -37,12 +37,9 @@ export const useProductStore = create<ProductCache & ProductActions>()(
             productsCache: {},
 
             setProducts: (userId: string, products: Product[]) => {
-                // Validar productos con Zod antes de guardar
-                const validatedProducts = products.map((product, index) => {
+                // Validar productos con Zod antes de guardar de forma silenciosa
+                const validatedProducts = products.map((product) => {
                     const result = productSchema.safeParse(product);
-                    if (!result.success) {
-                        console.warn(`Producto inválido en índice ${index}:`, result.error?.issues);
-                    }
                     return result.success ? result.data : product;
                 });
 

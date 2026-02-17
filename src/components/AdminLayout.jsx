@@ -45,7 +45,7 @@ const AdminLayout = () => {
   };
 
   return (
-    <>
+    <div className="admin-root-container">
       <MasterModeBanner />
       <div className="admin-wrapper">
         {/* Botón Hamburguesa (solo visible en móvil) */}
@@ -75,7 +75,7 @@ const AdminLayout = () => {
           <Outlet />
         </main>
       </div>
-    </>
+    </div>
   );
 };
 

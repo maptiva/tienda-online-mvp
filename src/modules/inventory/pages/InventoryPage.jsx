@@ -149,7 +149,7 @@ const InventoryPage = () => {
   }
 
   return (
-    <div className="w-full bg-white p-4 md:p-8 rounded-xl shadow-xl flex flex-col h-full overflow-hidden">
+    <div className="w-full bg-white p-4 md:p-8 rounded-xl shadow-xl flex flex-col flex-1 min-h-0 overflow-y-auto custom-scrollbar">
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 mb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-3">
@@ -212,10 +212,10 @@ const InventoryPage = () => {
 
       <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-6">
         {/* Tabla de Productos */}
-        <div className="flex-1 overflow-x-auto border rounded-xl shadow-sm bg-gray-50/50">
+        <div className="flex-1 overflow-hidden border rounded-xl shadow-sm bg-white">
           <div className="overflow-y-auto h-full custom-scrollbar">
-            <table className="w-full text-left">
-              <thead className="bg-gray-100 sticky top-0 z-10">
+            <table className="w-full text-left border-separate border-spacing-0">
+              <thead className="bg-gray-100 sticky top-0 z-[40] shadow-sm">
                 <tr>
                   <th className="p-4 text-sm font-bold text-gray-600">ID</th>
                   <th className="p-4 text-sm font-bold text-gray-600">Producto</th>

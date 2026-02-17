@@ -14,7 +14,7 @@ const useMonthlyRevenue = ({ selectedYear }) => {
         const fetchMonthlyRevenue = async () => {
             try {
                 console.log('🔍 Consultando pagos para año:', selectedYear);
-                
+
                 // Consultar todos los pagos sin filtro de fecha primero
                 const { data: allPayments, error: allError } = await supabase
                     .from('payments')
@@ -80,10 +80,10 @@ const useMonthlyRevenue = ({ selectedYear }) => {
 const SimpleSummary = ({ monthlyData, year }) => {
     const currentMonth = new Date().getMonth(); // 0-11
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    
+
     // Determinar qué 3 meses mostrar según el año seleccionado
     let last3Months = [];
-    
+
     if (year === new Date().getFullYear()) {
         // Si es el año actual, mostrar los últimos 3 meses hasta el mes actual
         const monthsToShow = Math.min(3, currentMonth + 1);
@@ -113,7 +113,9 @@ const SimpleSummary = ({ monthlyData, year }) => {
             <div className="p-6 bg-gradient-to-r from-[#5FAFB8] to-[#4a9ea8]">
                 <h3 className="text-xl font-black text-white italic tracking-tight">📊 Resumen Simple</h3>
                 <p className="text-[10px] text-white/80 uppercase font-black tracking-widest mt-1">
-                    {year === new Date().getFullYear() ? 'Últimos 3 meses' : `Meses clave ${year}`}
+                    {year === new Date().getFullYear()
+                        ? (last3Months.length >= 3 ? 'Últimos 3 meses' : `Resumen acumulado ${year}`)
+                        : `Meses clave ${year}`}
                 </p>
             </div>
             <div className="p-6 space-y-4">
@@ -146,7 +148,7 @@ const SimpleSummary = ({ monthlyData, year }) => {
 const FullTableView = ({ monthlyData }) => {
     const totalAnnual = monthlyData.reduce((acc, month) => acc + month.total, 0);
     const currentMonth = new Date().getMonth();
-    
+
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('es-AR', {
             style: 'currency',
@@ -194,7 +196,7 @@ const FullTableView = ({ monthlyData }) => {
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                                <div 
+                                                <div
                                                     className="h-full bg-[#5FAFB8] rounded-full transition-all"
                                                     style={{ width: getPercentage(month.total) }}
                                                 />
@@ -267,8 +269,8 @@ const RevenueViewSelector = ({ selectedYear, onYearChange }) => {
         <div className="space-y-6">
             {/* Selector de año */}
             <div className="flex gap-2 items-center">
-                <select 
-                    value={selectedYear || currentYear} 
+                <select
+                    value={selectedYear || currentYear}
                     onChange={(e) => onYearChange && onYearChange(parseInt(e.target.value))}
                     className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-bold cursor-pointer hover:bg-gray-700 transition-colors"
                 >
@@ -285,31 +287,28 @@ const RevenueViewSelector = ({ selectedYear, onYearChange }) => {
             <div className="flex gap-2 bg-white p-2 rounded-xl shadow-lg border border-gray-100">
                 <button
                     onClick={() => setViewMode('simple')}
-                    className={`flex-1 py-3 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                        viewMode === 'simple'
-                            ? 'bg-[#5FAFB8] text-white shadow-lg shadow-[#5FAFB8]/20'
-                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                    }`}
+                    className={`flex-1 py-3 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'simple'
+                        ? 'bg-[#5FAFB8] text-white shadow-lg shadow-[#5FAFB8]/20'
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
                 >
                     📊 Simple
                 </button>
                 <button
                     onClick={() => setViewMode('bar')}
-                    className={`flex-1 py-3 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                        viewMode === 'bar'
-                            ? 'bg-[#10b981] text-white shadow-lg shadow-[#10b981]/20'
-                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                    }`}
+                    className={`flex-1 py-3 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'bar'
+                        ? 'bg-[#10b981] text-white shadow-lg shadow-[#10b981]/20'
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
                 >
                     📈 Barras
                 </button>
                 <button
                     onClick={() => setViewMode('table')}
-                    className={`flex-1 py-3 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                        viewMode === 'table'
-                            ? 'bg-[#8b5cf6] text-white shadow-lg shadow-[#8b5cf6]/20'
-                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                    }`}
+                    className={`flex-1 py-3 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'table'
+                        ? 'bg-[#8b5cf6] text-white shadow-lg shadow-[#8b5cf6]/20'
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
                 >
                     📋 Tabla
                 </button>
@@ -456,7 +455,7 @@ const CRMDashboard = () => {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
     return (
-        <div className="p-4 md:p-6 max-w-7xl mx-auto flex flex-col min-h-screen">
+        <div className="p-4 md:p-6 max-w-7xl mx-auto flex flex-col flex-1 overflow-y-auto custom-scrollbar">
             <div className="mb-8">
                 <h1 className="text-2xl md:text-4xl font-black text-gray-800 tracking-tighter italic border-b border-gray-100 pb-4">Consola de Gestión Maestro</h1>
                 <p className="text-gray-400 text-[10px] md:text-xs mt-2 uppercase tracking-[0.2em] font-black opacity-50">Inteligencia Comercial CLICANDO</p>
@@ -470,7 +469,7 @@ const CRMDashboard = () => {
                     <h2 className="text-xl font-black text-gray-800 italic tracking-tight">Ingresos por Mes</h2>
                     <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest mt-1">Selecciona el formato de visualización</p>
                 </div>
-                <RevenueViewSelector 
+                <RevenueViewSelector
                     selectedYear={selectedYear}
                     onYearChange={setSelectedYear}
                 />

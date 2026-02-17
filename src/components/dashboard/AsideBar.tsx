@@ -45,14 +45,16 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
     };
 
     return (
-        <aside className={`
-            fixed top-0 left-0 h-full bg-white shadow-xl z-[999]
-            transition-transform duration-300 ease-in-out
-            w-[280px] px-5 flex flex-col pb-5
-            lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:w-[280px]
-            lg:rounded-2xl lg:shadow-lg lg:border lg:border-gray-200 lg:p-8
-            ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}>
+        <aside
+            className={`
+                fixed top-0 left-0 h-full bg-white shadow-xl z-[999]
+                transition-transform duration-300 ease-in-out
+                w-[280px] px-5 flex flex-col pb-5
+                lg:relative lg:translate-x-0 lg:w-[280px] lg:h-full
+                lg:rounded-2xl lg:shadow-lg lg:border lg:border-gray-200 lg:p-8
+                ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}
+        >
             <h3 className='text-2xl font-bold mb-2 border-b pb-2'>Menu</h3>
 
             <nav className='flex flex-col flex-1 gap-1 overflow-y-auto'>

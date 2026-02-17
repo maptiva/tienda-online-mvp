@@ -7,6 +7,39 @@ const MasterModeBanner = () => {
     const { impersonatedUser, setImpersonatedUser, isMaster } = useAuth();
     const navigate = useNavigate();
 
+    const bannerRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (!impersonatedUser || !isMaster) {
+            document.documentElement.style.setProperty('--master-banner-height', '0px');
+            document.documentElement.classList.remove('has-master-banner');
+            return;
+        }
+
+        const updateHeight = () => {
+            if (bannerRef.current) {
+                const height = bannerRef.current.offsetHeight;
+                document.documentElement.style.setProperty('--master-banner-height', `${height}px`);
+                document.documentElement.classList.add('has-master-banner');
+            }
+        };
+
+        // Actualización inicial
+        updateHeight();
+
+        // Observer para cambios de tamaño (ej. al redimensionar ventana o cambio de contenido)
+        const observer = new ResizeObserver(updateHeight);
+        if (bannerRef.current) {
+            observer.observe(bannerRef.current);
+        }
+
+        return () => {
+            observer.disconnect();
+            document.documentElement.style.setProperty('--master-banner-height', '0px');
+            document.documentElement.classList.remove('has-master-banner');
+        };
+    }, [impersonatedUser, isMaster]);
+
     if (!isMaster || !impersonatedUser) return null;
 
     const handleStopImpersonation = () => {
@@ -15,7 +48,10 @@ const MasterModeBanner = () => {
     };
 
     return (
-        <div className="bg-amber-500 text-white px-4 py-2 flex justify-between items-center shadow-md animate-pulse-subtle sticky top-0 z-[100]">
+        <div
+            ref={bannerRef}
+            className="bg-amber-500 text-white px-4 py-2 flex justify-between items-center shadow-md animate-pulse-subtle relative z-[10000] w-full flex-shrink-0"
+        >
             <div className="flex items-center gap-2">
                 <FaUserShield className="text-xl" />
                 <div className="flex flex-col md:flex-row md:items-center gap-0 md:gap-2">
