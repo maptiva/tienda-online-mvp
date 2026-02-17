@@ -455,7 +455,7 @@ const CRMDashboard = () => {
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
     return (
-        <div className="p-4 md:p-6 max-w-7xl mx-auto flex flex-col flex-1 overflow-y-auto custom-scrollbar">
+        <div className="p-4 md:p-6 max-w-7xl mx-auto flex flex-col flex-1 overflow-y-auto hide-scrollbar">
             <div className="mb-8">
                 <h1 className="text-2xl md:text-4xl font-black text-gray-800 tracking-tighter italic border-b border-gray-100 pb-4">Consola de Gestión Maestro</h1>
                 <p className="text-gray-400 text-[10px] md:text-xs mt-2 uppercase tracking-[0.2em] font-black opacity-50">Inteligencia Comercial CLICANDO</p>

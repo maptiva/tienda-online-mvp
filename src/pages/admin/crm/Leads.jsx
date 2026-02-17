@@ -264,7 +264,7 @@ const Leads = () => {
     if (loading) return <Loading message="Cargando Leads..." />;
 
     return (
-        <div className="p-6 max-w-7xl mx-auto flex flex-col flex-1 overflow-y-auto custom-scrollbar">
+        <div className="p-6 max-w-7xl mx-auto flex flex-col flex-1 overflow-y-auto hide-scrollbar">
             {/* Header style based on Clients.jsx */}
             <div className="mb-2 flex justify-between items-end border-b border-white pb-1 mt-0">
                 <div>
