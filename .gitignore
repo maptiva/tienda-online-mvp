@@ -10,6 +10,7 @@
 !STOCK*.md
 !reporte-motor-stock.md
 !docs/PLAN_BACKUP.md
+!docs/SESION_BACKUP_*.md
 
 # Supabase structural migrations (KEEP THESE)
 !supabase/migrations/*.sql

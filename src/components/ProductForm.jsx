@@ -323,124 +323,174 @@ function ProductForm() {
   }
 
   return (
-    <div className={styles.formContainer}>
-      <div className={styles.productFormBox}>
-        <h1>{productId ? 'Editar Producto' : 'Añadir Nuevo Producto'}</h1>
-        {error && <p className={styles.error}>{error}</p>}
-        <form onSubmit={handleSubmit}>
-          {formConfig.map((field) => (
-            <div key={field.name} className={styles.formGroup}>
-              <label htmlFor={field.name}>{field.label}</label>
-              {field.type === 'textarea' ? (
-                <textarea
-                  id={field.name}
-                  name={field.name}
-                  value={formData[field.name] || ''}
-                  onChange={handleChange}
-                  required={field.required}
-                />
-              ) : field.type === 'file' ? (
-                <>
-                  <input
-                    type="file"
+    <div className="w-full flex-1 flex flex-col items-center min-h-0 p-0 overflow-hidden">
+      <div className="w-full max-w-2xl flex-1 flex flex-col bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden font-outfit my-2 md:my-4">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 border-b pb-4">{productId ? 'Editar Producto' : 'Añadir Nuevo Producto'}</h1>
+          {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 border border-red-100 font-medium text-center">{error}</div>}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {formConfig.map((field) => (
+              <div key={field.name} className={styles.formGroup}>
+                <label htmlFor={field.name} className="block text-sm font-bold text-gray-700 mb-2">{field.label}</label>
+                {field.type === 'textarea' ? (
+                  <textarea
                     id={field.name}
                     name={field.name}
+                    value={formData[field.name] || ''}
                     onChange={handleChange}
-                    accept="image/*"
+                    required={field.required}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none transition-all min-h-[100px]"
                   />
-                  {originalImageUrl && !imageFile && (
-                    <div className="mt-2 text-sm text-gray-600">
-                      Imagen actual: <a href={originalImageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Ver</a>
-                    </div>
-                  )}
-
-                  {/* Sección de Galería Adicional */}
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <label className="block text-sm font-medium mb-2">Galería (Máx 4 extra)</label>
+                ) : field.type === 'file' ? (
+                  <>
                     <input
                       type="file"
-                      name="gallery_images"
+                      id={field.name}
+                      name={field.name}
                       onChange={handleChange}
-                      multiple
                       accept="image/*"
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-[#5FAFB8] file:text-white hover:file:bg-[#4A9BA4] transition-all cursor-pointer"
                     />
+                    {originalImageUrl && !imageFile && (
+                      <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200 inline-block">
+                        Imagen actual: <a href={originalImageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-bold ml-1">Ver imagen</a>
+                      </div>
+                    )}
 
-                    {/* Grid de Previsualización */}
-                    <div className="grid grid-cols-4 gap-2 mt-3">
-                      {/* Imágenes Existentes */}
-                      {existingGalleryImages.map((url, idx) => (
-                        <div key={`existing-${idx}`} className="relative group aspect-square">
-                          <img src={url} alt="Galeria" className="w-full h-full object-cover rounded shadow-sm" />
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryImage(idx, true)}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                          >✕</button>
-                        </div>
-                      ))}
+                    {/* Sección de Galería Adicional */}
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                      <label className="block text-sm font-bold text-gray-700 mb-3">Galería Adicional (Máx 4)</label>
+                      <input
+                        type="file"
+                        name="gallery_images"
+                        onChange={handleChange}
+                        multiple
+                        accept="image/*"
+                        className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-[#5FAFB8] file:text-white hover:file:bg-[#4A9BA4] transition-all cursor-pointer"
+                      />
 
-                      {/* Nuevas Imágenes */}
-                      {galleryPreviews.map((url, idx) => (
-                        <div key={`new-${idx}`} className="relative group aspect-square">
-                          <img src={url} alt="Nueva" className="w-full h-full object-cover rounded shadow-sm border-2 border-green-200" />
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryImage(idx, false)}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                          >✕</button>
+                      {/* Grid de Previsualización */}
+                      {(existingGalleryImages.length > 0 || galleryPreviews.length > 0) && (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+                          {/* Imágenes Existentes */}
+                          {existingGalleryImages.map((url, idx) => (
+                            <div key={`existing-${idx}`} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                              <img src={url} alt="Galeria" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                              <button
+                                type="button"
+                                onClick={() => removeGalleryImage(idx, true)}
+                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all shadow-md"
+                                title="Eliminar imagen"
+                              >✕</button>
+                              <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] p-1 text-center opacity-0 group-hover:opacity-100 transition-opacity">Existente</div>
+                            </div>
+                          ))}
+
+                          {/* Nuevas Imágenes */}
+                          {galleryPreviews.map((url, idx) => (
+                            <div key={`new-${idx}`} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-[#5FAFB8] shadow-sm">
+                              <img src={url} alt="Nueva" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                              <button
+                                type="button"
+                                onClick={() => removeGalleryImage(idx, false)}
+                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all shadow-md"
+                                title="Eliminar imagen"
+                              >✕</button>
+                              <div className="absolute bottom-0 left-0 right-0 bg-[#5FAFB8] text-white text-[10px] p-1 text-center font-bold">Nueva</div>
+                            </div>
+                          ))}
                         </div>
+                      )}
+                    </div>
+                  </>
+                ) : field.type === 'select' ? (
+                  <div className="relative">
+                    <select
+                      id={field.name}
+                      name={field.name}
+                      value={formData[field.name] || ''}
+                      onChange={handleChange}
+                      required={field.required}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none appearance-none bg-white font-medium text-gray-700"
+                    >
+                      <option value="">Seleccione una categoría</option>
+                      {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                     </div>
                   </div>
-                </>
-              ) : field.type === 'select' ? (
-                <select
-                  id={field.name}
-                  name={field.name}
-                  value={formData[field.name] || ''}
-                  onChange={handleChange}
-                  required={field.required}
-                >
-                  <option value="">Seleccione una categoría</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-              ) : field.type === 'checkbox' ? (
-                <div className="flex items-center gap-2 mt-1">
+                ) : field.type === 'checkbox' ? (
+                  <div className="flex items-start gap-3 mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => {
+                    // Hack para permitir click en todo el contenedor
+                    const checkbox = document.getElementById(field.name);
+                    if (checkbox) checkbox.click();
+                  }}>
+                    <div className="flex items-center h-5">
+                      <input
+                        type="checkbox"
+                        id={field.name}
+                        name={field.name}
+                        checked={formData[field.name] || false}
+                        onChange={handleChange}
+                        onClick={(e) => e.stopPropagation()} // Evitar doble evento
+                        className="w-5 h-5 text-[#5FAFB8] border-gray-300 rounded focus:ring-[#5FAFB8] cursor-pointer"
+                      />
+                    </div>
+                    <div className="ml-2 text-sm">
+                      <label htmlFor={field.name} className="font-bold text-gray-700 cursor-pointer select-none">{field.label}</label>
+                      {field.name === 'price_on_request' && (
+                        <p className="text-gray-500 text-xs mt-0.5">
+                          {formData.price_on_request
+                            ? "✅ El precio se ocultará. El cliente verá un botón de 'Consultar Precio'."
+                            : "Si activas esto, el precio numérico se ignorará en la tienda."}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
                   <input
-                    type="checkbox"
+                    type={field.type}
                     id={field.name}
                     name={field.name}
-                    checked={formData[field.name] || false}
+                    value={formData[field.name] || ''}
                     onChange={handleChange}
-                    className="w-5 h-5 accent-[var(--color-primary)] cursor-pointer"
+                    required={field.name === 'price' && formData.price_on_request ? false : field.required}
+                    disabled={field.name === 'price' && formData.price_on_request}
+                    placeholder={field.name === 'price' && formData.price_on_request ? "Precio oculto (Consultar Precio activo)" : ""}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none transition-all ${field.name === 'price' && formData.price_on_request
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed italic'
+                      : 'border-gray-300 font-medium'
+                      }`}
                   />
-                  <span className="text-sm text-gray-600 italic">
-                    {field.name === 'price_on_request' && formData.price_on_request
-                      ? "✨ El precio se guardará internamente pero no se mostrará al cliente."
-                      : ""}
-                  </span>
-                </div>
-              ) : (
-                <input
-                  type={field.type}
-                  id={field.name}
-                  name={field.name}
-                  value={formData[field.name] || ''}
-                  onChange={handleChange}
-                  required={field.name === 'price' && formData.price_on_request ? false : field.required}
-                  disabled={field.name === 'price' && formData.price_on_request}
-                  placeholder={field.name === 'price' && formData.price_on_request ? "Precio oculto (Consultar Precio activo)" : ""}
-                />
-              )}
+                )}
+              </div>
+            ))}
+
+            <div className="pt-4 border-t border-gray-100 mt-8">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#5FAFB8] hover:bg-[#4A9BA4] text-white font-bold py-4 px-6 rounded-xl shadow-md hover:shadow-lg transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Guardando...
+                  </>
+                ) : (
+                  <>{productId ? '💾 Guardar Cambios' : '✨ Crear Producto'}</>
+                )}
+              </button>
             </div>
-          ))}
-          <button type="submit" disabled={loading} className={styles.saveButton}>
-            {loading ? 'Guardando...' : 'Guardar Producto'}
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
