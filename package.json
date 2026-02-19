@@ -17,7 +17,10 @@
     "check:rls": "node scripts/check-rls.js",
     "lint:migrations": "node scripts/lint-migrations.js",
     "test:security": "node tests/test-public-security.js",
-    "validate:all": "npm run lint:migrations && npm run check:rls && npm run test:security && npm run build"
+    "validate:all": "npm run lint:migrations && npm run check:rls && npm run test:security && npm run build",
+    "backup:db": "node scripts/backup-database.js",
+    "backup:config": "node scripts/backup-config.js",
+    "backup:all": "npm run backup:db && npm run backup:config"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",

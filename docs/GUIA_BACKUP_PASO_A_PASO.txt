@@ -1,0 +1,365 @@
+================================================================================
+                    GUÍA DE BACKUP PARA NO PROGRAMADORES
+                         Proyecto Clicando - MVP
+================================================================================
+
+ÍNDICE
+------
+1. ¿Qué es un backup y por qué lo necesito?
+2. ¿Qué se va a respaldar?
+3. Las herramientas creadas (explicación simple)
+4. Paso a paso: Crear proyecto "clicando-backup" en Supabase
+5. Paso a paso: Backup del código en GitHub
+6. Paso a paso: Backup del código en tu computadora
+7. Cómo mantener la periodicidad (recordatorios)
+8. Preguntas frecuentes
+
+================================================================================
+1. ¿QUÉ ES UN BACKUP Y POR QUÉ LO NECESITO?
+================================================================================
+
+Un backup es una COPIA DE SEGURIDAD. Es como sacar fotocopias de documentos 
+importantes y guardarlas en otro lugar.
+
+¿Por qué necesitas backups?
+- Si borras algo importante por error
+- Si alguien hackea tu sistema
+- Si Supabase tiene un problema (aunque es muy confiable)
+- Si quieres volver a una versión anterior de tu proyecto
+
+IMPORTANTE: El plan gratuito de Supabase NO incluye backups automáticos.
+Por eso necesitamos hacerlos manualmente.
+
+================================================================================
+2. ¿QUÉ SE VA A RESPALDAR?
+================================================================================
+
+Tu proyecto tiene DOS partes principales que necesitan backup:
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PARTE 1: BASE DE DATOS (en Supabase)                                       │
+│  - Información de tiendas                                                    │
+│  - Productos de cada tienda                                                  │
+│  - Clientes y leads                                                          │
+│  - Configuraciones                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PARTE 2: CÓDIGO FUENTE (en GitHub y tu computadora)                        │
+│  - El "programa" que hace funcionar la web                                   │
+│  - Diseño y estilos                                                          │
+│  - Configuraciones (SIN las claves secretas)                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+3. LAS HERRAMIENTAS CREADAS (EXPLICACIÓN SIMPLE)
+================================================================================
+
+He creado 4 herramientas para ayudarte:
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ HERRAMIENTA 1: Script de backup de base de datos                            │
+│ Archivo: scripts/backup-database.js                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ¿Qué hace?                                                                  │
+│ - Se conecta a tu base de datos en Supabase                                 │
+│ - Descarga toda la información a archivos JSON                              │
+│ - Guarda todo en la carpeta "backups/db/"                                   │
+│                                                                             │
+│ ¿Cómo se usa?                                                               │
+│ - Abres una terminal en VS Code                                             │
+│ - Escribes: npm run backup:db                                               │
+│ - Esperas a que termine (unos segundos)                                     │
+│                                                                             │
+│ ¿Cuándo usarlo?                                                             │
+│ - Una vez por semana (mínimo)                                               │
+│ - Antes de hacer cambios importantes                                        │
+│ - Antes de actualizar el sistema                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ HERRAMIENTA 2: Script de backup de configuración                            │
+│ Archivo: scripts/backup-config.js                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ¿Qué hace?                                                                  │
+│ - Resguarda tus archivos de configuración local                             │
+│ - Guarda copias de tus archivos .env (con claves secretas)                  │
+│ - Verifica que no estés subiendo secretos al repo                           │
+│                                                                             │
+│ ¿Cómo se usa?                                                               │
+│ - En la terminal escribes: npm run backup:config                            │
+│                                                                             │
+│ ¿Cuándo usarlo?                                                             │
+│ - Cuando cambies configuraciones                                            │
+│ - Antes de formatear tu computadora                                         │
+│ - Una vez al mes                                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ HERRAMIENTA 3: Workflow de GitHub (automático)                              │
+│ Archivo: .github/workflows/backup.yml                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ¿Qué hace?                                                                  │
+│ - Se activa SOLO cuando subes código a GitHub                               │
+│ - Verifica que no estés subiendo archivos sensibles                         │
+│ - Crea una "foto" del código cada vez que haces cambios                     │
+│                                                                             │
+│ ¿Tienes que hacer algo?                                                     │
+│ - NO, funciona automáticamente                                              │
+│ - Solo asegúrate de subir código regularmente a GitHub                      │
+│                                                                             │
+│ ¿Qué es un "workflow"?                                                      │
+│ - Es una lista de tareas que GitHub ejecuta automáticamente                │
+│ - Como un robot que revisa tu trabajo                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ HERRAMIENTA 4: Skill de backup (guía para IA)                               │
+│ Archivo: .agent/skills/backup-recovery/SKILL.md                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ¿Qué hace?                                                                  │
+│ - Es una "memoria" para la IA que te ayuda                                  │
+│ - Contiene las instrucciones de cómo hacer backups                          │
+│ - Cuando preguntes sobre backups, la IA consultará este archivo             │
+│                                                                             │
+│ ¿Tienes que usarlo?                                                         │
+│ - No directamente, es para que la IA te ayuda mejor                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+4. PASO A PASO: CREAR PROYECTO "CLICANDO-BACKUP" EN SUPABASE
+================================================================================
+
+Este proyecto paralelo servirá como "lugar seguro" para guardar copias de tu 
+base de datos principal.
+
+PASO 1: Crear el proyecto backup
+--------------------------------
+1. Ve a https://supabase.com y entra a tu cuenta
+2. Haz clic en "New Project" (Nuevo Proyecto)
+3. Llámalo "clicando-backup" o "clicando-respaldo"
+4. Elige una contraseña FUERTE para la base de datos (guárdala bien)
+5. Elige la región más cercana (probablemente same que tu proyecto principal)
+6. Espera unos minutos a que se cree (toma 2-3 minutos)
+
+PASO 2: Anotar las credenciales del nuevo proyecto
+---------------------------------------------------
+Una vez creado, ve a Settings → API y anota:
+- Project URL (la dirección del proyecto)
+- anon public key (la clave pública)
+
+Guárdalas en un lugar seguro (puedes usar un gestor de contraseñas como 
+Bitwarden o LastPass, o un archivo en tu Google Drive personal).
+
+PASO 3: Ejecutar las migraciones en el proyecto backup
+-------------------------------------------------------
+Para que el proyecto backup tenga la misma estructura que el principal:
+
+1. Ve a SQL Editor en el proyecto backup
+2. Abre los archivos SQL de tu carpeta "sql/" en orden numérico:
+   - 01_create_base_tables.sql
+   - 02_create_stores_multitenant.sql
+   - 03_implement_rls.sql
+   - ... etc.
+3. Copia el contenido de cada archivo y ejecútalo en el SQL Editor
+4. Haz esto en ORDEN (del 01 al 28)
+
+PASO 4: Hacer el backup (copiar datos del principal al backup)
+---------------------------------------------------------------
+Opción A: Usando el script (más fácil)
+1. En tu terminal, ejecuta: npm run backup:db
+2. Esto crea archivos JSON en backups/db/data/
+3. Luego puedes importar esos datos al proyecto backup
+
+Opción B: Exportar desde Supabase (más completo)
+1. Ve a tu proyecto PRINCIPAL en Supabase
+2. Entra a Table Editor
+3. Para cada tabla importante, haz clic en "Export" → "CSV"
+4. Guarda los CSVs en una carpeta segura
+5. En el proyecto BACKUP, usa "Import" para subir los CSVs
+
+FRECUENCIA RECOMENDADA:
+- Una vez por semana
+- Siempre antes de hacer cambios importantes
+- Después de agregar muchos productos nuevos
+
+================================================================================
+5. PASO A PASO: BACKUP DEL CÓDIGO EN GITHUB
+================================================================================
+
+Tu código ya está en GitHub, pero aquí te explico cómo tener MEJORES respaldos.
+
+OPCIÓN A: Crear un repositorio de backup separado
+-------------------------------------------------
+1. Ve a GitHub.com y entra a tu cuenta
+2. Haz clic en "New repository"
+3. Llámalo "clicando-backup-codigo"
+4. Márcalo como PRIVATE (privado) para mayor seguridad
+5. No inicialices con README (dejarlo vacío)
+
+Para copiar tu código al nuevo repo:
+1. En tu terminal local, ve a la carpeta del proyecto
+2. Agrega el nuevo repositorio como "remote":
+   git remote add backup https://github.com/TU-USUARIO/clicando-backup-codigo.git
+3. Sube el código:
+   git push backup main
+
+OPCIÓN B: Usar branches (ramas) de respaldo
+--------------------------------------------
+Una "branch" es como una línea de tiempo paralela de tu código.
+
+Crear una branch de respaldo antes de cambios importantes:
+1. En tu terminal:
+   git checkout -b backup/antes-de-cambio-FECHA
+   (reemplaza FECHA con la fecha real, ej: 2026-02-19)
+2. Sube la branch:
+   git push origin backup/antes-de-cambio-2026-02-19
+
+OPCIÓN C: Usar tags (etiquetas de versión)
+-------------------------------------------
+Un "tag" es como una foto instantánea de tu código en un momento dado.
+
+Crear un tag:
+1. En tu terminal:
+   git tag -a v1.0 -m "Versión estable - Febrero 2026"
+2. Sube el tag:
+   git push origin v1.0
+
+RECOMENDACIÓN: Usa las tres opciones para máxima seguridad.
+
+================================================================================
+6. PASO A PASO: BACKUP DEL CÓDIGO EN TU COMPUTADORA
+================================================================================
+
+Además de GitHub, es bueno tener copias locales.
+
+OPCIÓN A: Copiar la carpeta completa
+-------------------------------------
+1. Cierra VS Code y cualquier programa usando la carpeta
+2. Ve a la carpeta del proyecto en el Explorador de Windows
+3. Copia toda la carpeta "tienda-online-mvp"
+4. Pégala en otro lugar (otra carpeta, disco externo, etc.)
+5. Renómbrala agregando la fecha: "tienda-online-mvp-backup-2026-02-19"
+
+OPCIÓN B: Usar el script de backup de configuración
+----------------------------------------------------
+1. En la terminal:
+   npm run backup:config
+2. Esto guarda tus archivos .env en backups/config/secrets/
+3. Copia esa carpeta a un lugar seguro
+
+OPCIÓN C: Sincronizar con Google Drive / Dropbox
+-------------------------------------------------
+1. Mueve tu carpeta de proyecto dentro de Google Drive o Dropbox
+2. O crea una carpeta "backups-clicando" y copia ahí los backups periódicamente
+3. La sincronización automática te da versiones históricas
+
+================================================================================
+7. CÓMO MANTENER LA PERIODICIDAD (RECORDATORIOS)
+================================================================================
+
+El mayor enemigo de los backups es el olvido. Aquí estrategias:
+
+ESTRATEGIA 1: Recordatorios en el calendario
+--------------------------------------------
+- Crea un evento recurrente en Google Calendar
+- Título: "Backup Clicando"
+- Frecuencia: Cada domingo a las 10am
+- Agrega un recordatorio por email y notificación
+
+ESTRATEGIA 2: Checklist semanal
+-------------------------------
+Crea una lista de verificación simple:
+
+□ Ejecutar npm run backup:db
+□ Verificar que se crearon archivos en backups/db/
+□ Copiar carpeta backups/ a Google Drive
+□ Verificar que el código está actualizado en GitHub
+
+ESTRATEGIA 3: Antes de cada cambio importante
+---------------------------------------------
+Haz backup SIEMPRE antes de:
+- Agregar nuevas funcionalidades
+- Cambiar cómo funciona el sistema
+- Actualizar dependencias (npm update)
+- Modificar la base de datos
+- Dar acceso a otra persona
+
+ESTRATEGIA 4: Automatización con GitHub
+---------------------------------------
+El workflow que creé ya hace verificaciones automáticas.
+Solo asegúrate de:
+- Subir código a GitHub regularmente (git push)
+- Revisar los emails de GitHub si hay alertas
+
+================================================================================
+8. PREGUNTAS FRECUENTES
+================================================================================
+
+P: ¿Cuánto tiempo toma hacer un backup?
+R: El script de base de datos toma unos 10-30 segundos. Copiar la carpeta 
+   completa puede tomar 1-2 minutos.
+
+P: ¿Dónde guardo los backups?
+R: En varios lugares para máxima seguridad:
+   - Carpeta "backups/" del proyecto (local)
+   - Google Drive o Dropbox (nube personal)
+   - Proyecto backup en Supabase (base de datos)
+   - Repositorio backup en GitHub (código)
+
+P: ¿Qué pasa si pierdo mi computadora?
+R: Si tienes los backups en:
+   - GitHub: Todo el código está a salvo
+   - Supabase backup: Los datos están a salvo
+   - Solo perderías configuraciones locales (.env), pero puedes recrearlas
+
+P: ¿Puedo automatizar todo esto?
+R: Parcialmente. El plan gratuito de Supabase no permite backups automáticos.
+   Pero el workflow de GitHub ya verifica tu código automáticamente.
+   Para la base de datos, necesitas ejecutar el script manualmente.
+
+P: ¿Qué archivos NO debo subir nunca a GitHub?
+R: Archivos con claves y secretos:
+   - .env
+   - .env.local
+   - .env.production
+   - Cualquier archivo con contraseñas o claves API
+   
+   El .gitignore ya está configurado para bloquearlos, pero es bueno saberlo.
+
+P: ¿Cómo sé si mi backup funcionó?
+R: 
+   1. Revisa que existan archivos en backups/db/data/ con fecha reciente
+   2. Abre un archivo JSON y verifica que tenga datos reales
+   3. El script te muestra un resumen al terminar
+
+P: ¿Puedo recuperar un solo producto o tienda?
+R: Sí. Los backups en JSON contienen todos los datos. Puedes abrirlos, 
+   buscar lo que necesitas y restaurarlo manualmente en Supabase.
+
+================================================================================
+                           RESUMEN RÁPIDO
+================================================================================
+
+COMANDOS ESENCIALES:
+--------------------
+npm run backup:db        → Backup de base de datos
+npm run backup:config    → Backup de configuraciones
+npm run backup:all       → Ambos backups juntos
+
+FRECUENCIA MÍNIMA:
+------------------
+- Base de datos: Cada semana
+- Código: Cada vez que hagas push a GitHub (automático)
+- Configuración local: Cada mes o antes de formatear
+
+UBICACIONES DE BACKUP:
+----------------------
+- Local: carpeta "backups/" del proyecto
+- Nube personal: Google Drive / Dropbox
+- Base de datos: Proyecto "clicando-backup" en Supabase
+- Código: GitHub (repo principal + repo backup opcional)
+
+================================================================================
+                    ¡LISTO! Con esto tu MVP está protegido.
+================================================================================

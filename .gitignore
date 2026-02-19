@@ -9,6 +9,7 @@
 !AUDIT_REPORT.md
 !STOCK*.md
 !reporte-motor-stock.md
+!docs/PLAN_BACKUP.md
 
 # Supabase structural migrations (KEEP THESE)
 !supabase/migrations/*.sql
@@ -45,3 +46,7 @@ npm-debug.log*
 .opencode/
 supabase/.temp
 captura*.png
+
+# Backups - NUNCA subir al repo (contiene datos sensibles)
+backups/
+!.gitkeep

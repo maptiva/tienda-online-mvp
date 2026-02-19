@@ -1,0 +1,204 @@
+# ============================================
+# Workflow de Backup - Clicando MVP
+# ============================================
+# 
+# Este workflow crea backups automáticos del código
+# y verifica que la configuración esté correcta.
+#
+# NOTA: Los backups de BD se hacen manualmente con
+# npm run backup:db (ver docs/PLAN_BACKUP.md)
+#
+# ============================================
+
+name: Backup & Safety Check
+
+on:
+  # Ejecutar manualmente
+  workflow_dispatch:
+    inputs:
+      create_tag:
+        description: 'Crear tag de versión'
+        required: false
+        default: 'false'
+        type: boolean
+      tag_name:
+        description: 'Nombre del tag (ej: v0.1.0)'
+        required: false
+        type: string
+
+  # Ejecutar antes de merges a main
+  push:
+    branches: [ 'main' ]
+
+  # Ejecutar en PRs a main
+  pull_request:
+    branches: [ 'main' ]
+
+jobs:
+  safety-check:
+    name: 🔒 Safety Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for sensitive files
+        run: |
+          echo "🔍 Verificando que no haya archivos sensibles..."
+          
+          # Archivos que NUNCA deben estar en el repo
+          SENSITIVE_FILES=(
+            ".env"
+            ".env.local"
+            ".env.production"
+            ".env.development"
+            "schema.sql"
+            "schema_sql.json"
+          )
+          
+          FOUND=0
+          for file in "${SENSITIVE_FILES[@]}"; do
+            if [ -f "$file" ]; then
+              echo "❌ ERROR: Archivo sensible encontrado: $file"
+              FOUND=1
+            fi
+          done
+          
+          if [ $FOUND -eq 1 ]; then
+            echo "::error::Se encontraron archivos sensibles en el repositorio"
+            exit 1
+          fi
+          
+          echo "✅ No se encontraron archivos sensibles"
+
+      - name: Check .gitignore patterns
+        run: |
+          echo "🔍 Verificando .gitignore..."
+          
+          REQUIRED_PATTERNS=(
+            ".env"
+            ".env.local"
+            ".env.*.local"
+            "backups/"
+          )
+          
+          for pattern in "${REQUIRED_PATTERNS[@]}"; do
+            if ! grep -q "$pattern" .gitignore; then
+              echo "⚠️  ADVERTENCIA: Patrón '$pattern' no encontrado en .gitignore"
+            else
+              echo "✅ Patrón '$pattern' presente en .gitignore"
+            fi
+          done
+
+      - name: Verify .env.template exists
+        run: |
+          if [ -f ".env.template" ]; then
+            echo "✅ .env.template existe"
+          else
+            echo "⚠️  .env.template no existe - crear para documentar variables necesarias"
+          fi
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "🔍 Buscando posibles secrets hardcodeados..."
+          
+          # Buscar patrones sospechosos en archivos de código
+          SUSPICIOUS=$(grep -r --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" \
+            -E "(supabase\.co|anon_key|service_role|password|secret|api_key)" \
+            --exclude-dir=node_modules \
+            --exclude-dir=dist \
+            . 2>/dev/null | grep -v "process.env" | grep -v "import.meta.env" | grep -v "// " | grep -v "/\*" || true)
+          
+          if [ -n "$SUSPICIOUS" ]; then
+            echo "⚠️  Posibles valores hardcodeados encontrados:"
+            echo "$SUSPICIOUS"
+            echo ""
+            echo "💡 Revisar que no sean secrets reales"
+          else
+            echo "✅ No se encontraron secrets hardcodeados"
+          fi
+
+  create-backup-branch:
+    name: 📦 Create Backup Branch
+    runs-on: ubuntu-latest
+    needs: safety-check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Create backup branch
+        run: |
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          BACKUP_BRANCH="backup/auto-${TIMESTAMP}"
+          
+          # Crear branch de backup
+          git branch "$BACKUP_BRANCH"
+          git push origin "$BACKUP_BRANCH"
+          
+          echo "✅ Branch de backup creado: $BACKUP_BRANCH"
+
+  create-version-tag:
+    name: 🏷️ Create Version Tag
+    runs-on: ubuntu-latest
+    needs: safety-check
+    if: github.event.inputs.create_tag == 'true'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Create and push tag
+        run: |
+          TAG_NAME="${{ github.event.inputs.tag_name }}"
+          
+          if [ -z "$TAG_NAME" ]; then
+            echo "❌ Error: tag_name es requerido"
+            exit 1
+          fi
+          
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME - $(date +%Y-%m-%d)"
+          git push origin "$TAG_NAME"
+          
+          echo "✅ Tag creado: $TAG_NAME"
+
+  cleanup-old-backups:
+    name: 🧹 Cleanup Old Backups
+    runs-on: ubuntu-latest
+    needs: safety-check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List and optionally cleanup old backup branches
+        run: |
+          echo "📋 Branches de backup existentes:"
+          git branch -r | grep "backup/auto-" || echo "No hay branches de backup"
+          
+          # Mantener solo los últimos 10 backups
+          # (descomentar para activar limpieza automática)
+          # BACKUP_BRANCHES=$(git branch -r | grep "backup/auto-" | sort -r | tail -n +11)
+          # for branch in $BACKUP_BRANCHES; do
+          #   echo "Eliminando branch antiguo: $branch"
+          #   git push origin --delete "${branch#origin/}"
+          # done
