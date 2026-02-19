@@ -48,7 +48,6 @@ const AdminLayout = () => {
     <div className="admin-root-container">
       <MasterModeBanner />
       <div className="admin-wrapper">
-        {/* Botón Hamburguesa (solo visible en móvil) */}
         <button
           className={`hamburger-button ${isMobileMenuOpen ? 'open' : ''}`}
           onClick={toggleMobileMenu}
@@ -61,16 +60,13 @@ const AdminLayout = () => {
           </div>
         </button>
 
-        {/* Overlay oscuro (solo visible cuando el menú está abierto en móvil) */}
         <div
           className={`mobile-overlay ${isMobileMenuOpen ? 'active' : ''}`}
           onClick={closeMobileMenu}
         />
 
-        {/* Sidebar */}
         <AsideBar isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
 
-        {/* Contenido principal */}
         <main className="admin-content">
           <Outlet />
         </main>

@@ -2,10 +2,15 @@
 .formContainer {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Align to top, not center vertically */
-  min-height: calc(100vh - 60px); /* Adjust for header if any */
+  align-items: flex-start;
   padding: 20px;
-  background-color: #f0f2f5;
+  flex: 1;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.formContainer::-webkit-scrollbar {
+  display: none;
 }
 
 .productFormBox {
