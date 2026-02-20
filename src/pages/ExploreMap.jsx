@@ -85,21 +85,7 @@ const MapFitBounds = ({ stores, selectedCity }) => {
     const map = useMap();
     useEffect(() => {
         if (stores && stores.length > 0) {
-            let storesToFit = stores;
-
-            // Si no hay ciudad seleccionada o término de búsqueda, priorizamos Chajarí para que se vea el "músculo" local
-            if (!selectedCity) {
-                const chajariStores = stores.filter(s =>
-                    s.city?.toLowerCase() === 'chajarí' ||
-                    s.city?.toLowerCase() === 'chajari'
-                );
-                // Si hay tiendas en Chajarí, enfocamos el zoom inicial ahí
-                if (chajariStores.length > 0) {
-                    storesToFit = chajariStores;
-                }
-            }
-
-            const bounds = L.latLngBounds(storesToFit.map(s => [s.latitude, s.longitude]));
+            const bounds = L.latLngBounds(stores.map(s => [s.latitude, s.longitude]));
             // Ajuste de padding y zoom para móvil: más cerca y con menos margen innecesario
             const isMobile = window.innerWidth < 768;
             const padding = isMobile ? [80, 40] : [20, 20];
@@ -207,6 +193,7 @@ const ExploreMap = () => {
             // Overrides manuales para corregir datos genéricos de la BD
             if (cat.id === 'Farmacia') emoji = '🧴';
             if (cat.id === 'Artesanías') emoji = '🏺';
+            if (cat.id === 'Diseño' || cat.label === 'Diseño') emoji = '🎨';
 
             // Usamos ID como clave porque las tiendas guardan el ID (ej: "Juguetería") NO la label ("Jugueterías")
             map[cat.id] = {
