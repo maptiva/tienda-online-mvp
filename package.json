@@ -20,13 +20,15 @@
     "validate:all": "npm run lint:migrations && npm run check:rls && npm run test:security && npm run build",
     "backup:db": "node scripts/backup-database.js",
     "backup:config": "node scripts/backup-config.js",
-    "backup:all": "npm run backup:db && npm run backup:config"
+    "backup:all": "npm run backup:db && npm run backup:config",
+    "import:products": "node scripts/importarProductos.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "browser-image-compression": "^2.0.2",
+    "csv-parse": "^6.1.0",
     "framer-motion": "^12.27.5",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.1.0",

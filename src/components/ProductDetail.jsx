@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { useProductById } from '../hooks/useProductById';
 import styles from './ProductDetail.module.css';
-import placeholder from '../assets/placeholder.jpg';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import SEO from './shared/SEO';
@@ -62,10 +61,12 @@ const ProductDetail = () => {
     );
   }
 
-  const imageUrl = product.image_url || placeholder;
+  const imageUrl = product.image_url;
 
   // Combinar imagen principal y galería
-  const allImages = [imageUrl, ...(product.gallery_images || [])].filter(Boolean);
+  const allImages = imageUrl
+    ? [imageUrl, ...(product.gallery_images || [])].filter(Boolean)
+    : [...(product.gallery_images || [])].filter(Boolean);
 
   const displayImage = selectedImage || imageUrl;
 
@@ -151,15 +152,24 @@ const ProductDetail = () => {
           {/* Imagen Principal */}
           <div
             className="w-full relative rounded-xl overflow-hidden mb-4 shadow-sm cursor-pointer"
-            onClick={() => setIsLightboxOpen(true)}
-            title="Click para ampliar"
+            onClick={() => imageUrl && setIsLightboxOpen(true)}
+            title={imageUrl ? "Click para ampliar" : "Sin imagen disponible"}
           >
-            <img
-              src={displayImage}
-              alt={product.name}
-              className="w-full h-auto object-contain transition-transform duration-300 hover:scale-[1.02]"
-              onError={(e) => { e.target.onerror = null; e.target.src = placeholder; }}
-            />
+            {imageUrl ? (
+              <img
+                src={displayImage}
+                alt={product.name}
+                className="w-full h-auto object-contain transition-transform duration-300 hover:scale-[1.02]"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.parentElement.innerHTML = '<div class="w-full aspect-square flex items-center justify-center bg-gray-100 dark:bg-slate-700"><span class="text-gray-400 dark:text-gray-500 text-lg font-medium">Sin Imagen</span></div>';
+                }}
+              />
+            ) : (
+              <div className="w-full aspect-square flex items-center justify-center bg-gray-100 dark:bg-slate-700">
+                <span className="text-gray-400 dark:text-gray-500 text-lg font-medium">Sin Imagen</span>
+              </div>
+            )}
           </div>
 
           {/* Galería de Miniaturas (Solo si hay más de 1 imagen) */}
@@ -315,7 +325,7 @@ const ProductDetail = () => {
       </div>
 
       {/* Visualizador de Imagen a Pantalla Completa (Lightbox) */}
-      {isLightboxOpen && (
+      {isLightboxOpen && displayImage && (
         <div
           className="fixed inset-0 z-[10000] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out animate-in fade-in duration-300"
           onClick={() => setIsLightboxOpen(false)}
