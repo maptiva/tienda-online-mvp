@@ -58,6 +58,9 @@ const CategoriaList: React.FC<CategoriaListProps> = ({ userId }) => {
   }, [categories]);
 
   const handleCategoryClick = (category: Category | null) => {
+    // Scroll al inicio de la página al cambiar de categoría
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (category === null) {
       clearCategoryActive();
     } else {
