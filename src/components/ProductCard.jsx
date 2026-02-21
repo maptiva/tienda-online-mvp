@@ -7,6 +7,7 @@ import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import StockBadge from '../modules/inventory/components/StockBadge';
 import { useStock } from '../modules/inventory/hooks/useStock';
 import Swal from 'sweetalert2';
+import ProductImage from './shared/ProductImage';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -68,22 +69,12 @@ const ProductCard = ({ product }) => {
       {/* Imagen: llega hasta los bordes, esquinas superiores redondeadas */}
       <Link to={`/${storeName}/product/${product.id}`} className='block'>
         <div className="w-full aspect-square overflow-hidden flex items-center justify-center bg-gray-100">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentElement.classList.add('bg-gray-100');
-                e.target.parentElement.innerHTML = '<span class="text-gray-400 text-sm font-medium">Sin Imagen</span>';
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-slate-700">
-              <span className="text-gray-400 dark:text-gray-500 text-sm font-medium">Sin Imagen</span>
-            </div>
-          )}
+          <ProductImage
+            src={imageUrl}
+            alt={product.name}
+            size="medium"
+            showHoverEffect={true}
+          />
         </div>
       </Link>
 

@@ -5,6 +5,7 @@ import styles from './ProductDetail.module.css';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import SEO from './shared/SEO';
+import ProductImage from './shared/ProductImage';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import StockBadge from '../modules/inventory/components/StockBadge';
@@ -155,21 +156,13 @@ const ProductDetail = () => {
             onClick={() => imageUrl && setIsLightboxOpen(true)}
             title={imageUrl ? "Click para ampliar" : "Sin imagen disponible"}
           >
-            {imageUrl ? (
-              <img
-                src={displayImage}
-                alt={product.name}
-                className="w-full h-auto object-contain transition-transform duration-300 hover:scale-[1.02]"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = '<div class="w-full aspect-square flex items-center justify-center bg-gray-100 dark:bg-slate-700"><span class="text-gray-400 dark:text-gray-500 text-lg font-medium">Sin Imagen</span></div>';
-                }}
-              />
-            ) : (
-              <div className="w-full aspect-square flex items-center justify-center bg-gray-100 dark:bg-slate-700">
-                <span className="text-gray-400 dark:text-gray-500 text-lg font-medium">Sin Imagen</span>
-              </div>
-            )}
+            <ProductImage
+              src={displayImage}
+              alt={product.name}
+              size="large"
+              showHoverEffect={false}
+              className="rounded-xl"
+            />
           </div>
 
           {/* Galería de Miniaturas (Solo si hay más de 1 imagen) */}
