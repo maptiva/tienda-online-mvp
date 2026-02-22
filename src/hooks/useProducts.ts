@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
-import { useProductStore } from '../store/useProductStore';
 import { productSchema, type Product } from '../schemas/product.schema';
 import { safeValidate } from '../utils/zodHelpers';
 
@@ -14,74 +13,53 @@ export interface UseProductsReturn {
     error: string | null;
 }
 
+/**
+ * Hook para obtener productos usando TanStack Query
+ * 
+ * Beneficios sobre el cache manual con Zustand:
+ * - Revalidación automática al volver a la pestaña (refetchOnWindowFocus)
+ * - Revalidación al reconectar (refetchOnReconnect)
+ * - Stale-while-revalidate built-in
+ * - DevTools para debugging
+ * - Eliminación de código manual de focus listeners
+ */
 export const useProducts = (userId?: string): UseProductsReturn => {
     const { user, impersonatedUser } = useAuth();
 
     // Determinar el ID objetivo (Tienda pública, usuario impersonado o logueado)
     const targetId = userId || impersonatedUser || user?.id;
 
-    const { getProducts, setProducts } = useProductStore();
-    const cacheEntry = targetId ? getProducts(targetId) : null;
-    const cachedProducts = cacheEntry?.data;
-    const isStale = cacheEntry?.isStale;
+    const { data: products, isLoading, error } = useQuery({
+        queryKey: ['products', targetId],
+        queryFn: async () => {
+            if (!targetId) return [];
 
-    // Estado de carga inicial: solo cargando si NO hay nada (ni siquiera cache viejo)
-    const [loading, setLoading] = useState(!cachedProducts && !!targetId);
-    const [error, setError] = useState<string | null>(null);
+            const { data, error: fetchError } = await supabase
+                .from('products')
+                .select('*, categories(name)')
+                .eq('user_id', targetId)
+                .order('id', { ascending: true });
 
-    useEffect(() => {
-        if (!targetId) {
-            setLoading(false);
-            return;
-        }
+            if (fetchError) throw fetchError;
 
-        const fetchProducts = async () => {
-            try {
-                // Solo activamos loading visual si realmente no hay nada que mostrar
-                if (!cachedProducts) {
-                    setLoading(true);
-                }
+            // Validar datos de productos con Zod de forma silenciosa e informativa
+            const validatedData = (data || []).map((item, index) => {
+                const result = safeValidate(productSchema, item, `products[${index}]`);
+                return result.success ? result.data : item;
+            }) as Product[];
 
-                const { data, error: fetchError } = await supabase
-                    .from('products')
-                    .select('*, categories(name)')
-                    .eq('user_id', targetId)
-                    .order('id', { ascending: true });
+            return validatedData;
+        },
+        enabled: !!targetId,
+        staleTime: 60 * 1000, // 1 minuto - datos frescos
+        gcTime: 10 * 60 * 1000, // 10 minutos - mantener en cache
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+    });
 
-                if (fetchError) throw fetchError;
-
-                // Validar datos de productos con Zod de forma silenciosa e informativa
-                const validatedData = (data || []).map((item, index) => {
-                    const result = safeValidate(productSchema, item, `products[${index}]`);
-                    return result.success ? result.data : item;
-                }) as Product[];
-
-                setProducts(targetId, validatedData);
-                setError(null);
-            } catch (err) {
-                console.error("Error fetching products:", err);
-                setError(err instanceof Error ? err.message : 'Error desconocido');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        // 1. Fetch inicial (o revalidación si es stale)
-        fetchProducts();
-
-        // 2. Focus Revalidation: escuchamos cuando la ventana vuelve a estar activa (ej: al despertar PC)
-        const handleFocus = () => {
-            const currentEntry = getProducts(targetId);
-            if (currentEntry?.isStale) {
-                fetchProducts();
-            }
-        };
-
-        window.addEventListener('focus', handleFocus);
-        return () => window.removeEventListener('focus', handleFocus);
-
-    }, [targetId, setProducts]);
-
-    // Devolvemos lo del cache (aunque sea viejo/stale) para que la UI no parpadee en blanco
-    return { products: cachedProducts || [], loading, error };
+    return {
+        products: products || [],
+        loading: isLoading,
+        error: error?.message || null,
+    };
 };

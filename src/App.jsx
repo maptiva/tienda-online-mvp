@@ -1,5 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { queryClient } from './lib/queryClient';
 import './App.css';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
@@ -40,45 +43,48 @@ function App() {
 
 
   return (
-    <CartProvider>
-      <ScrollToTop />
-      <Suspense fallback={<LazyLoadFallback />}>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/mapa" element={<ExploreMap />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+    <QueryClientProvider client={queryClient}>
+      <CartProvider>
+        <ScrollToTop />
+        <Suspense fallback={<LazyLoadFallback />}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/mapa" element={<ExploreMap />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
-          <Route path="/:storeName" element={<PublicLayout />}>
-            <Route index element={<ProductList />} />
-            <Route path="product/:productId" element={<ProductDetail />} />
-          </Route>
-
-
-          <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="producto" element={<AdminDashboard />} />
-            <Route path="categoria" element={<CategoriaPage />} />
-            <Route path="settings" element={<StoreSettings />} />
-            <Route path="new" element={<ProductForm />} />
-            <Route path="edit/:productId" element={<ProductForm />} />
-            <Route path="precios" element={<BulkPriceUpdate />} />
-            <Route path="inventario" element={<InventoryPage />} />
-
-            {/* CRM Routes - PROTECTED BY SUPER ADMIN ROUTE */}
-            <Route path="crm" element={<SuperAdminRoute><Outlet /></SuperAdminRoute>}>
-              <Route index element={<CRMDashboard />} />
-              <Route path="clients" element={<Clients />} />
-              <Route path="leads" element={<Leads />} />
-              <Route path="payments" element={<Payments />} />
+            <Route path="/:storeName" element={<PublicLayout />}>
+              <Route index element={<ProductList />} />
+              <Route path="product/:productId" element={<ProductDetail />} />
             </Route>
-          </Route>
 
-          <Route path='*' element={<Error404 />} />
-        </Routes>
-      </Suspense>
-    </CartProvider>
+
+            <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="producto" element={<AdminDashboard />} />
+              <Route path="categoria" element={<CategoriaPage />} />
+              <Route path="settings" element={<StoreSettings />} />
+              <Route path="new" element={<ProductForm />} />
+              <Route path="edit/:productId" element={<ProductForm />} />
+              <Route path="precios" element={<BulkPriceUpdate />} />
+              <Route path="inventario" element={<InventoryPage />} />
+
+              {/* CRM Routes - PROTECTED BY SUPER ADMIN ROUTE */}
+              <Route path="crm" element={<SuperAdminRoute><Outlet /></SuperAdminRoute>}>
+                <Route index element={<CRMDashboard />} />
+                <Route path="clients" element={<Clients />} />
+                <Route path="leads" element={<Leads />} />
+                <Route path="payments" element={<Payments />} />
+              </Route>
+            </Route>
+
+            <Route path='*' element={<Error404 />} />
+          </Routes>
+        </Suspense>
+      </CartProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
 

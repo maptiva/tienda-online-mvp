@@ -1,17 +1,16 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProducts } from '../../hooks/useProducts';
 import { useCategories } from '../../hooks/categoria/useCategories';
 import { Loading } from '../../components/dashboard/Loading';
 import SearchBar from '../../components/SearchBar';
 import { supabase } from '../../services/supabase';
-import { useProductStore } from '../../store/useProductStore';
 import { useAuth } from '../../context/AuthContext';
 
 const BulkPriceUpdate = () => {
+    const queryClient = useQueryClient();
     const { products, loading: productsLoading, error: productsError } = useProducts();
     const { categories, loading: categoriesLoading } = useCategories();
-    // Necesitamos acceso directo al store y usuario para actualizar la UI sin recargar
-    const { setProducts } = useProductStore();
     const { user, impersonatedUser } = useAuth();
 
     // Determinar el ID objetivo (Usuario impersonado o logueado)
@@ -233,19 +232,9 @@ const BulkPriceUpdate = () => {
 
             setUpdateMessage({ type: 'success', text: `¡Visibilidad actualizada con éxito!` });
 
-            // Actualización optimista del Store para reflejar cambios sin recargar
-            if (targetId) {
-                const updatedProductsList = products.map(p => {
-                    const update = updates.find(u => u.id === p.id);
-                    if (update) {
-                        // Crear nuevo objeto fusionando datos
-                        // Nota: el update tiene 'id' y 'updated_at' también
-                        return { ...p, ...update };
-                    }
-                    return p;
-                });
-                setProducts(targetId, updatedProductsList);
-            }
+            // Invalidar cache de TanStack Query para forzar re-fetch
+            // Esto asegura que los datos se actualicen en toda la app
+            queryClient.invalidateQueries({ queryKey: ['products'] });
 
             setTimeout(() => setUpdateMessage(null), 5000);
 

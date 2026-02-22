@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useParams, useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import Header from './Header';
 import Footer from './Footer';
 import WhatsAppButton from './WhatsAppButton';
@@ -14,8 +15,18 @@ const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { storeName } = useParams();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { store, loading, error } = useStoreByName(storeName);
   const { stockEnabled } = useStoreConfig();
+
+  // Invalidar cache cuando cambia la tienda
+  useEffect(() => {
+    if (storeName) {
+      queryClient.invalidateQueries({ queryKey: ['storeConfig'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    }
+  }, [storeName, queryClient]);
 
   // Verificar si estamos en la página de lista de productos
   const isProductListPage = location.pathname === `/${storeName}` || location.pathname === `/${storeName}/`;
