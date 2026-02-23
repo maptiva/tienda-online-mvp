@@ -32,7 +32,7 @@ export const useStock = (productId: string | null, storeSlug?: string) => {
     const queryClient = useQueryClient();
 
     // Determinar el ID objetivo (Usuario impersonado o logueado)
-    const targetId = impersonatedUser || user?.id;
+    const targetId = impersonatedUser?.id || user?.id;
 
     // Query para obtener inventario
     const {

@@ -20,7 +20,7 @@ export const useCategories = (): UseCategoriesReturn => {
     const [error, setError] = useState<Error | null>(null);
 
     // Determinar el ID objetivo (Usuario impersonado o logueado)
-    const targetId = impersonatedUser || user?.id;
+    const targetId = impersonatedUser?.id || user?.id;
 
     useEffect(() => {
         if (!targetId) {

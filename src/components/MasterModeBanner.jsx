@@ -57,7 +57,7 @@ const MasterModeBanner = () => {
                 <div className="flex flex-col md:flex-row md:items-center gap-0 md:gap-2">
                     <span className="font-black uppercase tracking-tighter text-xs md:text-sm">MODO GESTIÓN MAESTRA ACTIVO</span>
                     <span className="hidden md:inline opacity-50">|</span>
-                    <span className="text-[10px] md:text-xs font-bold bg-white/20 px-2 py-0.5 rounded">ID: {impersonatedUser}</span>
+                    <span className="text-[10px] md:text-xs font-bold bg-white/20 px-2 py-0.5 rounded">🏪 {impersonatedUser.storeName}</span>
                 </div>
             </div>
 

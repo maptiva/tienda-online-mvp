@@ -13,7 +13,7 @@ function StoreSettings() {
   const { categories: shopCategories, loading: categoriesLoading } = useShopCategories();
 
   // Determinar el ID objetivo (Usuario impersonado o logueado)
-  const targetId = impersonatedUser || user?.id;
+  const targetId = impersonatedUser?.id || user?.id;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

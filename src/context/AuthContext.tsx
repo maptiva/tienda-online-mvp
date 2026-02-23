@@ -11,8 +11,8 @@ export interface AuthContextType {
     signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ data: any; error: AuthError | null }>;
     signIn: (credentials: SignInWithPasswordCredentials) => Promise<{ data: any; error: AuthError | null }>;
     signOut: () => Promise<{ error: AuthError | null }>;
-    impersonatedUser: string | null;
-    setImpersonatedUser: (userId: string | null) => void;
+    impersonatedUser: { id: string; storeName: string } | null;
+    setImpersonatedUser: (user: { id: string; storeName: string } | null) => void;
     isMaster: boolean;
 }
 
@@ -25,8 +25,9 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
-    const [impersonatedUser, setImpersonatedUser] = useState<string | null>(() => {
-        return localStorage.getItem('clicando_impersonated_user');
+    const [impersonatedUser, setImpersonatedUser] = useState<{ id: string; storeName: string } | null>(() => {
+        const stored = localStorage.getItem('clicando_impersonated_user');
+        return stored ? JSON.parse(stored) : null;
     });
 
     const isMaster = isSuperAdmin(user);
@@ -54,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Persistir impersonación
     useEffect(() => {
         if (impersonatedUser) {
-            localStorage.setItem('clicando_impersonated_user', impersonatedUser);
+            localStorage.setItem('clicando_impersonated_user', JSON.stringify(impersonatedUser));
         } else {
             localStorage.removeItem('clicando_impersonated_user');
         }

@@ -14,7 +14,7 @@ const BulkPriceUpdate = () => {
     const { user, impersonatedUser } = useAuth();
 
     // Determinar el ID objetivo (Usuario impersonado o logueado)
-    const targetId = impersonatedUser || user?.id;
+    const targetId = impersonatedUser?.id || user?.id;
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');

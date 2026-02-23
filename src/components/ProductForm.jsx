@@ -16,7 +16,7 @@ function ProductForm() {
   const [formData, setFormData] = useState({});
 
   // Determinar el ID objetivo (Usuario impersonado o logueado)
-  const targetId = impersonatedUser || user?.id;
+  const targetId = impersonatedUser?.id || user?.id;
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

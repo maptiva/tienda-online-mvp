@@ -23,7 +23,6 @@ const Clients = () => {
     const [showArchived, setShowArchived] = useState(false);
 
     const handleImpersonate = (userId, storeName) => {
-        setImpersonatedUser(userId);
         Swal.fire({
             title: `¡Modo Gestión Activo!`,
             text: `Ahora estás viendo y editando la tienda de ${storeName}.`,
@@ -33,6 +32,7 @@ const Clients = () => {
             cancelButtonText: 'Quedarme aquí'
         }).then((result) => {
             if (result.isConfirmed) {
+                setImpersonatedUser({ id: userId, storeName });
                 navigate('/admin');
             }
         });

@@ -16,7 +16,7 @@ export const useStoreConfig = () => {
     const { storeName } = useParams();
 
     // Determinar el ID objetivo (Usuario impersonado o logueado)
-    const targetId = impersonatedUser || user?.id;
+    const targetId = impersonatedUser?.id || user?.id;
 
     // Query para obtener configuración de stock
     const { data: stockEnabled, isLoading, error, refetch } = useQuery({

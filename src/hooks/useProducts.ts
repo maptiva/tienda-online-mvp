@@ -27,7 +27,7 @@ export const useProducts = (userId?: string): UseProductsReturn => {
     const { user, impersonatedUser } = useAuth();
 
     // Determinar el ID objetivo (Tienda pública, usuario impersonado o logueado)
-    const targetId = userId || impersonatedUser || user?.id;
+    const targetId = userId || impersonatedUser?.id || user?.id;
 
     const { data: products, isLoading, error } = useQuery({
         queryKey: ['products', targetId],
