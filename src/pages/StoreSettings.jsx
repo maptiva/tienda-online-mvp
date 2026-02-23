@@ -6,6 +6,7 @@ import { compressLogo } from '../utils/imageCompression';
 import { getStoragePath } from '../utils/storageUtils';
 import StoreMap from '../components/StoreMap'; // Import StoreMap component
 import { useShopCategories } from '../hooks/useShopCategories';
+import QRKit from '../components/dashboard/QRKit';
 
 function StoreSettings() {
   const { user } = useAuth();
@@ -584,6 +585,15 @@ function StoreSettings() {
             </button>
           </div>
         </form>
+
+        {/* QR Diffusion Kit Section */}
+        {!loading && storeData.store_name && (
+          <QRKit
+            storeName={storeData.store_name}
+            logoUrl={storeData.logo_url}
+            storeSlug={storeData.store_slug || storeData.id}
+          />
+        )}
       </div>
     </div>
   );
