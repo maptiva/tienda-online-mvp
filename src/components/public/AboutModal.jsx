@@ -93,8 +93,8 @@ const AboutModal = ({ isOpen, onClose, storeName, storeAboutText }) => {
                         <button
                             onClick={() => setActiveTab('tienda')}
                             className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${activeTab === 'tienda'
-                                    ? 'shadow-md'
-                                    : 'opacity-60 hover:opacity-100'
+                                ? 'shadow-md'
+                                : 'opacity-60 hover:opacity-100'
                                 }`}
                             style={{
                                 backgroundColor: activeTab === 'tienda' ? 'var(--color-primary)' : 'transparent',
@@ -107,8 +107,8 @@ const AboutModal = ({ isOpen, onClose, storeName, storeAboutText }) => {
                         <button
                             onClick={() => setActiveTab('clicando')}
                             className={`px-4 py-2 rounded-lg font-medium transition-all ${activeTab === 'clicando'
-                                    ? 'shadow-md'
-                                    : 'opacity-60 hover:opacity-100'
+                                ? 'shadow-md'
+                                : 'opacity-60 hover:opacity-100'
                                 }`}
                             style={{
                                 backgroundColor: activeTab === 'clicando' ? 'var(--color-primary)' : 'transparent',
@@ -206,9 +206,19 @@ const AboutModal = ({ isOpen, onClose, storeName, storeAboutText }) => {
                             {/* Desarrollado por Maptiva */}
                             <div className={`pt-4 border-t ${theme === 'light' ? 'border-gray-200' : 'border-slate-700'
                                 }`}>
-                                <div className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
-                                    {renderContent(aboutClicandoContent.desarrollado)}
-                                </div>
+                                <p className={theme === 'light' ? 'text-gray-600' : 'text-gray-400'}>
+                                    Desarrollado con ❤️ y tecnología por{" "}
+                                    <a
+                                        href="https://maptiva.github.io/maptiva/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-semibold hover:underline"
+                                        style={{ color: 'var(--color-primary)' }}
+                                    >
+                                        Maptiva
+                                    </a>
+                                    , una empresa comprometida con la transformación digital.
+                                </p>
                                 <div className="flex gap-4 mt-3">
                                     <a
                                         href="https://instagram.com/clicando.ar"
