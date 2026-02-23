@@ -26,9 +26,9 @@ export const useStoreConfig = () => {
             if (storeName) {
                 return await inventoryService.checkStoreStockEnabledBySlug(storeName);
             }
-            return await inventoryService.checkStoreStockEnabled(user!.id);
+            return await inventoryService.checkStoreStockEnabled(targetId!);
         },
-        enabled: !!(storeName || user?.id),
+        enabled: !!(storeName || targetId),
         staleTime: storeName ? 30 * 1000 : 5 * 60 * 1000, // 30s público, 5min admin
         gcTime: 30 * 60 * 1000, // 30 minutos
         refetchOnWindowFocus: true,
