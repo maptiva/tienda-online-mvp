@@ -9,8 +9,12 @@ import { useShopCategories } from '../hooks/useShopCategories';
 import QRKit from '../components/dashboard/QRKit';
 
 function StoreSettings() {
-  const { user } = useAuth();
+  const { user, impersonatedUser } = useAuth();
   const { categories: shopCategories, loading: categoriesLoading } = useShopCategories();
+
+  // Determinar el ID objetivo (Usuario impersonado o logueado)
+  const targetId = impersonatedUser || user?.id;
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [storeData, setStoreData] = useState({
@@ -46,7 +50,7 @@ function StoreSettings() {
 
       // Critical Security Check: Ensure the cached data belongs to the current user
       // If user_id is missing in cache or doesn't match, reload from DB
-      if (parsedData.user_id === user.id) {
+      if (parsedData.user_id === targetId) {
         setStoreData(parsedData);
         setLoading(false);
       } else {
@@ -54,10 +58,10 @@ function StoreSettings() {
         sessionStorage.removeItem('storeSettingsForm');
         loadStoreData();
       }
-    } else if (user) {
+    } else if (targetId) {
       loadStoreData();
     }
-  }, [user]);
+  }, [targetId]);
 
   useEffect(() => {
     // Guardar en sessionStorage cada vez que storeData cambie
@@ -65,18 +69,18 @@ function StoreSettings() {
       // Include user_id in the stored data for validation
       const dataToStore = {
         ...storeData,
-        user_id: user.id
+        user_id: targetId
       };
       sessionStorage.setItem('storeSettingsForm', JSON.stringify(dataToStore));
     }
-  }, [storeData, loading, user]); // Added user to dependency
+  }, [storeData, loading, targetId]); // Added targetId to dependency
 
   const loadStoreData = async () => {
     try {
       const { data, error } = await supabase
         .from('stores')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', targetId)
         .single();
 
 
@@ -187,7 +191,7 @@ function StoreSettings() {
       const compressedFile = await compressLogo(logoFile);
 
       // Usar extensión .webp para el archivo comprimido
-      const fileName = `${user.id}/logo-${Date.now()}.webp`;
+      const fileName = `${targetId}/logo-${Date.now()}.webp`;
 
       const { data, error } = await supabase.storage
         .from('store-logos')
@@ -219,14 +223,14 @@ function StoreSettings() {
       const dataToSave = {
         ...storeData,
         logo_url: logoUrl,
-        user_id: user.id
+        user_id: targetId
       };
 
       // Check if store exists
       const { data: existingStore } = await supabase
         .from('stores')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('user_id', targetId)
         .single();
 
       let result;
@@ -235,7 +239,7 @@ function StoreSettings() {
         result = await supabase
           .from('stores')
           .update(dataToSave)
-          .eq('user_id', user.id);
+          .eq('user_id', targetId);
       } else {
         // Insert new store
         result = await supabase
