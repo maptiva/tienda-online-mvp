@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html lang="es"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Clicando - Tu Tienda Online Simple y Rápida</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
-<script>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Clicando - Tu Tienda Online Simple y Rápida</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -48,158 +51,342 @@
             document.documentElement.classList.toggle('dark');
         }
     </script>
-<style>
+    <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-        }.hide-scrollbar::-webkit-scrollbar {
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
             display: none;
         }
+
         .hide-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 transition-colors duration-300 min-h-screen">
-<button class="fixed top-6 right-6 z-50 p-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-slate-700 transition-all hover:scale-110" onclick="toggleDarkMode()">
-<span class="material-icons-round text-primary block dark:hidden">dark_mode</span>
-<span class="material-icons-round text-primary hidden dark:block">light_mode</span>
-</button>
-<main class="max-w-6xl mx-auto px-6 py-12 lg:py-20 space-y-24">
-<header class="text-center space-y-6">
-<div class="inline-block animate-float">
-<div class="relative w-32 h-32 mx-auto">
-<div class="w-24 h-32 bg-yellow-400 dark:bg-yellow-500 rounded-xl rounded-tr-[3rem] rotate-12 relative shadow-xl">
-<div class="absolute top-6 left-6 w-4 h-4 bg-background-light dark:bg-background-dark rounded-full"></div>
-<div class="absolute inset-0 flex items-center justify-center -rotate-12 translate-x-4 translate-y-4">
-<span class="material-icons-round text-slate-800 text-5xl">touch_app</span>
-</div>
-</div>
-</div>
-</div>
-<div class="space-y-2">
-<h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 transition-colors duration-300 min-h-screen">
+    <button
+        class="fixed top-6 right-6 z-50 p-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-slate-700 transition-all hover:scale-110"
+        onclick="toggleDarkMode()">
+        <span class="material-icons-round text-primary block dark:hidden">dark_mode</span>
+        <span class="material-icons-round text-primary hidden dark:block">light_mode</span>
+    </button>
+    <main class="max-w-6xl mx-auto px-6 py-12 lg:py-20 space-y-24">
+        <header class="text-center space-y-6">
+            <div class="inline-block animate-float">
+                <div class="relative w-32 h-32 mx-auto">
+                    <div
+                        class="w-24 h-32 bg-yellow-400 dark:bg-yellow-500 rounded-xl rounded-tr-[3rem] rotate-12 relative shadow-xl">
+                        <div
+                            class="absolute top-6 left-6 w-4 h-4 bg-background-light dark:bg-background-dark rounded-full">
+                        </div>
+                        <div
+                            class="absolute inset-0 flex items-center justify-center -rotate-12 translate-x-4 translate-y-4">
+                            <span class="material-icons-round text-slate-800 text-5xl">touch_app</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                     Clicando
                 </h1>
-<p class="text-xl text-slate-600 dark:text-slate-400 font-medium">
+                <p class="text-xl text-slate-600 dark:text-slate-400 font-medium">
                     Tu Tienda Online Simple y Rápida
                 </p>
-</div>
-</header>
-<section class="grid grid-cols-1 md:grid-cols-3 gap-8">
-<div class="group bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl transition-all hover:-translate-y-1">
-<div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-6">
-<span class="material-icons-round text-blue-600 dark:text-blue-400 text-3xl">inventory_2</span>
-</div>
-<h3 class="text-xl font-bold mb-3 dark:text-white">Catálogo Completo</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">Gestiona todos tus productos de forma intuitiva y profesional en un solo lugar.</p>
-</div>
-<div class="group bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl transition-all hover:-translate-y-1">
-<div class="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mb-6">
-<span class="material-icons-round text-green-600 dark:text-green-400 text-3xl">chat</span>
-</div>
-<h3 class="text-xl font-bold mb-3 dark:text-white">WhatsApp Integrado</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">Recibe pedidos directamente en tu chat y cierra ventas de manera inmediata.</p>
-</div>
-<div class="group bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl transition-all hover:-translate-y-1">
-<div class="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-6">
-<span class="material-icons-round text-purple-600 dark:text-purple-400 text-3xl">palette</span>
-</div>
-<h3 class="text-xl font-bold mb-3 dark:text-white">100% Personalizable</h3>
-<p class="text-slate-600 dark:text-slate-400 leading-relaxed">Tu marca, tu estilo. Ajusta colores y diseños para reflejar la identidad de tu negocio.</p>
-</div>
-</section>
-<section class="space-y-10">
-<h2 class="text-3xl font-bold text-center dark:text-white">Confían en Nosotros</h2>
-<div class="relative overflow-hidden group">
-<div class="flex space-x-8 animate-scroll whitespace-nowrap py-4">
-<div class="flex items-center space-x-8">
-<div class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
-<img alt="Papelera Villa Libertad" class="rounded-full mb-2 border-2 border-slate-100 dark:border-slate-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNzhLu7j8-r6VjqrT5ozUiow8lQSdTYgmT5O7a3P24jOnBnwDR96bVBzz0isV-RFYYdnQkIhFzJyYmpAWRgD8JeOUTQQLSPH69q80R_K51gyKApDPo9_iVQIvbhdhXU8Az2B0KUXnnULeA3syOXj5ShUVmOWlYicfjFoF91zmPIAFU5f11M0gAWzy_OciutIbmRX-cObZsj-wEzZlcUrAA8kyxGjuhMTD9HDTISpGe9PywjzB6zJDU-9HtEuRHpBKOnv-91OS6NBA"/>
-<span class="text-xs font-bold dark:text-white truncate w-full text-center">Papelera Villa Libertad</span>
-</div>
-<div class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
-<img alt="El Club del Mate" class="rounded-full mb-2 border-2 border-slate-100 dark:border-slate-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIwREtDttbdDMJwxHIylGb_BJmfhEyi-ECEOmQG-zNZuxK0JvsMgYCwiYbaKJ8cX_XDYtnyyAaf7DrPM_vhz4OgDMAcO8l-Go5v-HDrjQgSuobBQSKoIxpiQgUEPal5T0eYXPgIgnUNotbXFbY4Hf7V2X-Dwpb51VGhy2IIyYYAVlekLxDI1WaWJF1aSYWSMvcmmXGZ9RloTR-VAC4HEZxiyMBlOYMrWiYvwjyfl5fIbFpKNjB74QCLlm91zhGu-E3vXX6Y6T6vzI"/>
-<span class="text-xs font-bold dark:text-white truncate w-full text-center">El Club del Mate</span>
-</div>
-<div class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
-<img alt="TU y YO Regalos" class="rounded-full mb-2 border-2 border-slate-100 dark:border-slate-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUrtzEYI9BN5WRnEYomuUJbO05x3viHLRj4fGrHuke3pPmxWBnPSF3hp9LODGild49MeQdKKdVC4iDMnCPAqU5NWPB_XRqaMIe1afYI3gUMQ-diD2N2zueMrmXG2M95P_abxatayS-UnsCC_Zvo8glhcXcz7uGcYdOIIrjO29BVvAtuTvfvtZUxFoVWXDH_hVLO508HclxFt6C-sX5Q86_0vQJrkVrKgRB74R15lrJlRTSNLPt5M8PAY8GLa90ytqnKouCQrVq4RU"/>
-<span class="text-xs font-bold dark:text-white truncate w-full text-center">TU y YO Regalos</span>
-</div>
-<div class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
-<img alt="KOKETOS Peluquería" class="rounded-full mb-2 border-2 border-slate-100 dark:border-slate-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAogc7mdoPDk4U8w5Y1S6wpgHkdGmm5W0brY6yhfKmQjkU3YVyT3YppxMzEDst-coUHF0nKDeLWLp_NasQgGrOA_fsGffO1lmJzyqNKfa6EMsDypPXDbRVL9748HzELKxDE9vTWk6tItJh8We8FBP7jJmZoKM9GFLx82ruWceNHyV6u2NFAnqiAYpjvVmHejPAkCqy9gD4zKWu5EXZQk4DG9Nc0PmMkTb0FVPcOovqSTr3jMI73NVo9ydj2p4-NDncm3gN5rZyBs7U"/>
-<span class="text-xs font-bold dark:text-white truncate w-full text-center">KOKETOS Peluquería</span>
-</div>
-</div>
-<div class="flex items-center space-x-8">
-<div class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
-<img alt="Papelera Villa Libertad" class="rounded-full mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDChTnYb4bxCyLmvSwrqW-ybapHjGgiQxOxRH9oXq0VUCeo9aXfpWnoeKb3yQOWbVGAiOcLeNCRzbNVQUu_hy4Y3ddHNi4JXi79K0QvYewBqBBdzTjFFpjtlsDKup7cqGBDaaHj9VqxjcIaP-WjYFC6s8awx5eVcRdfIqUKW_xw6NgDisoRUysJzG9qqRE1TAzA3vEUk0FcE8G8m-MPFlYBigXFlFgmzz5ErD3P3YUzOWtM7-0luThDyQp04b1pKfiMhbalqR5z_jM"/>
-<span class="text-xs font-bold dark:text-white">Papelera Villa Libertad</span>
-</div>
-<div class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
-<img alt="El Club del Mate" class="rounded-full mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUmPlO40a0X0lsYzr0MT_91WT60Azn6GCq9f0HufffBYhVezbCFDye3D3lHGA1PE3nW6mr1pMFf5GrFJKlBEqyn9_Ls26ZErP8yMmwEDzVJsM69iPPhISYPqX4nqCu50h3oonUDle-mRgMbmSMska7WZM0PqtFLCJucW2QtzRO37PezMyyHmV0oojxybLz6VxJER1YmYrpeNUzXI5H91NtD7JpZkkgj2WmdpqLggVMDLOPe-GWVp3HQw5QrgJnjkkvL3-XAvddJgY"/>
-<span class="text-xs font-bold dark:text-white">El Club del Mate</span>
-</div>
-<div class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
-<img alt="TU y YO Regalos" class="rounded-full mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFqL7fbCitahooeY_Ysq91USBNhDc0BWaaTK7Y1uGXO34L7yqQeW-kgRW8L615Mop6zhkzkC5fHt8uXmlPuNtDtrdWD3VYXkQJ6A1GLWDluvuPWkzmOm9kSun5CkrY41oKF8qkKt3CwdoIY7jxeUzVda-aNFX2Bv_P4kSddrt_KMaWO1kMace8UW9SURkzkNRqmZbmKuNdvCLKUIjol8bhOQqt76r3UVBCN9FJH4oUzynbeWdch-gCYJWKGuMy9WxnalOwtgxjyBY"/>
-<span class="text-xs font-bold dark:text-white">TU y YO Regalos</span>
-</div>
-<div class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
-<img alt="KOKETOS Peluquería" class="rounded-full mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdS9cx8LHfrCVtvmLvyhFGqnYB9CDZzPpRl7gb3aNIr553HmdPu8GdrOpsjJtN7XnWfsaUcFBbQwFhjQDeAK9CdRYY-H1bYnp9Qqe21nysL7CX6OEyiZDFGVp573BZoJZU7T3TcxHxl1u8CVKBl87ArMUvdphGi0n_jw8E9oTa9Ud33OS19cQiTzrPR4zZBc5ANq9ltqmkpkDH_R8i0h9ulMA406duKloW55GxMw9eY_6O_y01xZnvmEeQyeyv8OX_RRiP9XJDmbo"/>
-<span class="text-xs font-bold dark:text-white">KOKETOS Peluquería</span>
-</div>
-</div>
-</div>
-<div class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
-<div class="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none"></div>
-</div>
-<div class="flex justify-center">
-<button class="px-8 py-3 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-all font-semibold shadow-lg shadow-primary/10">
+            </div>
+        </header>
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div
+                class="group bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl transition-all hover:-translate-y-1">
+                <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-6">
+                    <span class="material-icons-round text-blue-600 dark:text-blue-400 text-3xl">inventory_2</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3 dark:text-white">Catálogo Completo</h3>
+                <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Gestiona todos tus productos de forma
+                    intuitiva y profesional en un solo lugar.</p>
+            </div>
+            <div
+                class="group bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl transition-all hover:-translate-y-1">
+                <div
+                    class="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mb-6">
+                    <span class="material-icons-round text-green-600 dark:text-green-400 text-3xl">chat</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3 dark:text-white">WhatsApp Integrado</h3>
+                <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Recibe pedidos directamente en tu chat y
+                    cierra ventas de manera inmediata.</p>
+            </div>
+            <div
+                class="group bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-2xl transition-all hover:-translate-y-1">
+                <div
+                    class="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-6">
+                    <span class="material-icons-round text-purple-600 dark:text-purple-400 text-3xl">palette</span>
+                </div>
+                <h3 class="text-xl font-bold mb-3 dark:text-white">100% Personalizable</h3>
+                <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Tu marca, tu estilo. Ajusta colores y
+                    diseños para reflejar la identidad de tu negocio.</p>
+            </div>
+        </section>
+        <section class="space-y-10">
+            <h2 class="text-3xl font-bold text-center dark:text-white">Confían en Nosotros</h2>
+            <div class="relative overflow-hidden group">
+                <div class="flex space-x-8 animate-scroll whitespace-nowrap py-4">
+                    <div class="flex items-center space-x-8">
+                        <div
+                            class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
+                            <img alt="Papelera Villa Libertad"
+                                class="rounded-full mb-2 border-2 border-slate-100 dark:border-slate-600"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNzhLu7j8-r6VjqrT5ozUiow8lQSdTYgmT5O7a3P24jOnBnwDR96bVBzz0isV-RFYYdnQkIhFzJyYmpAWRgD8JeOUTQQLSPH69q80R_K51gyKApDPo9_iVQIvbhdhXU8Az2B0KUXnnULeA3syOXj5ShUVmOWlYicfjFoF91zmPIAFU5f11M0gAWzy_OciutIbmRX-cObZsj-wEzZlcUrAA8kyxGjuhMTD9HDTISpGe9PywjzB6zJDU-9HtEuRHpBKOnv-91OS6NBA" />
+                            <span class="text-xs font-bold dark:text-white truncate w-full text-center">Papelera Villa
+                                Libertad</span>
+                        </div>
+                        <div
+                            class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
+                            <img alt="El Club del Mate"
+                                class="rounded-full mb-2 border-2 border-slate-100 dark:border-slate-600"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIwREtDttbdDMJwxHIylGb_BJmfhEyi-ECEOmQG-zNZuxK0JvsMgYCwiYbaKJ8cX_XDYtnyyAaf7DrPM_vhz4OgDMAcO8l-Go5v-HDrjQgSuobBQSKoIxpiQgUEPal5T0eYXPgIgnUNotbXFbY4Hf7V2X-Dwpb51VGhy2IIyYYAVlekLxDI1WaWJF1aSYWSMvcmmXGZ9RloTR-VAC4HEZxiyMBlOYMrWiYvwjyfl5fIbFpKNjB74QCLlm91zhGu-E3vXX6Y6T6vzI" />
+                            <span class="text-xs font-bold dark:text-white truncate w-full text-center">El Club del
+                                Mate</span>
+                        </div>
+                        <div
+                            class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
+                            <img alt="TU y YO Regalos"
+                                class="rounded-full mb-2 border-2 border-slate-100 dark:border-slate-600"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUrtzEYI9BN5WRnEYomuUJbO05x3viHLRj4fGrHuke3pPmxWBnPSF3hp9LODGild49MeQdKKdVC4iDMnCPAqU5NWPB_XRqaMIe1afYI3gUMQ-diD2N2zueMrmXG2M95P_abxatayS-UnsCC_Zvo8glhcXcz7uGcYdOIIrjO29BVvAtuTvfvtZUxFoVWXDH_hVLO508HclxFt6C-sX5Q86_0vQJrkVrKgRB74R15lrJlRTSNLPt5M8PAY8GLa90ytqnKouCQrVq4RU" />
+                            <span class="text-xs font-bold dark:text-white truncate w-full text-center">TU y YO
+                                Regalos</span>
+                        </div>
+                        <div
+                            class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
+                            <img alt="KOKETOS Peluquería"
+                                class="rounded-full mb-2 border-2 border-slate-100 dark:border-slate-600"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAogc7mdoPDk4U8w5Y1S6wpgHkdGmm5W0brY6yhfKmQjkU3YVyT3YppxMzEDst-coUHF0nKDeLWLp_NasQgGrOA_fsGffO1lmJzyqNKfa6EMsDypPXDbRVL9748HzELKxDE9vTWk6tItJh8We8FBP7jJmZoKM9GFLx82ruWceNHyV6u2NFAnqiAYpjvVmHejPAkCqy9gD4zKWu5EXZQk4DG9Nc0PmMkTb0FVPcOovqSTr3jMI73NVo9ydj2p4-NDncm3gN5rZyBs7U" />
+                            <span class="text-xs font-bold dark:text-white truncate w-full text-center">KOKETOS
+                                Peluquería</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-8">
+                        <div
+                            class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
+                            <img alt="Papelera Villa Libertad" class="rounded-full mb-2"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDChTnYb4bxCyLmvSwrqW-ybapHjGgiQxOxRH9oXq0VUCeo9aXfpWnoeKb3yQOWbVGAiOcLeNCRzbNVQUu_hy4Y3ddHNi4JXi79K0QvYewBqBBdzTjFFpjtlsDKup7cqGBDaaHj9VqxjcIaP-WjYFC6s8awx5eVcRdfIqUKW_xw6NgDisoRUysJzG9qqRE1TAzA3vEUk0FcE8G8m-MPFlYBigXFlFgmzz5ErD3P3YUzOWtM7-0luThDyQp04b1pKfiMhbalqR5z_jM" />
+                            <span class="text-xs font-bold dark:text-white">Papelera Villa Libertad</span>
+                        </div>
+                        <div
+                            class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
+                            <img alt="El Club del Mate" class="rounded-full mb-2"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUmPlO40a0X0lsYzr0MT_91WT60Azn6GCq9f0HufffBYhVezbCFDye3D3lHGA1PE3nW6mr1pMFf5GrFJKlBEqyn9_Ls26ZErP8yMmwEDzVJsM69iPPhISYPqX4nqCu50h3oonUDle-mRgMbmSMska7WZM0PqtFLCJucW2QtzRO37PezMyyHmV0oojxybLz6VxJER1YmYrpeNUzXI5H91NtD7JpZkkgj2WmdpqLggVMDLOPe-GWVp3HQw5QrgJnjkkvL3-XAvddJgY" />
+                            <span class="text-xs font-bold dark:text-white">El Club del Mate</span>
+                        </div>
+                        <div
+                            class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
+                            <img alt="TU y YO Regalos" class="rounded-full mb-2"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFqL7fbCitahooeY_Ysq91USBNhDc0BWaaTK7Y1uGXO34L7yqQeW-kgRW8L615Mop6zhkzkC5fHt8uXmlPuNtDtrdWD3VYXkQJ6A1GLWDluvuPWkzmOm9kSun5CkrY41oKF8qkKt3CwdoIY7jxeUzVda-aNFX2Bv_P4kSddrt_KMaWO1kMace8UW9SURkzkNRqmZbmKuNdvCLKUIjol8bhOQqt76r3UVBCN9FJH4oUzynbeWdch-gCYJWKGuMy9WxnalOwtgxjyBY" />
+                            <span class="text-xs font-bold dark:text-white">TU y YO Regalos</span>
+                        </div>
+                        <div
+                            class="w-56 h-32 bg-white dark:bg-slate-800 rounded-xl shadow-md flex flex-col items-center justify-center p-4 border border-slate-100 dark:border-slate-700">
+                            <img alt="KOKETOS Peluquería" class="rounded-full mb-2"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdS9cx8LHfrCVtvmLvyhFGqnYB9CDZzPpRl7gb3aNIr553HmdPu8GdrOpsjJtN7XnWfsaUcFBbQwFhjQDeAK9CdRYY-H1bYnp9Qqe21nysL7CX6OEyiZDFGVp573BZoJZU7T3TcxHxl1u8CVKBl87ArMUvdphGi0n_jw8E9oTa9Ud33OS19cQiTzrPR4zZBc5ANq9ltqmkpkDH_R8i0h9ulMA406duKloW55GxMw9eY_6O_y01xZnvmEeQyeyv8OX_RRiP9XJDmbo" />
+                            <span class="text-xs font-bold dark:text-white">KOKETOS Peluquería</span>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none">
+                </div>
+                <div
+                    class="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background-light dark:from-background-dark to-transparent z-10 pointer-events-none">
+                </div>
+            </div>
+            <div class="flex justify-center">
+                <button
+                    class="px-8 py-3 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-all font-semibold shadow-lg shadow-primary/10">
                     Ver todas las tiendas
                 </button>
-</div>
-</section>
-<section class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-[2rem] border border-white/40 dark:border-slate-800 shadow-2xl p-8 lg:p-12">
-<div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 opacity-10 dark:opacity-20 pointer-events-none">
-<img alt="Map pattern background" class="object-cover w-full h-full rounded-full grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfPmKHXotDCwxBJAaEHs1aynRQGlO_RDOB9OgZWFQqxxukQOVqfFMsRk5Xsrk_QKhf8h4NqPM4yVTeB2Elgb2CrqJpgFZG2K81g8sJ8uah4aV6KVYr1xZuPuUvz-CsSXC6Sw8IVDa2ifTfbwTg5XkpiIQfIvPxvQkrkZmkQVO0RRUOO1FCnNCA16qK3WuYvAkBIv8-i6Ss4Zng5_oU6v9um1itOBt8iW919VRk69IyYAn6aiMSfRQVDr8g88QenwxZAltvQ32UKas"/>
-</div>
-<div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-<div class="space-y-4 max-w-xl text-center lg:text-left">
-<h2 class="text-3xl lg:text-4xl font-extrabold flex items-center justify-center lg:justify-start gap-3 dark:text-white">
-<span class="text-4xl">🗺️</span> ¿Buscás algo cerca?
+            </div>
+        </section>
+
+        <!-- Sección Nosotros -->
+        <section class="py-16 lg:py-24">
+            <div class="max-w-4xl mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl lg:text-4xl font-extrabold mb-4 dark:text-white">
+                        Acerca de Clicando
                     </h2>
-<p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-                        Explorá nuestro mapa interactivo y descubrí todos los comercios adheridos en tu ciudad. ¡Apoyá lo local!
+                    <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                        Conocenos y descubrí por qué cientos de comercios confían en nosotros para su presencia digital.
                     </p>
-</div>
-<button class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
-<span class="material-icons-round">map</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Nuestra Misión -->
+                    <div
+                        class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl">
+                        <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
+                            <span class="material-icons-round text-primary text-2xl">flag</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 dark:text-white">Nuestra Misión</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Clicando nació con un objetivo claro: <strong>democratizar el comercio digital
+                                local</strong>. Creemos que la tecnología no debería ser exclusiva de las grandes
+                            empresas. Por eso, desarrollamos una plataforma simple, potente y accesible para que
+                            cualquier comerciante, emprendedor o profesional pueda tener su propia tienda online, sin
+                            barreras técnicas y en tiempo récord.
+                        </p>
+                    </div>
+
+                    <!-- ¿Qué ofrecemos? -->
+                    <div
+                        class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl">
+                        <div
+                            class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mb-5">
+                            <span
+                                class="material-icons-round text-green-600 dark:text-green-400 text-2xl">inventory_2</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 dark:text-white">¿Qué ofrecemos?</h3>
+                        <ul class="text-slate-600 dark:text-slate-400 space-y-3">
+                            <li class="flex items-start gap-2">
+                                <span class="material-icons-round text-primary text-sm mt-0.5">check_circle</span>
+                                <span><strong>Catálogo Digital Profesional:</strong> Tu vidriera online abierta
+                                    24/7</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="material-icons-round text-primary text-sm mt-0.5">check_circle</span>
+                                <span><strong>Pedidos por WhatsApp:</strong> Sin intermediarios, sin comisiones</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="material-icons-round text-primary text-sm mt-0.5">check_circle</span>
+                                <span><strong>Identidad Propia:</strong> Tu marca, tu estilo</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="material-icons-round text-primary text-sm mt-0.5">check_circle</span>
+                                <span><strong>Mapa Interactivo:</strong> Encontrá comercios locales por cercanía</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="material-icons-round text-primary text-sm mt-0.5">check_circle</span>
+                                <span><strong>Autogestión Total:</strong> Manejá tu stock desde tu PC</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- ¿Por qué elegirnos? -->
+                    <div
+                        class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl">
+                        <div
+                            class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-5">
+                            <span
+                                class="material-icons-round text-purple-600 dark:text-purple-400 text-2xl">volunteer_activism</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 dark:text-white">¿Por qué elegirnos?</h3>
+                        <ul class="text-slate-600 dark:text-slate-400 space-y-3">
+                            <li class="flex items-start gap-2">
+                                <span class="text-primary font-bold">✓</span>
+                                <span><strong>Somos Accesibles:</strong> Precios justos y sin letras medianas</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-primary font-bold">✓</span>
+                                <span><strong>Somos Rápidos:</strong> Tu tienda lista para vender en el día</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-primary font-bold">✓</span>
+                                <span><strong>Somos Locales:</strong> Fomentamos el consumo en tu ciudad</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- El Futuro -->
+                    <div
+                        class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/30 dark:border-slate-800 shadow-xl">
+                        <div
+                            class="w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center mb-5">
+                            <span
+                                class="material-icons-round text-yellow-600 dark:text-yellow-400 text-2xl">rocket_launch</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 dark:text-white">El Futuro de Clicando</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                            No nos detenemos. Estamos trabajando constantemente para darte más herramientas:
+                        </p>
+                        <ul class="text-slate-600 dark:text-slate-400 space-y-2">
+                            <li class="flex items-center gap-2">
+                                <span>🎟️</span>
+                                <span>Sistema de Cupones y Descuentos</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span>📊</span>
+                                <span>Panel de Métricas y Estadísticas</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span>💳</span>
+                                <span>Integración de pagos digitales</span>
+                            </li>
+                        </ul>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed mt-4">
+                            Desarrollado con ❤️ y tecnología por <strong>Maptiva</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-[2rem] border border-white/40 dark:border-slate-800 shadow-2xl p-8 lg:p-12">
+            <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 opacity-10 dark:opacity-20 pointer-events-none">
+                <img alt="Map pattern background" class="object-cover w-full h-full rounded-full grayscale"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfPmKHXotDCwxBJAaEHs1aynRQGlO_RDOB9OgZWFQqxxukQOVqfFMsRk5Xsrk_QKhf8h4NqPM4yVTeB2Elgb2CrqJpgFZG2K81g8sJ8uah4aV6KVYr1xZuPuUvz-CsSXC6Sw8IVDa2ifTfbwTg5XkpiIQfIvPxvQkrkZmkQVO0RRUOO1FCnNCA16qK3WuYvAkBIv8-i6Ss4Zng5_oU6v9um1itOBt8iW919VRk69IyYAn6aiMSfRQVDr8g88QenwxZAltvQ32UKas" />
+            </div>
+            <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                <div class="space-y-4 max-w-xl text-center lg:text-left">
+                    <h2
+                        class="text-3xl lg:text-4xl font-extrabold flex items-center justify-center lg:justify-start gap-3 dark:text-white">
+                        <span class="text-4xl">🗺️</span> ¿Buscás algo cerca?
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
+                        Explorá nuestro mapa interactivo y descubrí todos los comercios adheridos en tu ciudad. ¡Apoyá
+                        lo local!
+                    </p>
+                </div>
+                <button
+                    class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <span class="material-icons-round">map</span>
                     Abrir Mapa Interactivo
                 </button>
-</div>
-</section>
-<section class="flex flex-col items-center space-y-12">
-<div class="text-center space-y-4">
-<button class="bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+            </div>
+        </section>
+        <section class="flex flex-col items-center space-y-12">
+            <div class="text-center space-y-4">
+                <button
+                    class="bg-primary hover:bg-primary/90 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
                     Acceder a mi Tienda
                 </button>
-<p class="text-sm text-slate-500 dark:text-slate-500">¿Eres cliente? Accede directamente con tu usuario</p>
-</div>
-<div class="w-full max-w-3xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-md rounded-2xl p-10 border border-white/20 dark:border-slate-800 text-center space-y-6">
-<h4 class="text-xl font-bold dark:text-white">¿Aún no tienes tu tienda online?</h4>
-<button class="bg-accent-green hover:bg-green-600 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-green-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto">
-<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.284l-.582 2.128 2.185-.573c.945.515 2.011.787 3.143.788 3.18 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.766-5.765-5.767zm3.387 8.313c-.154.433-.746.788-1.028.841-.282.053-.522.072-1.465-.303-1.082-.43-1.802-1.536-1.855-1.61-.053-.074-.439-.584-.439-1.121 0-.537.282-.801.382-.914.101-.113.22-.141.294-.141h.211c.074 0 .175-.028.272.211.101.246.345.842.375.903.03.061.05.133.01.211-.041.08-.061.129-.122.201-.06.072-.125.161-.179.215-.061.06-.124.126-.053.246.071.121.314.518.674.839.462.412.853.54 1.028.627.175.087.277.072.379-.044.102-.116.442-.518.56-.694.118-.176.236-.148.397-.089.161.059 1.021.482 1.197.57.176.088.293.131.336.205.043.074.043.43-.111.863zM12 2C6.477 2 2 6.477 2 12c0 1.891.525 3.66 1.438 5.168L2 22l4.985-1.313C8.428 21.503 10.141 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"></path>
-</svg>
+                <p class="text-sm text-slate-500 dark:text-slate-500">¿Eres cliente? Accede directamente con tu usuario
+                </p>
+            </div>
+            <div
+                class="w-full max-w-3xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-md rounded-2xl p-10 border border-white/20 dark:border-slate-800 text-center space-y-6">
+                <h4 class="text-xl font-bold dark:text-white">¿Aún no tienes tu tienda online?</h4>
+                <button
+                    class="bg-accent-green hover:bg-green-600 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-green-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                        <path
+                            d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.284l-.582 2.128 2.185-.573c.945.515 2.011.787 3.143.788 3.18 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.766-5.765-5.767zm3.387 8.313c-.154.433-.746.788-1.028.841-.282.053-.522.072-1.465-.303-1.082-.43-1.802-1.536-1.855-1.61-.053-.074-.439-.584-.439-1.121 0-.537.282-.801.382-.914.101-.113.22-.141.294-.141h.211c.074 0 .175-.028.272.211.101.246.345.842.375.903.03.061.05.133.01.211-.041.08-.061.129-.122.201-.06.072-.125.161-.179.215-.061.06-.124.126-.053.246.071.121.314.518.674.839.462.412.853.54 1.028.627.175.087.277.072.379-.044.102-.116.442-.518.56-.694.118-.176.236-.148.397-.089.161.059 1.021.482 1.197.57.176.088.293.131.336.205.043.074.043.43-.111.863zM12 2C6.477 2 2 6.477 2 12c0 1.891.525 3.66 1.438 5.168L2 22l4.985-1.313C8.428 21.503 10.141 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z">
+                        </path>
+                    </svg>
                     Solicitá la tuya
                 </button>
-</div>
-</section>
-<footer class="text-center pt-8 border-t border-white/20 dark:border-slate-800">
-<p class="text-slate-500 dark:text-slate-600 text-sm">
+            </div>
+        </section>
+        <footer class="text-center pt-8 border-t border-white/20 dark:border-slate-800">
+            <p class="text-slate-500 dark:text-slate-600 text-sm">
                 Desarrollado por <span class="font-semibold text-primary/80">Maptiva</span>
-</p>
-</footer>
-</main>
+            </p>
+        </footer>
+    </main>
 
-</body></html>
+</body>
+
+</html>

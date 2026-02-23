@@ -29,6 +29,7 @@ function StoreSettings() {
     whatsapp_number: '',
     whatsapp_message: 'Hola, estoy interesado en sus productos.',
     short_description: '', // New field for Carousel
+    about_text: '', // New field for "Nosotros" section
     latitude: null, // New field
     longitude: null, // New field
     city: '', // New field for GIS
@@ -350,6 +351,28 @@ function StoreSettings() {
             />
             <p className="text-xs text-gray-500 mt-1">
               Esta frase aparecerá en el carrusel de la página principal.
+            </p>
+          </div>
+
+          {/* About Text (Nosotros) */}
+          <div>
+            <label className="block text-sm font-medium mb-2 flex justify-between">
+              <span>Sección "Nosotros"</span>
+              <span className={`text-xs ${storeData.about_text?.length >= 500 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                {storeData.about_text?.length || 0}/500
+              </span>
+            </label>
+            <textarea
+              name="about_text"
+              value={storeData.about_text || ''}
+              onChange={handleInputChange}
+              maxLength={500}
+              rows={4}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
+              placeholder="Cuéntanos la historia de tu negocio, cuáles son tus valores, qué te diferencia..."
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Esta descripción aparecerá en la sección "Nosotros" de tu tienda.
             </p>
           </div>
 
