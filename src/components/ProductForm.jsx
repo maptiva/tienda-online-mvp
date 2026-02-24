@@ -204,7 +204,10 @@ function ProductForm() {
         const fileName = `${Date.now()}-main-${Math.random().toString(36).substring(2, 9)}.webp`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('product-images')
-          .upload(fileName, compressedFile);
+          .upload(fileName, compressedFile, {
+            contentType: 'image/webp',
+            upsert: true
+          });
 
         if (uploadError) throw uploadError;
 
@@ -229,7 +232,10 @@ function ProductForm() {
           const fileName = `${Date.now()}-gallery-${Math.random().toString(36).substring(2, 9)}.webp`;
           const { data, error } = await supabase.storage
             .from('product-images')
-            .upload(fileName, compressedFile);
+            .upload(fileName, compressedFile, {
+              contentType: 'image/webp',
+              upsert: true
+            });
 
           if (error) throw error;
 
@@ -380,7 +386,7 @@ function ProductForm() {
                               <button
                                 type="button"
                                 onClick={() => removeGalleryImage(idx, true)}
-                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all shadow-md"
+                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all shadow-md"
                                 title="Eliminar imagen"
                               >✕</button>
                               <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] p-1 text-center opacity-0 group-hover:opacity-100 transition-opacity">Existente</div>
@@ -394,7 +400,7 @@ function ProductForm() {
                               <button
                                 type="button"
                                 onClick={() => removeGalleryImage(idx, false)}
-                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all shadow-md"
+                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all shadow-md"
                                 title="Eliminar imagen"
                               >✕</button>
                               <div className="absolute bottom-0 left-0 right-0 bg-[#5FAFB8] text-white text-[10px] p-1 text-center font-bold">Nueva</div>
