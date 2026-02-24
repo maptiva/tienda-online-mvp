@@ -358,15 +358,15 @@ function StoreSettings() {
           <div>
             <label className="block text-sm font-medium mb-2 flex justify-between">
               <span>Sección "Nosotros"</span>
-              <span className={`text-xs ${storeData.about_text?.length >= 500 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
-                {storeData.about_text?.length || 0}/500
+              <span className={`text-xs ${storeData.about_text?.length >= 600 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                {storeData.about_text?.length || 0}/600
               </span>
             </label>
             <textarea
               name="about_text"
               value={storeData.about_text || ''}
               onChange={handleInputChange}
-              maxLength={500}
+              maxLength={600}
               rows={4}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
               placeholder="Cuéntanos la historia de tu negocio, cuáles son tus valores, qué te diferencia..."

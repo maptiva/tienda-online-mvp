@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Auditor de Storage — Clicando</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --bg: #0f1117;
+            --bg2: #1a1d27;
+            --bg3: #22263a;
+            --border: #2e3350;
+            --accent: #5fafb8;
+            --accent2: #4a9ba4;
+            --red: #ef4444;
+            --orange: #f97316;
+            --yellow: #eab308;
+            --green: #22c55e;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --text3: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px
+        }
+
+        .header p {
+            color: var(--text2);
+            font-size: .9rem
+        }
+
+        .card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        label {
+            display: block;
+            font-size: .85rem;
+            color: var(--text2);
+            margin-bottom: 6px
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .8rem;
+            outline: none;
+            transition: border-color .2s;
+            margin-bottom: 14px
+        }
+
+        input:focus {
+            border-color: var(--accent)
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, .1);
+            border: 1px solid rgba(239, 68, 68, .3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: .8rem;
+            color: #fca5a5;
+            margin-bottom: 14px;
+            line-height: 1.5
+        }
+
+        .info-box {
+            background: rgba(95, 175, 184, .1);
+            border: 1px solid rgba(95, 175, 184, .3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: .8rem;
+            color: #a7d8dd;
+            margin-bottom: 14px;
+            line-height: 1.5
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            width: 100%
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(95, 175, 184, .3)
+        }
+
+        .btn:active {
+            transform: translateY(0)
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            margin-top: 8px
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            margin-top: 8px
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px
+        }
+
+        .btn-row .btn {
+            width: auto;
+            flex: 1
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px
+        }
+
+        .stat-card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .stat-label {
+            font-size: .75rem;
+            color: var(--text2);
+            margin-top: 4px
+        }
+
+        .stat-sub {
+            font-size: .7rem;
+            color: var(--text3);
+            margin-top: 2px;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .color-red {
+            color: var(--red)
+        }
+
+        .color-orange {
+            color: var(--orange)
+        }
+
+        .color-yellow {
+            color: var(--yellow)
+        }
+
+        .color-green {
+            color: var(--green)
+        }
+
+        .color-accent {
+            color: var(--accent)
+        }
+
+        .file-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8rem
+        }
+
+        .file-table th {
+            text-align: left;
+            color: var(--text3);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .05em
+        }
+
+        .file-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(46, 51, 80, .5);
+            vertical-align: middle
+        }
+
+        .file-table tr:hover td {
+            background: rgba(95, 175, 184, .03)
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: .7rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .badge-red {
+            background: rgba(239, 68, 68, .2);
+            color: #fca5a5
+        }
+
+        .badge-orange {
+            background: rgba(249, 115, 22, .2);
+            color: #fdba74
+        }
+
+        .badge-green {
+            background: rgba(34, 197, 94, .2);
+            color: #86efac
+        }
+
+        .badge-blue {
+            background: rgba(95, 175, 184, .2);
+            color: #a7d8dd
+        }
+
+        .badge-gray {
+            background: rgba(100, 116, 139, .2);
+            color: #94a3b8
+        }
+
+        .badge-yellow {
+            background: rgba(234, 179, 8, .2);
+            color: #fde047
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg3);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 4px
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width .5s ease
+        }
+
+        .log {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .75rem;
+            color: var(--text2);
+            max-height: 220px;
+            overflow-y: auto;
+            line-height: 1.7
+        }
+
+        .log .log-ok {
+            color: var(--green)
+        }
+
+        .log .log-warn {
+            color: var(--yellow)
+        }
+
+        .log .log-error {
+            color: var(--red)
+        }
+
+        .log .log-info {
+            color: var(--accent)
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px
+        }
+
+        .section-header h2 {
+            margin-bottom: 0
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px
+        }
+
+        .filter-btn {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: .8rem;
+            color: var(--text2);
+            cursor: pointer;
+            transition: all .15s
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        .orphan-highlight td {
+            background: rgba(239, 68, 68, .05) !important
+        }
+
+        .png-highlight td {
+            background: rgba(249, 115, 22, .05) !important
+        }
+
+        .large-highlight td {
+            background: rgba(234, 179, 8, .05) !important
+        }
+
+        #cleanupSection {
+            border-color: rgba(239, 68, 68, .4)
+        }
+
+        .guda-section {
+            border-color: rgba(239, 68, 68, .6)
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>🔍 Storage Auditor — Clicando</h1>
+        <p>Auditoría completa: PNGs, huérfanos, archivos grandes · Exportación de resultados · Limpieza de tiendas dadas
+            de baja</p>
+    </div>
+
+    <!-- CREDENCIALES -->
+    <div class="card">
+        <h2>🔑 Credenciales de Producción</h2>
+        <div class="warning-box">⚠️ <strong>Importante:</strong> Usá la <strong>Service Role Key</strong> (no la anon
+            key) para poder listar todos los archivos sin restricciones de RLS. Esta herramienta corre 100% local, no
+            envía datos a ningún servidor externo.</div>
+        <label>Supabase URL (Producción)</label>
+        <input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co" />
+        <label>Service Role Key (Producción)</label>
+        <input type="password" id="sbKey" placeholder="eyJhbGci..." />
+        <div class="info-box">💡 Supabase Dashboard → Settings → API → <strong>service_role</strong> (secret). Buckets:
+            <strong>product-images</strong> y <strong>store-logos</strong></div>
+        <button class="btn" id="btnAudit" onclick="startAudit()">🚀 Iniciar Auditoría Completa</button>
+    </div>
+
+    <!-- LOG -->
+    <div class="card" id="logCard" style="display:none">
+        <div class="section-header">
+            <h2>📋 Log de Auditoría</h2>
+            <button onclick="exportLog()"
+                style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:4px 12px;font-size:.75rem;cursor:pointer">📄
+                Exportar Log</button>
+        </div>
+        <div class="log" id="logBox"></div>
+    </div>
+
+    <!-- ESTADÍSTICAS GENERALES -->
+    <div class="card" id="statsCard" style="display:none">
+        <h2>📊 Resumen General</h2>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="egresBar" style="background:linear-gradient(90deg,#22c55e,#ef4444)"></div>
+        </div>
+        <p style="font-size:.75rem;color:var(--text3);margin-top:6px;text-align:right" id="egresLabel"></p>
+        <div class="btn-row" id="exportRow" style="display:none">
+            <button class="btn btn-export" onclick="exportJSON()">📦 Exportar JSON Completo</button>
+            <button class="btn btn-export" onclick="exportTXT()">📄 Exportar Reporte TXT</button>
+            <button class="btn btn-export" onclick="exportCSV()">📊 Exportar CSV</button>
+        </div>
+    </div>
+
+    <!-- PROBLEMAS DETECTADOS -->
+    <div class="card" id="problemsCard" style="display:none">
+        <h2>⚠️ Problemas Detectados</h2>
+        <div id="problemsList"></div>
+    </div>
+
+    <!-- TABLA DE ARCHIVOS -->
+    <div class="card" id="tableCard" style="display:none">
+        <div class="section-header">
+            <h2>📁 Todos los Archivos</h2>
+            <span id="fileCount" style="font-size:.8rem;color:var(--text3)"></span>
+        </div>
+        <div class="filter-row">
+            <button class="filter-btn active" onclick="filterTable('all',this)">Todos</button>
+            <button class="filter-btn" onclick="filterTable('png',this)">🟠 Solo PNGs</button>
+            <button class="filter-btn" onclick="filterTable('orphan',this)">🔴 Huérfanos</button>
+            <button class="filter-btn" onclick="filterTable('large',this)">🟡 Grandes (>300KB)</button>
+            <button class="filter-btn" onclick="filterTable('logos',this)">🏪 Logos</button>
+            <button class="filter-btn" onclick="filterTable('products',this)">🖼️ Productos</button>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th>Bucket</th>
+                        <th>Archivo</th>
+                        <th>Formato</th>
+                        <th>Tamaño</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="fileTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LIMPIEZA HUÉRFANOS -->
+    <div class="card" id="cleanupSection" style="display:none">
+        <h2>🗑️ Limpieza — Archivos Huérfanos</h2>
+        <div class="warning-box">⚠️ <strong>IRREVERSIBLE.</strong> Solo se muestran archivos sin referencia en la base
+            de datos.</div>
+        <div id="cleanupList"></div>
+        <button class="btn btn-danger" id="btnCleanup" onclick="cleanupOrphans()" style="display:none">🗑️ Eliminar
+            Huérfanos Seleccionados</button>
+    </div>
+
+    <!-- ELIMINAR TIENDA DADA DE BAJA -->
+    <div class="card guda-section" id="storeDeleteSection">
+        <h2>🏪 Eliminar Tienda Dada de Baja</h2>
+        <div class="warning-box">
+            ⚠️ <strong>OPERACIÓN DESTRUCTIVA E IRREVERSIBLE.</strong> Elimina todos los productos, imágenes en Storage,
+            y el registro de la tienda de la base de datos.
+            Se requiere confirmación por nombre antes de proceder.
+        </div>
+        <div class="info-box" id="storePreview">
+            🎯 <strong>Tienda pre-cargada:</strong> GuDa Indumentaria<br>
+            🆔 User ID: <code>32ed87dd-db55-4f54-b3c3-9f812e94b0eb</code><br>
+            📋 Acción: Eliminar tienda, todos sus productos e imágenes del storage.
+        </div>
+        <label>User ID de la tienda a eliminar</label>
+        <input type="text" id="deleteUserId" value="32ed87dd-db55-4f54-b3c3-9f812e94b0eb" />
+        <label>Escribí el nombre exacto de la tienda para confirmar</label>
+        <input type="text" id="deleteConfirmName" placeholder="GuDa Indumentaria" />
+        <div class="btn-row">
+            <button class="btn" onclick="previewStoreDelete()"
+                style="background:linear-gradient(135deg,#64748b,#475569)">🔍 Ver qué se eliminará (Preview)</button>
+            <button class="btn btn-danger" id="btnDeleteStore" onclick="executeStoreDelete()" disabled>🗑️ ELIMINAR
+                TIENDA Y TODO SU CONTENIDO</button>
+        </div>
+        <div id="storeDeletePreview" style="margin-top:16px"></div>
+        <div class="log" id="deleteLog" style="display:none;margin-top:12px"></div>
+    </div>
+
+    <script>
+        // =============================================
+        // ESTADO GLOBAL
+        // =============================================
+        let allFiles = [];
+        let orphanFiles = [];
+        let dbReferences = new Set();
+        let auditMeta = { url: '', timestamp: '', totalFiles: 0, totalSize: 0, pngCount: 0, orphanCount: 0, largeCount: 0 };
+
+        // =============================================
+        // UTILIDADES
+        // =============================================
+        function log(msg, type = 'info') {
+            const box = document.getElementById('logBox');
+            const line = document.createElement('div');
+            line.className = `log-${type}`;
+            const time = new Date().toTimeString().split(' ')[0];
+            line.textContent = `[${time}] ${msg}`;
+            box.appendChild(line);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function dlog(msg, type = 'info') {
+            const box = document.getElementById('deleteLog');
+            box.style.display = 'block';
+            const line = document.createElement('div');
+            line.className = `log-${type}`;
+            const time = new Date().toTimeString().split(' ')[0];
+            line.textContent = `[${time}] ${msg}`;
+            box.appendChild(line);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function fmt(bytes) {
+            if (!bytes || bytes === 0) return '—';
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / 1048576).toFixed(2)} MB`;
+        }
+
+        function fmtDate(d) {
+            if (!d) return '—';
+            const dt = new Date(d);
+            return dt.toLocaleDateString('es-AR') + ' ' + dt.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function ext(name) { return name.split('.').pop().toLowerCase(); }
+        function isImg(name) { return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'avif'].includes(ext(name)); }
+
+        function getHeaders() {
+            const key = document.getElementById('sbKey').value.trim();
+            return { 'apikey': key, 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' };
+        }
+
+        // =============================================
+        // AUDITORÍA PRINCIPAL
+        // =============================================
+        async function startAudit() {
+            const url = document.getElementById('sbUrl').value.trim().replace(/\/$/, '');
+            const key = document.getElementById('sbKey').value.trim();
+            if (!url || !key) { alert('Completá la URL y la Service Role Key'); return; }
+
+            document.getElementById('btnAudit').disabled = true;
+            document.getElementById('btnAudit').textContent = '⏳ Auditando...';
+            document.getElementById('exportRow').style.display = 'none';
+            ['logCard', 'statsCard', 'problemsCard', 'tableCard', 'cleanupSection'].forEach(id => document.getElementById(id).style.display = 'block');
+
+            log('Iniciando auditoría de Storage...', 'info');
+            log(`Proyecto: ${url}`, 'info');
+            auditMeta.url = url;
+            auditMeta.timestamp = new Date().toISOString();
+            allFiles = [];
+            dbReferences = new Set();
+            orphanFiles = [];
+
+            const headers = getHeaders();
+            const buckets = ['product-images', 'store-logos'];
+
+            for (const bucket of buckets) {
+                log(`Escaneando bucket: ${bucket}`, 'info');
+                await listFiles(url, headers, bucket, '');
+            }
+            log(`✅ Total archivos encontrados: ${allFiles.length}`, 'ok');
+
+            log('Consultando referencias en la base de datos...', 'info');
+            await fetchDbRefs(url, headers);
+
+            log('Analizando archivos huérfanos...', 'info');
+            detectOrphans();
+
+            renderStats(url);
+            renderProblems();
+            renderTable();
+            renderCleanup(url, headers);
+
+            auditMeta.totalFiles = allFiles.length;
+            auditMeta.totalSize = allFiles.reduce((s, f) => s + (f.size || 0), 0);
+            auditMeta.pngCount = allFiles.filter(f => f.ext === 'png').length;
+            auditMeta.orphanCount = orphanFiles.length;
+            auditMeta.largeCount = allFiles.filter(f => f.size > 300 * 1024).length;
+
+            document.getElementById('exportRow').style.display = 'flex';
+            log('✅ Auditoría completa. Usá los botones de Exportar para guardar los resultados.', 'ok');
+            document.getElementById('btnAudit').disabled = false;
+            document.getElementById('btnAudit').textContent = '🔄 Re-auditar';
+        }
+
+        async function listFiles(url, headers, bucket, prefix) {
+            try {
+                const res = await fetch(`${url}/storage/v1/object/list/${bucket}`, {
+                    method: 'POST', headers,
+                    body: JSON.stringify({ prefix, limit: 1000, offset: 0, sortBy: { column: 'name', order: 'asc' } })
+                });
+                if (!res.ok) { log(`❌ Error bucket ${bucket}/${prefix}: ${res.status}`, 'error'); return; }
+                const data = await res.json();
+                if (!Array.isArray(data)) { log(`⚠️ Respuesta inesperada para ${bucket}/${prefix}`, 'warn'); return; }
+                for (const item of data) {
+                    if (item.id === null) {
+                        const np = prefix ? `${prefix}/${item.name}` : item.name;
+                        await listFiles(url, headers, bucket, np);
+                    } else {
+                        const fullPath = prefix ? `${prefix}/${item.name}` : item.name;
+                        allFiles.push({
+                            bucket, name: item.name, path: fullPath,
+                            publicUrl: `${url}/storage/v1/object/public/${bucket}/${fullPath}`,
+                            size: item.metadata?.size || 0, mimetype: item.metadata?.mimetype || '',
+                            lastModified: item.updated_at || item.created_at, ext: ext(item.name),
+                            isOrphan: false
+                        });
+                    }
+                }
+                log(`  📁 ${bucket}/${prefix || '(raíz)'}: ${data.length} items`, 'info');
+            } catch (err) { log(`❌ Error: ${err.message}`, 'error'); }
+        }
+
+        async function fetchDbRefs(url, headers) {
+            try {
+                const res = await fetch(`${url}/rest/v1/products?select=image_url,gallery_images&limit=10000`, {
+                    headers: { ...headers, 'Prefer': 'count=exact' }
+                });
+                if (res.ok) {
+                    const products = await res.json();
+                    log(`  📦 Productos en DB: ${products.length}`, 'ok');
+                    products.forEach(p => {
+                        if (p.image_url) dbReferences.add(p.image_url);
+                        if (Array.isArray(p.gallery_images)) p.gallery_images.forEach(u => u && dbReferences.add(u));
+                    });
+                    log(`  🔗 URLs referenciadas: ${dbReferences.size}`, 'ok');
+                } else log(`⚠️ No se pudieron obtener productos: ${res.status}`, 'warn');
+            } catch (err) { log(`❌ Error productos: ${err.message}`, 'error'); }
+
+            try {
+                const res = await fetch(`${url}/rest/v1/stores?select=logo_url&limit=1000`, { headers });
+                if (res.ok) {
+                    const stores = await res.json();
+                    log(`  🏪 Tiendas en DB: ${stores.length}`, 'ok');
+                    stores.forEach(s => s.logo_url && dbReferences.add(s.logo_url));
+                }
+            } catch (err) { log(`⚠️ Error tiendas: ${err.message}`, 'warn'); }
+        }
+
+        function detectOrphans() {
+            orphanFiles = [];
+            allFiles.forEach(file => {
+                if (isImg(file.name)) {
+                    const referenced = Array.from(dbReferences).some(ref => ref && ref.includes(file.path));
+                    file.isOrphan = !referenced;
+                    if (!referenced) {
+                        orphanFiles.push(file);
+                        log(`  👻 Huérfano: ${file.bucket}/${file.path} (${fmt(file.size)})`, 'warn');
+                    }
+                }
+            });
+            log(`Total huérfanos: ${orphanFiles.length}`, orphanFiles.length > 0 ? 'warn' : 'ok');
+        }
+
+        // =============================================
+        // RENDERIZADO
+        // =============================================
+        function renderStats(url) {
+            const total = allFiles.length;
+            const totalSize = allFiles.reduce((s, f) => s + (f.size || 0), 0);
+            const pngs = allFiles.filter(f => f.ext === 'png');
+            const webps = allFiles.filter(f => f.ext === 'webp');
+            const large = allFiles.filter(f => f.size > 300 * 1024);
+            const pct = Math.min(100, (totalSize / (1024 * 1024 * 1024)) * 100);
+
+            document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-value color-accent">${total}</div><div class="stat-label">Archivos Totales</div><div class="stat-sub">${fmt(totalSize)}</div></div>
+    <div class="stat-card"><div class="stat-value ${pngs.length > 0 ? 'color-orange' : 'color-green'}">${pngs.length}</div><div class="stat-label">Archivos PNG</div><div class="stat-sub">${fmt(pngs.reduce((s, f) => s + f.size, 0))}</div></div>
+    <div class="stat-card"><div class="stat-value color-green">${webps.length}</div><div class="stat-label">Archivos WebP</div><div class="stat-sub">✅ formato óptimo</div></div>
+    <div class="stat-card"><div class="stat-value ${orphanFiles.length > 0 ? 'color-red' : 'color-green'}">${orphanFiles.length}</div><div class="stat-label">Huérfanos</div><div class="stat-sub">${fmt(orphanFiles.reduce((s, f) => s + f.size, 0))} recuperables</div></div>
+    <div class="stat-card"><div class="stat-value ${large.length > 0 ? 'color-yellow' : 'color-green'}">${large.length}</div><div class="stat-label">Archivos >300KB</div><div class="stat-sub">contribuyen al egress</div></div>
+    <div class="stat-card"><div class="stat-value color-accent">${pct.toFixed(1)}%</div><div class="stat-label">Storage Usado</div><div class="stat-sub">${fmt(totalSize)} / 1 GB</div></div>
+  `;
+            document.getElementById('egresBar').style.width = `${pct}%`;
+            document.getElementById('egresLabel').textContent = `Storage total: ${fmt(totalSize)} de 1 GB (${pct.toFixed(1)}%)`;
+        }
+
+        function renderProblems() {
+            const problems = [];
+            const pngs = allFiles.filter(f => f.ext === 'png');
+            const big = allFiles.filter(f => f.size > 1024 * 1024);
+            const large = allFiles.filter(f => f.size > 500 * 1024);
+
+            if (pngs.length > 0) problems.push({
+                icon: '🟠', title: `${pngs.length} archivos PNG detectados`,
+                desc: `Peso total: ${fmt(pngs.reduce((s, f) => s + f.size, 0))}. Los PNG generan mucho más egress. Deberían convertirse a WebP.`, sev: 'orange'
+            });
+            if (orphanFiles.length > 0) problems.push({
+                icon: '🔴', title: `${orphanFiles.length} archivos huérfanos`,
+                desc: `Sin referencia en DB. Peso recuperable: ${fmt(orphanFiles.reduce((s, f) => s + f.size, 0))}.`, sev: 'red'
+            });
+            if (big.length > 0) problems.push({
+                icon: '🟡', title: `${big.length} imágenes pesan más de 1MB`,
+                desc: `El compresor WebP tiene como objetivo 500KB pero no lo garantiza. Imágenes con mucho detalle pueden superar ese límite.`, sev: 'yellow'
+            });
+            if (large.length > 0 && large.length !== big.length) problems.push({
+                icon: '🟡', title: `${large.filter(f => f.size <= 1024 * 1024).length} imágenes entre 300KB y 1MB`,
+                desc: `Peso moderado pero acumulativo. Con muchas visitas contribuyen al egress mensual.`, sev: 'yellow'
+            });
+
+            if (problems.length === 0) {
+                document.getElementById('problemsList').innerHTML = `<div style="text-align:center;padding:24px;color:var(--green)">✅ <strong>Sin problemas detectados.</strong></div>`;
+                return;
+            }
+            document.getElementById('problemsList').innerHTML = problems.map(p => `
+    <div style="border-left:3px solid var(--${p.sev === 'red' ? 'red' : p.sev === 'orange' ? 'orange' : 'yellow'});padding:12px 16px;margin-bottom:12px;background:var(--bg3);border-radius:0 8px 8px 0">
+      <div style="font-weight:600;margin-bottom:4px">${p.icon} ${p.title}</div>
+      <div style="font-size:.8rem;color:var(--text2)">${p.desc}</div>
+    </div>`).join('');
+        }
+
+        function renderTable() {
+            document.getElementById('fileCount').textContent = `${allFiles.length} archivos`;
+            renderFiltered(allFiles);
+        }
+
+        function renderFiltered(files) {
+            const tbody = document.getElementById('fileTableBody');
+            files = [...files].sort((a, b) => (b.size || 0) - (a.size || 0));
+            tbody.innerHTML = '';
+            if (files.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3)">Sin archivos para este filtro</td></tr>`;
+                return;
+            }
+            files.forEach(f => {
+                const isPng = f.ext === 'png';
+                const isLarge = f.size > 300 * 1024;
+                const rowClass = f.isOrphan ? 'orphan-highlight' : isPng ? 'png-highlight' : isLarge ? 'large-highlight' : '';
+                let badges = '';
+                if (f.isOrphan) badges += `<span class="badge badge-red">👻 Huérfano</span> `;
+                if (isPng) badges += `<span class="badge badge-orange">🟠 PNG</span> `;
+                if (f.size > 1024 * 1024) badges += `<span class="badge badge-red">⚠️ +1MB</span> `;
+                else if (isLarge) badges += `<span class="badge badge-yellow">⚠️ Grande</span> `;
+                if (!isLarge && !isPng && !f.isOrphan) badges = `<span class="badge badge-green">✅ OK</span>`;
+                const extClass = isPng ? 'badge-orange' : f.ext === 'webp' ? 'badge-green' : 'badge-gray';
+                tbody.innerHTML += `
+      <tr class="${rowClass}">
+        <td><span class="badge badge-blue">${f.bucket}</span></td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:.72rem;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.path}">
+          <a href="${f.publicUrl}" target="_blank" style="color:var(--accent);text-decoration:none">${f.path}</a>
+        </td>
+        <td><span class="badge ${extClass}">.${f.ext.toUpperCase()}</span></td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;${f.size > 500 * 1024 ? 'color:var(--red)' : f.size > 300 * 1024 ? 'color:var(--yellow)' : ''}">${fmt(f.size)}</td>
+        <td style="font-size:.72rem;color:var(--text3)">${fmtDate(f.lastModified)}</td>
+        <td>${badges}</td>
+      </tr>`;
+            });
+        }
+
+        function filterTable(filter, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            let filtered;
+            switch (filter) {
+                case 'png': filtered = allFiles.filter(f => f.ext === 'png'); break;
+                case 'orphan': filtered = orphanFiles; break;
+                case 'large': filtered = allFiles.filter(f => f.size > 300 * 1024); break;
+                case 'logos': filtered = allFiles.filter(f => f.bucket === 'store-logos'); break;
+                case 'products': filtered = allFiles.filter(f => f.bucket === 'product-images'); break;
+                default: filtered = allFiles;
+            }
+            document.getElementById('fileCount').textContent = `${filtered.length} / ${allFiles.length} archivos`;
+            renderFiltered(filtered);
+        }
+
+        function renderCleanup(url, headers) {
+            const div = document.getElementById('cleanupList');
+            if (orphanFiles.length === 0) {
+                div.innerHTML = `<div style="text-align:center;padding:16px;color:var(--green)">✅ Sin archivos huérfanos. ¡Perfecto!</div>`;
+                return;
+            }
+            window._cleanupCtx = { url, headers };
+            div.innerHTML = `<p style="font-size:.8rem;color:var(--text2);margin-bottom:12px">Seleccioná los huérfanos a eliminar:</p>` +
+                orphanFiles.map((f, i) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:8px;margin-bottom:6px;border:1px solid rgba(239,68,68,.2)">
+        <input type="checkbox" id="orphan_${i}" value="${f.bucket}|||${f.path}" checked style="accent-color:var(--red)">
+        <label for="orphan_${i}" style="flex:1;font-family:'JetBrains Mono',monospace;font-size:.72rem;cursor:pointer">
+          <span style="color:var(--text3)">${f.bucket}/</span>${f.path}
+        </label>
+        <span style="font-size:.75rem;color:var(--red)">${fmt(f.size)}</span>
+      </div>`).join('');
+            document.getElementById('btnCleanup').style.display = 'block';
+        }
+
+        async function cleanupOrphans() {
+            const { url, headers } = window._cleanupCtx || {};
+            if (!url) { alert('Primero ejecutá la auditoría'); return; }
+            const checks = document.querySelectorAll('[id^="orphan_"]:checked');
+            if (checks.length === 0) { alert('Seleccioná al menos uno'); return; }
+            if (!confirm(`⚠️ Eliminar ${checks.length} archivo(s) de forma IRREVERSIBLE. ¿Seguro?`)) return;
+            document.getElementById('btnCleanup').disabled = true;
+            const byBucket = {};
+            checks.forEach(cb => { const [b, p] = cb.value.split('|||'); (byBucket[b] = byBucket[b] || []).push(p); });
+            for (const [bucket, paths] of Object.entries(byBucket)) {
+                log(`🗑️ Eliminando ${paths.length} archivo(s) de ${bucket}...`, 'warn');
+                try {
+                    const res = await fetch(`${url}/storage/v1/object/${bucket}`, { method: 'DELETE', headers, body: JSON.stringify({ prefixes: paths }) });
+                    if (res.ok) log(`✅ ${paths.length} archivo(s) eliminados de ${bucket}`, 'ok');
+                    else log(`❌ Error: ${await res.text()}`, 'error');
+                } catch (err) { log(`❌ ${err.message}`, 'error'); }
+            }
+            log('🔄 Re-auditando...', 'info');
+            await startAudit();
+        }
+
+        // =============================================
+        // EXPORTACIÓN
+        // =============================================
+        function exportJSON() {
+            const data = {
+                meta: { ...auditMeta, exportedAt: new Date().toISOString() },
+                summary: {
+                    totalFiles: allFiles.length,
+                    totalSizeBytes: allFiles.reduce((s, f) => s + (f.size || 0), 0),
+                    pngFiles: allFiles.filter(f => f.ext === 'png').length,
+                    webpFiles: allFiles.filter(f => f.ext === 'webp').length,
+                    orphanFiles: orphanFiles.length,
+                    filesOver300KB: allFiles.filter(f => f.size > 300 * 1024).length,
+                    filesOver1MB: allFiles.filter(f => f.size > 1024 * 1024).length,
+                },
+                problems: {
+                    pngs: allFiles.filter(f => f.ext === 'png').map(f => ({ path: f.path, bucket: f.bucket, size: f.size, url: f.publicUrl })),
+                    orphans: orphanFiles.map(f => ({ path: f.path, bucket: f.bucket, size: f.size })),
+                    largeFiles: allFiles.filter(f => f.size > 300 * 1024).map(f => ({ path: f.path, bucket: f.bucket, size: f.size, ext: f.ext })),
+                },
+                allFiles: allFiles.map(f => ({ bucket: f.bucket, path: f.path, size: f.size, ext: f.ext, isOrphan: f.isOrphan, lastModified: f.lastModified }))
+            };
+            download('storage-audit.json', 'application/json', JSON.stringify(data, null, 2));
+        }
+
+        function exportTXT() {
+            const now = new Date().toLocaleString('es-AR');
+            const ts = allFiles.reduce((s, f) => s + (f.size || 0), 0);
+            const pngs = allFiles.filter(f => f.ext === 'png');
+            const large = allFiles.filter(f => f.size > 300 * 1024);
+
+            let txt = `============================================================\n`;
+            txt += `  REPORTE DE AUDITORÍA — STORAGE CLICANDO\n`;
+            txt += `  Fecha: ${now}\n`;
+            txt += `  Proyecto: ${auditMeta.url}\n`;
+            txt += `============================================================\n\n`;
+            txt += `RESUMEN GENERAL\n`;
+            txt += `---------------\n`;
+            txt += `Total archivos:      ${allFiles.length}\n`;
+            txt += `Tamaño total:        ${fmt(ts)}\n`;
+            txt += `Archivos PNG:        ${pngs.length} (${fmt(pngs.reduce((s, f) => s + f.size, 0))})\n`;
+            txt += `Archivos WebP:       ${allFiles.filter(f => f.ext === 'webp').length}\n`;
+            txt += `Huérfanos:           ${orphanFiles.length}\n`;
+            txt += `Archivos >300KB:     ${large.length}\n`;
+            txt += `Archivos >1MB:       ${allFiles.filter(f => f.size > 1024 * 1024).length}\n\n`;
+
+            if (pngs.length > 0) {
+                txt += `ARCHIVOS PNG DETECTADOS (${pngs.length})\n`;
+                txt += `------------------------------------\n`;
+                pngs.sort((a, b) => b.size - a.size).forEach(f => {
+                    txt += `  [${f.bucket}] ${f.path.padEnd(60)} ${fmt(f.size).padStart(10)}\n`;
+                });
+                txt += `\n`;
+            }
+
+            if (orphanFiles.length > 0) {
+                txt += `ARCHIVOS HUÉRFANOS - SIN REFERENCIA EN DB (${orphanFiles.length})\n`;
+                txt += `------------------------------------------------------\n`;
+                orphanFiles.forEach(f => {
+                    txt += `  [${f.bucket}] ${f.path.padEnd(60)} ${fmt(f.size).padStart(10)}\n`;
+                });
+                txt += `\n`;
+            }
+
+            if (large.length > 0) {
+                txt += `ARCHIVOS GRANDES >300KB (${large.length})\n`;
+                txt += `---------------------------------------\n`;
+                large.sort((a, b) => b.size - a.size).forEach(f => {
+                    txt += `  [${f.bucket}] ${f.path.padEnd(50)} ${fmt(f.size).padStart(10)}  .${f.ext.toUpperCase()}\n`;
+                });
+                txt += `\n`;
+            }
+
+            txt += `TODOS LOS ARCHIVOS\n`;
+            txt += `------------------\n`;
+            [...allFiles].sort((a, b) => b.size - a.size).forEach(f => {
+                const flags = [f.isOrphan ? 'HUERFANO' : '', f.ext === 'png' ? 'PNG' : '', f.size > 300 * 1024 ? 'GRANDE' : ''].filter(Boolean).join(',');
+                txt += `  [${f.bucket}] ${f.path.padEnd(50)} ${fmt(f.size).padStart(10)}  .${f.ext.toUpperCase()}${flags ? ' [' + flags + ']' : ''}\n`;
+            });
+            txt += `\n============================================================\n`;
+            txt += `  Fin del reporte\n`;
+            txt += `============================================================\n`;
+
+            download('storage-audit.txt', 'text/plain', txt);
+        }
+
+        function exportCSV() {
+            let csv = 'bucket,path,filename,extension,size_bytes,size_readable,is_orphan,is_png,is_large,last_modified,public_url\n';
+            [...allFiles].sort((a, b) => b.size - a.size).forEach(f => {
+                csv += `"${f.bucket}","${f.path}","${f.name}","${f.ext}",${f.size},"${fmt(f.size)}",${f.isOrphan},${f.ext === 'png'},${f.size > 300 * 1024},"${f.lastModified || ''}","${f.publicUrl}"\n`;
+            });
+            download('storage-audit.csv', 'text/csv', csv);
+        }
+
+        function exportLog() {
+            const lines = Array.from(document.getElementById('logBox').children).map(el => el.textContent).join('\n');
+            download('audit-log.txt', 'text/plain', lines);
+        }
+
+        function download(filename, type, content) {
+            const blob = new Blob([content], { type });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+        }
+
+        // =============================================
+        // ELIMINAR TIENDA DADA DE BAJA
+        // =============================================
+        let storeDataToDelete = null;
+
+        async function previewStoreDelete() {
+            const url = document.getElementById('sbUrl').value.trim().replace(/\/$/, '');
+            const key = document.getElementById('sbKey').value.trim();
+            if (!url || !key) { alert('Primero completá las credenciales de producción arriba'); return; }
+
+            const userId = document.getElementById('deleteUserId').value.trim();
+            if (!userId) { alert('Ingresá el User ID'); return; }
+
+            const headers = getHeaders();
+            const div = document.getElementById('storeDeletePreview');
+            div.innerHTML = `<div style="color:var(--text2);font-size:.85rem;padding:12px">⏳ Consultando datos...</div>`;
+
+            try {
+                // Traer info de la tienda
+                const storeRes = await fetch(`${url}/rest/v1/stores?user_id=eq.${userId}&select=*`, { headers });
+                const stores = await storeRes.json();
+
+                // Traer productos
+                const prodRes = await fetch(`${url}/rest/v1/products?user_id=eq.${userId}&select=id,name,image_url,gallery_images`, { headers });
+                const products = await prodRes.json();
+
+                // Contar imágenes de storage que le pertenecen
+                const storeImages = allFiles.filter(f => f.path.startsWith(userId));
+
+                storeDataToDelete = { url, headers, userId, stores, products, storeImages };
+
+                let html = `<div style="background:var(--bg3);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:16px;margin-top:12px">`;
+                html += `<h3 style="font-weight:700;margin-bottom:12px;color:var(--red)">⚠️ Se eliminará todo lo siguiente:</h3>`;
+
+                if (stores.length > 0) {
+                    html += `<div style="margin-bottom:10px"><strong>🏪 Tienda:</strong> ${stores[0].name || '(sin nombre)'} (ID: ${stores[0].id || userId})</div>`;
+                } else {
+                    html += `<div style="margin-bottom:10px;color:var(--yellow)">⚠️ No se encontró tienda con ese User ID en la tabla <code>stores</code>.</div>`;
+                }
+
+                html += `<div style="margin-bottom:8px"><strong>📦 Productos en DB:</strong> <span class="badge badge-red">${products.length}</span></div>`;
+
+                // Calcular imágenes referenciadas por productos
+                let imgCount = 0;
+                products.forEach(p => { if (p.image_url) imgCount++; if (Array.isArray(p.gallery_images)) imgCount += p.gallery_images.length; });
+                html += `<div style="margin-bottom:8px"><strong>🖼️ Imágenes referenciadas:</strong> <span class="badge badge-red">~${imgCount}</span></div>`;
+
+                if (storeImages.length > 0) {
+                    html += `<div style="margin-bottom:8px"><strong>📁 Archivos en Storage (con prefijo userId):</strong> <span class="badge badge-red">${storeImages.length}</span></div>`;
+                } else {
+                    html += `<div style="margin-bottom:8px;color:var(--text3);font-size:.8rem">ℹ️ (Los archivos en storage usan nombres con timestamp, no prefijo de userId — se eliminarán por referencia desde los productos)</div>`;
+                }
+
+                const totalSize = products.reduce((s, p) => {
+                    let sz = 0;
+                    const pFile = allFiles.find(f => p.image_url && p.image_url.includes(f.path));
+                    if (pFile) sz += pFile.size;
+                    if (Array.isArray(p.gallery_images)) p.gallery_images.forEach(u => { const gf = allFiles.find(f => u && u.includes(f.path)); if (gf) sz += gf.size; });
+                    return s + sz;
+                }, 0);
+                if (totalSize > 0) html += `<div style="margin-bottom:8px"><strong>💾 Espacio a liberar:</strong> <span class="badge badge-green">~${fmt(totalSize)}</span></div>`;
+
+                html += `</div>`;
+                div.innerHTML = html;
+
+                document.getElementById('btnDeleteStore').disabled = false;
+            } catch (err) {
+                div.innerHTML = `<div style="color:var(--red);font-size:.85rem;padding:12px">❌ Error: ${err.message}</div>`;
+            }
+        }
+
+        async function executeStoreDelete() {
+            const confirmName = document.getElementById('deleteConfirmName').value.trim();
+            const expectedName = 'GuDa Indumentaria';
+
+            if (confirmName.toLowerCase() !== expectedName.toLowerCase()) {
+                alert(`⛔ El nombre ingresado no coincide.\nEscribo exactamente: "${expectedName}"`);
+                return;
+            }
+
+            if (!confirm(`🚨 ÚLTIMA CONFIRMACIÓN\n\nVas a eliminar PERMANENTEMENTE:\n✗ La tienda "${expectedName}"\n✗ Todos sus productos\n✗ Todas sus imágenes en Storage\n\n¿Confirmar eliminación total?`)) return;
+
+            const { url, headers, userId, stores, products } = storeDataToDelete;
+            document.getElementById('btnDeleteStore').disabled = true;
+
+            // 1. Recolectar todos los paths de imágenes
+            dlog('Recolectando imágenes a eliminar...');
+            const imagePaths = [];
+            products.forEach(p => {
+                if (p.image_url) {
+                    const found = allFiles.find(f => p.image_url.includes(f.path));
+                    if (found) imagePaths.push({ bucket: found.bucket, path: found.path });
+                }
+                if (Array.isArray(p.gallery_images)) {
+                    p.gallery_images.forEach(u => {
+                        const found = allFiles.find(f => u && u.includes(f.path));
+                        if (found) imagePaths.push({ bucket: found.bucket, path: found.path });
+                    });
+                }
+            });
+            dlog(`  📁 Imágenes encontradas: ${imagePaths.length}`);
+
+            // 2. Eliminar imágenes del storage
+            const byBucket = {};
+            imagePaths.forEach(({ bucket, path }) => (byBucket[bucket] = byBucket[bucket] || []).push(path));
+            for (const [bucket, paths] of Object.entries(byBucket)) {
+                // Eliminar en lotes de 100
+                for (let i = 0; i < paths.length; i += 100) {
+                    const batch = paths.slice(i, i + 100);
+                    dlog(`🗑️ Eliminando ${batch.length} archivos de ${bucket}...`, 'warn');
+                    try {
+                        const res = await fetch(`${url}/storage/v1/object/${bucket}`, { method: 'DELETE', headers, body: JSON.stringify({ prefixes: batch }) });
+                        if (res.ok) dlog(`  ✅ ${batch.length} archivos eliminados`, 'ok');
+                        else dlog(`  ❌ Error: ${await res.text()}`, 'error');
+                    } catch (err) { dlog(`  ❌ ${err.message}`, 'error'); }
+                }
+            }
+
+            // 3. Eliminar productos de la DB
+            dlog(`🗑️ Eliminando ${products.length} productos de la DB...`, 'warn');
+            try {
+                const res = await fetch(`${url}/rest/v1/products?user_id=eq.${userId}`, { method: 'DELETE', headers });
+                if (res.ok || res.status === 204) dlog(`  ✅ Productos eliminados`, 'ok');
+                else dlog(`  ❌ Error: ${await res.text()}`, 'error');
+            } catch (err) { dlog(`  ❌ ${err.message}`, 'error'); }
+
+            // 4. Eliminar categorías si existen
+            dlog('🗑️ Eliminando categorías...', 'warn');
+            try {
+                const res = await fetch(`${url}/rest/v1/categories?user_id=eq.${userId}`, { method: 'DELETE', headers });
+                if (res.ok || res.status === 204) dlog(`  ✅ Categorías eliminadas`, 'ok');
+                else dlog(`  ⚠️ ${res.status} (puede que no existan)`, 'warn');
+            } catch (err) { dlog(`  ⚠️ ${err.message}`, 'warn'); }
+
+            // 5. Eliminar tienda
+            dlog('🗑️ Eliminando registro de tienda...', 'warn');
+            try {
+                const res = await fetch(`${url}/rest/v1/stores?user_id=eq.${userId}`, { method: 'DELETE', headers });
+                if (res.ok || res.status === 204) dlog(`  ✅ Tienda eliminada de la DB`, 'ok');
+                else dlog(`  ❌ Error: ${await res.text()}`, 'error');
+            } catch (err) { dlog(`  ❌ ${err.message}`, 'error'); }
+
+            dlog('', 'info');
+            dlog('============================================', 'ok');
+            dlog('✅ PROCESO COMPLETADO', 'ok');
+            dlog(`Tienda "${expectedName}" eliminada del sistema.`, 'ok');
+            dlog('Re-auditá para confirmar que el storage quedó limpio.', 'ok');
+            dlog('============================================', 'ok');
+
+            document.getElementById('btnDeleteStore').textContent = '✅ Eliminación completada';
+        }
+    </script>
+</body>
+
+</html>
