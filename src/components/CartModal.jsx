@@ -12,12 +12,13 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
   const handleWhatsAppOrder = async (retriesLeft = 1) => {
     const isDev = import.meta.env.MODE !== 'production';
-    if (isDev) console.debug('🔍 [CART DEBUG]: handleWhatsAppOrder iniciado', { 
+    if (isDev) console.debug('🔍 [CART DEBUG]: handleWhatsAppOrder iniciado', {
       cartLength: cart.length,
       cartItems: cart.map(item => ({
         name: item.product.name,
@@ -45,6 +46,8 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
       });
       return;
     }
+
+    setIsSubmitting(true);
 
     if (!whatsappNumber) {
       Swal.fire({
@@ -122,21 +125,30 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
 
           if (swalRes.isConfirmed) {
             proceedToWhatsApp();
+          } else {
+            setIsSubmitting(false);
           }
           return;
         }
 
         if (isDev) console.debug('✅ [STOCK SUCCESS]: Stock descontado correctamente');
 
-        await Swal.fire({
+        // Notificación no bloqueante (opcional, para feedback visual rápido)
+        Swal.fire({
           icon: 'success',
-          title: '✅ Stock Reservado',
-          text: 'Tu stock ha sido reservado correctamente. Ahora serás redirigido a WhatsApp.',
-          timer: 2000,
-          showConfirmButton: false
+          title: '✅ ¡Pedido Confirmado!',
+          text: 'Redirigiendo a WhatsApp...',
+          showConfirmButton: false,
+          timer: 1500,
+          toast: true,
+          position: 'top-end'
         });
 
+        // Redirección inmediata
+        proceedToWhatsApp();
+
       } catch (error) {
+        setIsSubmitting(false);
         if (isDev) console.error('🔥 [STOCK CRITICAL ERROR]:', error);
 
         const swalRes = await Swal.fire({
@@ -153,23 +165,28 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
           if (retriesLeft > 0) {
             await handleWhatsAppOrder(retriesLeft - 1);
           } else {
-            await Swal.fire({icon: 'error', title: 'No se pudo reservar stock', text: 'Por favor intenta más tarde o contacta al vendedor.'});
+            await Swal.fire({ icon: 'error', title: 'No se pudo reservar stock', text: 'Por favor intenta más tarde o contacta al vendedor.' });
           }
         }
         return;
       }
+    } else {
+      // Si el stock NO está habilitado, vamos directo a WhatsApp sin demora
+      proceedToWhatsApp();
     }
 
     // Función auxiliar para continuar a WhatsApp
-    const proceedToWhatsApp = () => {
+    // CAMBIO IMPORTANTE: Usamos window.location.href en lugar de window.open
+    // Esto es mucho más confiable en móviles y evita el bloqueo de popups después de un proceso asíncrono
+    function proceedToWhatsApp() {
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
+
+      // En móviles, location.href suele abrir la App directamente de forma más fluida
+      window.location.href = whatsappUrl;
+
       onClose();
       clearCart();
-    };
-
-    // Si no hay stock habilitado o se procesó correctamente, continuar con WhatsApp (una sola llamada)
-    proceedToWhatsApp();
+    }
   };
 
   const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -235,7 +252,13 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
           </div>
         </div>
 
-        <button className={styles.whatsappButton} onClick={handleWhatsAppOrder}>Confirmar Pedido por WhatsApp</button>
+        <button
+          className={styles.whatsappButton}
+          onClick={handleWhatsAppOrder}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Procesando pedido...' : 'Confirmar Pedido por WhatsApp'}
+        </button>
       </div>
     </div>
   );

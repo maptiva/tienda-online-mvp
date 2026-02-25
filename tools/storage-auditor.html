@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔍 Auditor de Storage — Clicando</title>
+    <!-- Bibliotecas externas -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -414,7 +417,8 @@
         <label>Service Role Key (Producción)</label>
         <input type="password" id="sbKey" placeholder="eyJhbGci..." />
         <div class="info-box">💡 Supabase Dashboard → Settings → API → <strong>service_role</strong> (secret). Buckets:
-            <strong>product-images</strong> y <strong>store-logos</strong></div>
+            <strong>product-images</strong> y <strong>store-logos</strong>
+        </div>
         <button class="btn" id="btnAudit" onclick="startAudit()">🚀 Iniciar Auditoría Completa</button>
     </div>
 
@@ -440,7 +444,8 @@
         <div class="btn-row" id="exportRow" style="display:none">
             <button class="btn btn-export" onclick="exportJSON()">📦 Exportar JSON Completo</button>
             <button class="btn btn-export" onclick="exportTXT()">📄 Exportar Reporte TXT</button>
-            <button class="btn btn-export" onclick="exportCSV()">📊 Exportar CSV</button>
+            <button class="btn" onclick="runDeepCheck()"
+                style="background:var(--bg3); border:1px solid var(--accent)">🔍 Realizar Verificación Profunda</button>
         </div>
     </div>
 
@@ -461,6 +466,8 @@
             <button class="filter-btn" onclick="filterTable('png',this)">🟠 Solo PNGs</button>
             <button class="filter-btn" onclick="filterTable('orphan',this)">🔴 Huérfanos</button>
             <button class="filter-btn" onclick="filterTable('large',this)">🟡 Grandes (>300KB)</button>
+            <button class="filter-btn" onclick="filterTable('json_bug',this)"
+                style="border-color:var(--red); color:var(--red)">🚨 Corruptos (JSON)</button>
             <button class="filter-btn" onclick="filterTable('logos',this)">🏪 Logos</button>
             <button class="filter-btn" onclick="filterTable('products',this)">🖼️ Productos</button>
         </div>
@@ -474,11 +481,36 @@
                         <th>Tamaño</th>
                         <th>Fecha</th>
                         <th>Estado</th>
+                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody id="fileTableBody"></tbody>
             </table>
         </div>
+    </div>
+
+    <!-- OPTIMIZACIÓN EN LOTE -->
+    <div class="card" id="optimizationSection" style="display:none; border-color:var(--accent)">
+        <div class="section-header">
+            <h2>⚡ Optimización Automática</h2>
+            <span id="largeFileCount" class="badge badge-yellow">0 archivos pesados</span>
+        </div>
+        <div class="info-box">
+            🚀 <strong>Potenciado por Clicando:</strong> Esta herramienta descarga las imágenes pesadas (>300KB), las
+            procesa con el nuevo compresor de <strong>doble pasada</strong> (objetivo 250KB) y las resube
+            automáticamente manteniendo la misma URL.
+        </div>
+        <div id="optimizationProgress" style="margin-bottom:16px; display:none">
+            <div style="display:flex; justify-content:space-between; font-size:.8rem; margin-bottom:6px">
+                <span id="optStatus">Procesando...</span>
+                <span id="optPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div id="optBar" class="progress-fill" style="width:0%; background:var(--accent)"></div>
+            </div>
+        </div>
+        <button class="btn" id="btnOptimizeAll" onclick="recompressAllLarge()">🪄 Optimizar Todos los Archivos
+            Pesados</button>
     </div>
 
     <!-- LIMPIEZA HUÉRFANOS -->
@@ -620,7 +652,17 @@
             auditMeta.largeCount = allFiles.filter(f => f.size > 300 * 1024).length;
 
             document.getElementById('exportRow').style.display = 'flex';
-            log('✅ Auditoría completa. Usá los botones de Exportar para guardar los resultados.', 'ok');
+
+            // Mostrar sección de optimización si hay archivos grandes o corruptos
+            const largeFiles = allFiles.filter(f => f.size > 300 * 1024 && !f.isOrphan);
+            const jsonFiles = allFiles.filter(f => f.mimetype === 'application/json');
+
+            if (largeFiles.length > 0 || jsonFiles.length > 0) {
+                document.getElementById('optimizationSection').style.display = 'block';
+                document.getElementById('largeFileCount').textContent = `${largeFiles.length} pesados, ${jsonFiles.length} corruptos`;
+            }
+
+            log('✅ Auditoría preliminar completa.', 'ok');
             document.getElementById('btnAudit').disabled = false;
             document.getElementById('btnAudit').textContent = '🔄 Re-auditar';
         }
@@ -771,10 +813,17 @@
                 let badges = '';
                 if (f.isOrphan) badges += `<span class="badge badge-red">👻 Huérfano</span> `;
                 if (isPng) badges += `<span class="badge badge-orange">🟠 PNG</span> `;
+                if (f.mimetype === 'application/json') badges += `<span class="badge badge-red">🚨 Error: JSON</span> `;
                 if (f.size > 1024 * 1024) badges += `<span class="badge badge-red">⚠️ +1MB</span> `;
                 else if (isLarge) badges += `<span class="badge badge-yellow">⚠️ Grande</span> `;
-                if (!isLarge && !isPng && !f.isOrphan) badges = `<span class="badge badge-green">✅ OK</span>`;
+                if (!isLarge && !isPng && !f.isOrphan && f.mimetype !== 'application/json') badges = `<span class="badge badge-green">✅ OK</span>`;
                 const extClass = isPng ? 'badge-orange' : f.ext === 'webp' ? 'badge-green' : 'badge-gray';
+
+                const isJsonBug = f.mimetype === 'application/json';
+                const actionBtn = (!f.isOrphan && (isLarge || isPng || isJsonBug))
+                    ? `<button class="filter-btn" style="padding:2px 8px; font-size:0.7rem; color:var(--accent)" onclick="recompressFile('${f.bucket}', '${f.path}', this)">🪄 Optimizar</button>`
+                    : '—';
+
                 tbody.innerHTML += `
       <tr class="${rowClass}">
         <td><span class="badge badge-blue">${f.bucket}</span></td>
@@ -785,6 +834,7 @@
         <td style="font-family:'JetBrains Mono',monospace;font-size:.8rem;${f.size > 500 * 1024 ? 'color:var(--red)' : f.size > 300 * 1024 ? 'color:var(--yellow)' : ''}">${fmt(f.size)}</td>
         <td style="font-size:.72rem;color:var(--text3)">${fmtDate(f.lastModified)}</td>
         <td>${badges}</td>
+        <td>${actionBtn}</td>
       </tr>`;
             });
         }
@@ -797,6 +847,7 @@
                 case 'png': filtered = allFiles.filter(f => f.ext === 'png'); break;
                 case 'orphan': filtered = orphanFiles; break;
                 case 'large': filtered = allFiles.filter(f => f.size > 300 * 1024); break;
+                case 'json_bug': filtered = allFiles.filter(f => f.mimetype === 'application/json'); break;
                 case 'logos': filtered = allFiles.filter(f => f.bucket === 'store-logos'); break;
                 case 'products': filtered = allFiles.filter(f => f.bucket === 'product-images'); break;
                 default: filtered = allFiles;
@@ -1102,6 +1153,188 @@
             dlog('============================================', 'ok');
 
             document.getElementById('btnDeleteStore').textContent = '✅ Eliminación completada';
+        }
+
+        /**
+         * Verificación profunda: hace una petición HEAD real a cada archivo para ver qué sirve el servidor.
+         * Optimizada con procesamiento en paralelo y barra de progreso.
+         */
+        async function runDeepCheck() {
+            const suspicious = allFiles.filter(f => !f.isOrphan);
+            if (suspicious.length === 0) return;
+
+            log(`🔍 Iniciando Verificación Profunda de ${suspicious.length} archivos...`, 'info');
+
+            const progress = document.getElementById('optimizationProgress');
+            const bar = document.getElementById('optBar');
+            const status = document.getElementById('optStatus');
+            const percent = document.getElementById('optPercent');
+
+            progress.style.display = 'block';
+            status.textContent = `Verificando metadatos reales...`;
+
+            let found = 0;
+            let processed = 0;
+            const batchSize = 15; // Procesar de a 15 para no saturar
+
+            for (let i = 0; i < suspicious.length; i += batchSize) {
+                const batch = suspicious.slice(i, i + batchSize);
+                await Promise.all(batch.map(async (f) => {
+                    try {
+                        const res = await fetch(f.publicUrl, { method: 'HEAD', cache: 'no-cache' });
+                        const contentType = res.headers.get('Content-Type');
+                        if (contentType === 'application/json') {
+                            f.mimetype = 'application/json'; // Marcar como corrupto
+                            found++;
+                        } else if (contentType && contentType.includes('webp')) {
+                            f.mimetype = 'image/webp';
+                        }
+                    } catch (e) { }
+                    processed++;
+                    const pct = Math.round((processed / suspicious.length) * 100);
+                    bar.style.width = `${pct}%`;
+                    percent.textContent = `${pct}%`;
+                    status.textContent = `Verificando ${processed}/${suspicious.length}...`;
+                }));
+            }
+
+            log(`✅ Fin de Verificación Profunda. Se encontraron ${found} archivos con bug de JSON.`, found > 0 ? 'warn' : 'ok');
+            status.textContent = `✅ Verificación finalizada. ${found} corruptos detectados.`;
+            renderStats();
+            renderTable();
+        }
+
+        // =============================================
+        // OPTIMIZACIÓN / RE-COMPRESIÓN
+        // =============================================
+
+        /**
+         * Lógica de compresión de doble pasada (replica src/utils/imageCompression.js)
+         */
+        async function compressImageInternal(file) {
+            const options = {
+                maxSizeMB: 0.25,
+                maxWidthOrHeight: 1200,
+                useWebWorker: true,
+                fileType: 'image/webp',
+                initialQuality: 0.80,
+            };
+
+            try {
+                let compressedFile = await imageCompression(file, options);
+                const limitBytes = options.maxSizeMB * 1024 * 1024;
+
+                if (compressedFile.size > limitBytes * 1.5) {
+                    console.warn(`[Auditor] Segunda pasada para ${file.name}`);
+                    const aggressiveOptions = {
+                        ...options,
+                        maxSizeMB: options.maxSizeMB * 0.8,
+                        initialQuality: 0.65,
+                        maxWidthOrHeight: 900,
+                    };
+                    const secondPass = await imageCompression(file, aggressiveOptions);
+                    if (secondPass.size < compressedFile.size) compressedFile = secondPass;
+                }
+                return compressedFile;
+            } catch (e) {
+                console.error('Error compresión:', e);
+                return file;
+            }
+        }
+
+        async function recompressFile(bucket, path, btn) {
+            const url = document.getElementById('sbUrl').value.trim();
+            const headers = getHeaders();
+
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳...';
+            }
+
+            try {
+                log(`⚡ Optimizando: ${bucket}/${path}`, 'info');
+
+                // 1. Descargar
+                const res = await fetch(`${url}/storage/v1/object/public/${bucket}/${path}?t=${Date.now()}`);
+                if (!res.ok) throw new Error(`Error descarga: ${res.status}`);
+                const blob = await res.blob();
+                const file = new File([blob], path.split('/').pop(), { type: blob.type });
+
+                // 2. Comprimir
+                const compressed = await compressImageInternal(file);
+
+                const isJsonBug = blob.type === 'application/json';
+                if (compressed.size >= blob.size && !path.endsWith('.png') && !isJsonBug) {
+                    log(`  ⏭️ Saltando (ya está optimizado): ${fmt(compressed.size)}`, 'info');
+                    if (btn) btn.textContent = '✅ OK';
+                    return true;
+                }
+
+                // 3. Resubir
+                // CORRECCIÓN FINAL: Usar PUT y forzar Cache-Control para limpiar el CDN
+                const uploadHeaders = { ...headers };
+                uploadHeaders['Content-Type'] = 'image/webp';
+                uploadHeaders['cache-control'] = 'max-age=0, no-cache, no-store, must-revalidate';
+
+                log(`  📤 Resubiendo con PUT (forzando image/webp)...`, 'info');
+                const uploadRes = await fetch(`${url}/storage/v1/object/${bucket}/${path}`, {
+                    method: 'PUT',
+                    headers: uploadHeaders,
+                    body: compressed
+                });
+
+                if (!uploadRes.ok) {
+                    throw new Error(`Error subida: ${await uploadRes.text()}`);
+                }
+
+                // 4. Verificación Real (HEAD)
+                const verifyRes = await fetch(`${url}/storage/v1/object/public/${bucket}/${path}?t=${Date.now()}`, { method: 'HEAD' });
+                const realType = verifyRes.headers.get('Content-Type');
+
+                if (realType !== 'image/webp') {
+                    throw new Error(`Fallo de persistencia: el CDN sigue reportando ${realType}`);
+                }
+
+                log(`  ✨ Éxito Total: ${fmt(blob.size)} → ${fmt(compressed.size)} | Tipo: ${realType} ✅`, 'ok');
+                if (btn) btn.textContent = '✅';
+                return true;
+            } catch (err) {
+                log(`❌ Error ${path}: ${err.message}`, 'error');
+                if (btn) btn.textContent = '❌';
+                return false;
+            }
+        }
+
+        async function recompressAllLarge() {
+            const largeFiles = allFiles.filter(f => (f.size > 300 * 1024 || f.ext === 'png') && !f.isOrphan);
+            if (largeFiles.length === 0) return;
+
+            if (!confirm(`🪄 Se van a auto-optimizar ${largeFiles.length} archivos.\nEste proceso resube las imágenes comprimidas manteniendo la URL.\n\n¿Continuar?`)) return;
+
+            const btn = document.getElementById('btnOptimizeAll');
+            const progress = document.getElementById('optimizationProgress');
+            const bar = document.getElementById('optBar');
+            const status = document.getElementById('optStatus');
+            const percent = document.getElementById('optPercent');
+
+            btn.disabled = true;
+            progress.style.display = 'block';
+
+            let count = 0;
+            for (const f of largeFiles) {
+                count++;
+                const pct = Math.round((count / largeFiles.length) * 100);
+                status.textContent = `Procesando ${count}/${largeFiles.length}: ${f.name}`;
+                bar.style.width = `${pct}%`;
+                percent.textContent = `${pct}%`;
+
+                await recompressFile(f.bucket, f.path);
+            }
+
+            status.textContent = '✅ Optimización completada';
+            log('🚀 Proceso de optimización masiva terminado.', 'ok');
+            alert('¡Lote completado! La auditoría se reiniciará para verificar los cambios.');
+            await startAudit();
         }
     </script>
 </body>
