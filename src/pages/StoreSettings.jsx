@@ -6,6 +6,7 @@ import { compressLogo } from '../utils/imageCompression';
 import { getStoragePath } from '../utils/storageUtils';
 import StoreMap from '../components/StoreMap';
 import { useShopCategories } from '../hooks/useShopCategories';
+import QRKit from '../components/dashboard/QRKit';
 
 function StoreSettings() {
   const { user } = useAuth();
@@ -58,7 +59,10 @@ function StoreSettings() {
 
   useEffect(() => {
     if (!loading && user) {
-      const dataToStore = { ...storeData, user_id: user.id };
+      const dataToStore = {
+        ...storeData,
+        user_id: user.id
+      };
       sessionStorage.setItem('storeSettingsForm', JSON.stringify(dataToStore));
     }
   }, [storeData, loading, user]);
@@ -83,7 +87,10 @@ function StoreSettings() {
           category: (data.category === 'Veterinaria' || data.category === 'Petshop') ? 'Pet Shop' : (data.category || ''),
           discount_settings: data.discount_settings || { enabled: false, cash_discount: 0, transfer_discount: 0 }
         });
-        if (data.latitude && data.longitude) setShowMapPreview(true);
+
+        if (data.latitude && data.longitude) {
+          setShowMapPreview(true);
+        }
       }
     } catch (error) {
       console.error('Error loading store data:', error);
@@ -97,15 +104,28 @@ function StoreSettings() {
       Swal.fire('Error', 'Ingresa una dirección completa primero', 'warning');
       return;
     }
+
     setGeocoding(true);
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(storeData.address)}&limit=1`);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(storeData.address)}&limit=1`
+      );
       const data = await response.json();
+
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
-        setStoreData(prev => ({ ...prev, latitude: parseFloat(lat), longitude: parseFloat(lon) }));
+        setStoreData(prev => ({
+          ...prev,
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lon)
+        }));
         setShowMapPreview(true);
-        Swal.fire({ icon: 'success', title: '¡Ubicación encontrada!', timer: 1500 });
+        Swal.fire({
+          icon: 'success',
+          title: '¡Ubicación encontrada!',
+          text: 'Verifica el marcador en el mapa',
+          timer: 1500
+        });
       } else {
         Swal.fire('No encontrado', 'No pudimos encontrar esa dirección.', 'warning');
       }
@@ -118,39 +138,80 @@ function StoreSettings() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setStoreData(prev => ({ ...prev, [name]: value }));
+    setStoreData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleDiscountChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setStoreData(prev => ({
+      ...prev,
+      discount_settings: {
+        ...prev.discount_settings,
+        [name]: type === 'checkbox' ? checked : parseFloat(value) || 0
+      }
+    }));
   };
 
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
-    if (file) setLogoFile(file);
+    if (file) {
+      setLogoFile(file);
+    }
   };
 
   const uploadLogo = async () => {
     if (!logoFile) return storeData.logo_url;
+
     try {
       if (storeData.logo_url) {
         const oldPath = getStoragePath(storeData.logo_url, 'store-logos');
-        if (oldPath) await supabase.storage.from('store-logos').remove([oldPath]);
+        if (oldPath) {
+          await supabase.storage.from('store-logos').remove([oldPath]);
+        }
       }
+
       const compressedFile = await compressLogo(logoFile);
       const fileName = `${user.id}/logo-${Date.now()}.webp`;
-      const { error } = await supabase.storage.from('store-logos').upload(fileName, compressedFile, { upsert: true });
+
+      const { error } = await supabase.storage
+        .from('store-logos')
+        .upload(fileName, compressedFile, {
+          upsert: true
+        });
+
       if (error) throw error;
-      const { data: { publicUrl } } = supabase.storage.from('store-logos').getPublicUrl(fileName);
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('store-logos')
+        .getPublicUrl(fileName);
+
       return publicUrl;
-    } catch (error) {
-      throw new Error(`Error al procesar el logo: ${error.message}`);
+    } catch (compressionError) {
+      throw new Error(`Error al procesar el logo: ${compressionError.message}`);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+
     try {
       const logoUrl = await uploadLogo();
-      const dataToSave = { ...storeData, logo_url: logoUrl, user_id: user.id };
-      const { data: existingStore } = await supabase.from('stores').select('id').eq('user_id', user.id).single();
+
+      const dataToSave = {
+        ...storeData,
+        logo_url: logoUrl,
+        user_id: user.id
+      };
+
+      const { data: existingStore } = await supabase
+        .from('stores')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
 
       let result;
       if (existingStore) {
@@ -158,12 +219,25 @@ function StoreSettings() {
       } else {
         result = await supabase.from('stores').insert([dataToSave]);
       }
+
       if (result.error) throw result.error;
+
       sessionStorage.removeItem('storeSettingsForm');
       setStoreData(prev => ({ ...prev, logo_url: logoUrl }));
-      Swal.fire({ icon: 'success', title: '¡Guardado!', timer: 2000 });
+
+      Swal.fire({
+        icon: 'success',
+        title: '¡Guardado!',
+        text: 'Configuración de tienda actualizada correctamente',
+        timer: 2000
+      });
+
     } catch (error) {
-      Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'No se pudo guardar la configuración'
+      });
     } finally {
       setSaving(false);
     }
@@ -172,91 +246,173 @@ function StoreSettings() {
   if (loading) return <div className="flex justify-center items-center h-64"><p className="text-xl">Cargando...</p></div>;
 
   return (
-    <div className="w-full flex-1 flex flex-col min-h-0 bg-white p-0 rounded-xl shadow-xl overflow-hidden">
-      <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar p-4 md:p-8">
+    <div className="w-full flex-1 flex flex-col min-h-0 bg-white p-0 rounded-xl shadow-xl overflow-hidden border border-gray-100">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
         <h2 className="text-2xl md:text-3xl font-bold mb-6">Configuración de Tienda</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+          {/* Store Name */}
           <div>
             <label className="block text-sm font-medium mb-2">Nombre de la Tienda *</label>
-            <input type="text" name="store_name" value={storeData.store_name} onChange={handleInputChange} required className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+            <input type="text" name="store_name" value={storeData.store_name} onChange={handleInputChange} required className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Mi Tienda Online" />
           </div>
 
+          {/* Logo Upload */}
           <div>
             <label className="block text-sm font-medium mb-2">Logo de la Tienda</label>
             <input type="file" accept="image/*" onChange={handleLogoChange} className="w-full p-3 border border-gray-300 rounded-lg" />
             {storeData.logo_url && (
               <div className="mt-3">
-                <img src={storeData.logo_url} alt="Logo" className="h-20 object-contain" />
+                <img src={storeData.logo_url} alt="Logo actual" className="h-20 object-contain" />
               </div>
             )}
           </div>
 
+          {/* Slogan */}
           <div>
             <label className="block text-sm font-medium mb-2 flex justify-between">
               <span>Slogan / Breve Descripción</span>
-              <span className="text-xs text-gray-400">{storeData.short_description?.length || 0}/50</span>
+              <span className={`text-xs ${storeData.short_description?.length >= 50 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                {storeData.short_description?.length || 0}/50
+              </span>
             </label>
-            <input type="text" name="short_description" value={storeData.short_description || ''} onChange={handleInputChange} maxLength={50} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+            <input type="text" name="short_description" value={storeData.short_description || ''} onChange={handleInputChange} maxLength={50} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej: Los mejores budines caseros de la zona." />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Domicilio</label>
-            <input type="text" name="address" value={storeData.address} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+          {/* Location */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Domicilio</label>
+              <input type="text" name="address" value={storeData.address} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Av. Ejemplo 1234" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Ciudad / Localidad</label>
+              <input type="text" name="city" value={storeData.city || ''} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Ciudad / Localidad</label>
-            <input type="text" name="city" value={storeData.city || ''} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-          </div>
-
+          {/* Category */}
           <div>
             <label className="block text-sm font-medium mb-2">Categoría del Comercio</label>
-            <select name="category" value={storeData.category || ''} onChange={handleInputChange} disabled={categoriesLoading} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-              <option value="">Selecciona una categoría</option>
+            <select name="category" value={storeData.category || ''} onChange={handleInputChange} disabled={categoriesLoading} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100">
+              <option value="">{categoriesLoading ? 'Cargando rubros...' : 'Selecciona una categoría'}</option>
               {shopCategories.map(cat => <option key={cat.id} value={cat.id}>{cat.label}</option>)}
             </select>
           </div>
 
+          {/* Map Section */}
           <div className="border-t border-gray-200 pt-6">
             <h3 className="text-lg font-semibold mb-4">📍 Ubicación en Mapa</h3>
-            <button type="button" onClick={handleGeocode} className="bg-green-600 text-white px-4 py-2 rounded-lg mb-4">🔍 Buscar por dirección</button>
+            <button type="button" onClick={handleGeocode} disabled={geocoding || !storeData.address} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 transition-colors mb-4">
+              {geocoding ? 'Buscando...' : '🔍 Buscar ubicación por dirección'}
+            </button>
             {showMapPreview && storeData.latitude && storeData.longitude && (
-              <div className="h-[300px] border border-gray-300 rounded-lg overflow-hidden">
-                <StoreMap
-                  latitude={storeData.latitude}
-                  longitude={storeData.longitude}
-                  storeName={storeData.store_name}
-                  draggable={true}
-                  onPositionChange={pos => setStoreData(p => ({ ...p, latitude: pos.lat, longitude: pos.lng }))}
-                />
+              <div className="h-[300px] w-full border border-gray-300 rounded-lg overflow-hidden">
+                <StoreMap latitude={storeData.latitude} longitude={storeData.longitude} storeName={storeData.store_name} address={storeData.address} draggable={true} onPositionChange={newPos => setStoreData(prev => ({ ...prev, latitude: newPos.lat, longitude: newPos.lng }))} />
               </div>
             )}
             <div className="flex items-center mt-4">
-              <input type="checkbox" id="show_map" checked={storeData.show_map} onChange={e => setStoreData(p => ({ ...p, show_map: e.target.checked }))} className="mr-2" />
-              <label htmlFor="show_map">Mostrar mapa en el pie de página</label>
+              <input type="checkbox" id="show_map" name="show_map" checked={storeData.show_map || false} onChange={e => setStoreData(prev => ({ ...prev, show_map: e.target.checked }))} className="h-4 w-4 text-blue-600 border-gray-300 rounded cursor-pointer" />
+              <label htmlFor="show_map" className="ml-2 block text-sm text-gray-900 cursor-pointer">Mostrar el mapa de ubicación en el pie de página</label>
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Horarios de Atención</label>
-            <input type="text" name="business_hours" value={storeData.business_hours} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg" />
+          {/* Discount Settings Section */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-semibold mb-4 text-emerald-700 flex items-center gap-2">
+              💰 Descuentos por Medio de Pago
+            </h3>
+            <div className="flex items-center mb-4">
+              <input
+                type="checkbox"
+                id="discount_enabled"
+                name="enabled"
+                checked={storeData.discount_settings?.enabled}
+                onChange={handleDiscountChange}
+                className="h-4 w-4 text-emerald-600 border-gray-300 rounded cursor-pointer"
+              />
+              <label htmlFor="discount_enabled" className="ml-2 block text-sm font-medium text-gray-700 cursor-pointer">
+                Activar sistema de descuentos automáticos
+              </label>
+            </div>
+            {storeData.discount_settings?.enabled && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100 animate-fade-in">
+                <div>
+                  <label className="block text-xs font-bold text-emerald-800 uppercase mb-2">Descuento Efectivo (%)</label>
+                  <input
+                    type="number"
+                    name="cash_discount"
+                    value={storeData.discount_settings.cash_discount}
+                    onChange={handleDiscountChange}
+                    min="0"
+                    max="100"
+                    className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-emerald-800 uppercase mb-2">Descuento Transferencia (%)</label>
+                  <input
+                    type="number"
+                    name="transfer_discount"
+                    value={storeData.discount_settings.transfer_discount}
+                    onChange={handleDiscountChange}
+                    min="0"
+                    max="100"
+                    className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white"
+                  />
+                </div>
+                <p className="md:col-span-2 text-xs text-emerald-600 italic">
+                  * Los descuentos se aplicarán automáticamente al subtotal en el carrito según el medio de pago seleccionado.
+                </p>
+              </div>
+            )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Número de WhatsApp</label>
-            <input type="text" name="whatsapp_number" value={storeData.whatsapp_number} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg" />
+          {/* Contact Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-gray-200">
+            <div>
+              <label className="block text-sm font-medium mb-2">Horarios de Atención</label>
+              <input type="text" name="business_hours" value={storeData.business_hours} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Lun-Sab: 9:00 - 20:00" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Número de WhatsApp</label>
+              <input type="text" name="whatsapp_number" value={storeData.whatsapp_number} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="5491112345678" />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">URL de Instagram</label>
-            <input type="url" name="instagram_url" value={storeData.instagram_url} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg" />
+          {/* Social Media */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Instagram</label>
+              <input type="url" name="instagram_url" value={storeData.instagram_url} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Facebook</label>
+              <input type="url" name="facebook_url" value={storeData.facebook_url} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">TikTok</label>
+              <input type="url" name="tiktok_url" value={storeData.tiktok_url} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg" />
+            </div>
           </div>
 
-          <button type="submit" disabled={saving} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400">
+          {/* WhatsApp Message */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Mensaje de WhatsApp</label>
+            <textarea name="whatsapp_message" value={storeData.whatsapp_message} onChange={handleInputChange} rows="2" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+          </div>
+
+          <button type="submit" disabled={saving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition-colors uppercase tracking-wider">
             {saving ? 'Guardando...' : 'Guardar Configuración'}
           </button>
         </form>
+
+        {/* QR Diffusion Kit Section */}
+        {!loading && storeData.store_name && (
+          <div className="mt-8">
+            <QRKit storeName={storeData.store_name} logoUrl={storeData.logo_url} storeSlug={storeData.store_slug || storeData.id} />
+          </div>
+        )}
       </div>
     </div>
   );
