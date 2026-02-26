@@ -68,6 +68,15 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
                 </NavLink>
 
                 <NavLink
+                    to={'/admin/pedidos'}
+                    onClick={handleNavClick}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">🛍️</span>
+                    <span>Pedidos</span>
+                </NavLink>
+
+                <NavLink
                     to={'/admin/producto'}
                     onClick={handleNavClick}
                     className={`${commonClass} ${isProductSection ? activeClass : inactiveClass}`}
