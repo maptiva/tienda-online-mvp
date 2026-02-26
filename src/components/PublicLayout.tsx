@@ -38,6 +38,15 @@ const PublicLayout: React.FC = () => {
     }
   }, [storeName, queryClient]);
 
+  // Invalidar cache cuando cambia la tienda
+  useEffect(() => {
+    if (storeName) {
+      queryClient.invalidateQueries({ queryKey: ['storeConfig'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    }
+  }, [storeName, queryClient]);
+
   // Verificar si estamos en la página de lista de productos
   const isProductListPage = location.pathname === `/${storeName}` || location.pathname === `/${storeName}/`;
 

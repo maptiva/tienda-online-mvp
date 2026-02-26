@@ -9,13 +9,13 @@ export const useCategory = () => {
     const { categories, categoryActive, getCategories, activeCategory, limpiarCategories, clearCategoryActive, addCategory, deleteCategory, updateCategory } = useCategoryState();
 
     // Determinar el ID objetivo (Usuario impersonado o logueado)
-    const targetId = impersonatedUser || user?.id;
+    const targetId = impersonatedUser?.id || user?.id;
 
     const limpiarCategoryActive = async () => {
         clearCategoryActive()
     };
 
-    const startActiveCategory = async (id) => {
+    const startActiveCategory = async (id: number) => {
         const category = categories.find(elem => elem.id === id);
 
         if (category) {

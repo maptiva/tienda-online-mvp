@@ -210,6 +210,8 @@ const CartModal: React.FC<CartModalProps> = ({
     }
 
     // Función auxiliar para continuar a WhatsApp
+    // CAMBIO IMPORTANTE: Usamos window.location.href en lugar de window.open
+    // Esto es mucho más confiable en móviles y evita el bloqueo de popups después de un proceso asíncrono
     function proceedToWhatsApp() {
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
@@ -230,7 +232,6 @@ const CartModal: React.FC<CartModalProps> = ({
         paymentMethod: paymentMethod,
         discountApplied: discountAmount
       });
-
       onClose();
       clearCart();
     }

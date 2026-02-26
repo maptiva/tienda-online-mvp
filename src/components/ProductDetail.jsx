@@ -159,7 +159,7 @@ const ProductDetail = () => {
             <ProductImage
               src={displayImage}
               alt={product.name}
-              size="large"
+              variant="detail"
               showHoverEffect={false}
               className="rounded-xl"
             />
@@ -171,7 +171,11 @@ const ProductDetail = () => {
               {allImages.map((img, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setSelectedImage(img)}
+                  onClick={() => {
+                    setSelectedImage(img);
+                    // Scroll suave hacia arriba para ver la imagen principal
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className={`flex justify-center items-center aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${displayImage === img
                     ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20 transform scale-95'
                     : 'border-transparent hover:border-gray-300'

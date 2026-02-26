@@ -72,7 +72,7 @@ const ProductCard = ({ product }) => {
           <ProductImage
             src={imageUrl}
             alt={product.name}
-            size="medium"
+            variant="card"
             showHoverEffect={true}
           />
         </div>

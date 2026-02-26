@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Compresión - Nueva Lógica (250KB + Segunda Pasada)</title>
+    <script
+        src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .config-box {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #11998e;
+        }
+
+        .config-box h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .config-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .config-box li {
+            padding: 5px 0;
+            color: #555;
+        }
+
+        .config-box .pass {
+            font-weight: bold;
+            color: #11998e;
+        }
+
+        .config-box .threshold {
+            color: #f57c00;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border: 2px dashed #11998e;
+        }
+
+        .file-input-wrapper {
+            text-align: center;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .image-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-card h3 {
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        .image-card.first-pass {
+            border-top: 4px solid #667eea;
+        }
+
+        .image-card.second-pass {
+            border-top: 4px solid #f57c00;
+        }
+
+        .image-card.final {
+            border-top: 4px solid #11998e;
+        }
+
+        .image-wrapper {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .stat-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .stat-value.warning {
+            color: #f57c00;
+        }
+
+        .stat-value.success {
+            color: #11998e;
+        }
+
+        .pass-indicator {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .pass-indicator.first {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .pass-indicator.second {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .pass-indicator.skipped {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .savings {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .log-container {
+            background: #263238;
+            color: #aed581;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-container .info {
+            color: #81d4fa;
+        }
+
+        .log-container .warn {
+            color: #ffcc80;
+        }
+
+        .log-container .error {
+            color: #ef5350;
+        }
+
+        .log-container .success {
+            color: #aed581;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #11998e;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🖼️ Prueba de Compresión - Nueva Lógica</h1>
+        <p class="subtitle">Sube una imagen y probá la compresión con segunda pasada automática</p>
+
+        <div class="config-box">
+            <h3>⚙️ Configuración de Compresión</h3>
+            <ul>
+                <li><span class="pass">Primera Pasada:</span> 250KB objetivo, 1200px máx, 80% calidad</li>
+                <li><span class="threshold">Umbral segunda pasada:</span> Si resultado > 375KB</li>
+                <li><span class="pass">Segunda Pasada:</span> 200KB objetivo, 900px máx, 65% calidad</li>
+                <li><span class="pass">Formato de salida:</span> WebP</li>
+            </ul>
+        </div>
+
+        <div class="upload-section">
+            <div class="file-input-wrapper">
+                <label for="imageInput" class="upload-btn">
+                    📁 Seleccionar Imagen
+                </label>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            ⏳ Procesando imagen...
+        </div>
+
+        <div id="results" class="hidden">
+            <div class="comparison-grid">
+                <!-- Original -->
+                <div class="image-card">
+                    <h3>📷 Original</h3>
+                    <div class="image-wrapper">
+                        <img id="originalImage" alt="Original">
+                    </div>
+                    <div class="stats">
+                        <div class="stat-row">
+                            <span class="stat-label">Formato:</span>
+                            <span class="stat-value" id="originalFormat">-</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Tamaño:</span>
+                            <span class="stat-value" id="originalSize">-</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Dimensiones:</span>
+                            <span class="stat-value" id="originalDimensions">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Primera pasada -->
+                <div class="image-card first-pass">
+                    <div class="pass-indicator first" id="pass1Indicator">1️⃣ Primera Pasada</div>
+                    <div class="image-wrapper">
+                        <img id="firstPassImage" alt="Primera Pasada">
+                    </div>
+                    <div class="stats">
+                        <div class="stat-row">
+                            <span class="stat-label">Tamaño:</span>
+                            <span class="stat-value" id="firstPassSize">-</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Dimensiones:</span>
+                            <span class="stat-value" id="firstPassDimensions">-</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Ahorro:</span>
+                            <span class="stat-value" id="firstPassSavings">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resultado final -->
+                <div class="image-card final">
+                    <div class="pass-indicator" id="finalIndicator">✨ Resultado Final</div>
+                    <div class="image-wrapper">
+                        <img id="finalImage" alt="Comprimido">
+                    </div>
+                    <div class="stats">
+                        <div class="stat-row">
+                            <span class="stat-label">Tamaño:</span>
+                            <span class="stat-value" id="finalSize">-</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Dimensiones:</span>
+                            <span class="stat-value" id="finalDimensions">-</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Ahorro:</span>
+                            <span class="stat-value success" id="finalSavings">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="savings" id="savings">
+                💾 Ahorro: 0%
+            </div>
+
+            <div class="log-container" id="logContainer">
+                <div class="info">📝 Log de compresión:</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const logContainer = document.getElementById('logContainer');
+
+        let currentFile = null;
+
+        // Configuración de compresión
+        const config = {
+            firstPass: {
+                maxSizeMB: 0.25,        // 250KB objetivo
+                maxWidthOrHeight: 1200,  // 1200px máx
+                initialQuality: 0.80,   // 80% calidad
+                fileType: 'image/webp',
+                useWebWorker: true
+            },
+            secondPassThreshold: 1.5,    // Si > 250KB * 1.5 = 375KB
+            secondPass: {
+                maxSizeMB: 0.20,        // 200KB (20% más estricto)
+                maxWidthOrHeight: 900,   // 900px
+                initialQuality: 0.65,   // 65% calidad
+            }
+        };
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                currentFile = file;
+                processImage(file);
+            }
+        });
+
+        async function processImage(file) {
+            loading.classList.remove('hidden');
+            results.classList.add('hidden');
+            logContainer.innerHTML = '<div class="info">📝 Log de compresión:</div>';
+
+            try {
+                log(`📷 Archivo original: ${file.name}`, 'info');
+                log(`   Tamaño: ${formatBytes(file.size)}`, 'info');
+
+                // Mostrar imagen original
+                const originalUrl = URL.createObjectURL(file);
+                document.getElementById('originalImage').src = originalUrl;
+                document.getElementById('originalFormat').textContent = file.type.split('/')[1].toUpperCase();
+                document.getElementById('originalSize').textContent = formatBytes(file.size);
+
+                const img = new Image();
+                img.src = originalUrl;
+                await img.decode();
+                document.getElementById('originalDimensions').textContent = `${img.width} × ${img.height}px`;
+
+                // ===== PRIMERA PASADA =====
+                log(`🚀 Primera pasada: objetivo 250KB, 1200px, 80%`, 'info');
+
+                const firstPassFile = await imageCompression(file, config.firstPass);
+                const firstPassSizeKB = (firstPassFile.size / 1024).toFixed(1);
+                const firstPassSavings = ((1 - firstPassFile.size / file.size) * 100).toFixed(1);
+
+                log(`   📊 Resultado: ${firstPassSizeKB}KB (ahorro: ${firstPassSavings}%)`, 'success');
+
+                // Mostrar resultado primera pasada
+                const firstPassUrl = URL.createObjectURL(firstPassFile);
+                document.getElementById('firstPassImage').src = firstPassUrl;
+                document.getElementById('firstPassSize').textContent = formatBytes(firstPassFile.size);
+
+                const firstPassImg = new Image();
+                firstPassImg.src = firstPassUrl;
+                await firstPassImg.decode();
+                document.getElementById('firstPassDimensions').textContent = `${firstPassImg.width} × ${firstPassImg.height}px`;
+                document.getElementById('firstPassSavings').textContent = `${firstPassSavings}%`;
+
+                // Verificar si necesita segunda pasada
+                const thresholdBytes = config.firstPass.maxSizeMB * 1024 * 1024 * config.secondPassThreshold;
+                let finalFile = firstPassFile;
+                let usedSecondPass = false;
+
+                if (firstPassFile.size > thresholdBytes) {
+                    // ===== SEGUNDA PASADA =====
+                    log(`⚠️  Primera pasada: ${firstPassSizeKB}KB > 375KB umbral`, 'warn');
+                    log(`🚀 Segunda pasada: objetivo 200KB, 900px, 65%`, 'warn');
+
+                    const secondPassOptions = {
+                        ...config.firstPass,
+                        ...config.secondPass,
+                        maxWidthOrHeight: Math.min(config.firstPass.maxWidthOrHeight, config.secondPass.maxWidthOrHeight)
+                    };
+
+                    const secondPassFile = await imageCompression(file, secondPassOptions);
+                    const secondPassSizeKB = (secondPassFile.size / 1024).toFixed(1);
+                    const secondPassSavings = ((1 - secondPassFile.size / file.size) * 100).toFixed(1);
+
+                    log(`   📊 Resultado: ${secondPassSizeKB}KB (ahorro: ${secondPassSavings}%)`, 'success');
+
+                    // Usar la más pequeña
+                    if (secondPassFile.size < firstPassFile.size) {
+                        finalFile = secondPassFile;
+                        usedSecondPass = true;
+                        log(`✅ Segunda pasada aceptada (más pequeña)`, 'success');
+                    } else {
+                        log(`⏭️  Segunda pasada descartada (no es más pequeña)`, 'warn');
+                    }
+                } else {
+                    log(`✅ Primera pasada dentro del límite (< 375KB) - sin segunda pasa`, 'success');
+                }
+
+                // Actualizar indicadores
+                const pass1Indicator = document.getElementById('pass1Indicator');
+                const finalIndicator = document.getElementById('finalIndicator');
+
+                if (usedSecondPass) {
+                    pass1Indicator.textContent = '1️⃣ Primera Pasada (descartada)';
+                    pass1Indicator.className = 'pass-indicator';
+                    finalIndicator.textContent = '🔄 Segunda Pasada (usada)';
+                    finalIndicator.className = 'pass-indicator second';
+                } else {
+                    pass1Indicator.textContent = '✅ Primera Pasada (final)';
+                    pass1Indicator.className = 'pass-indicator success';
+                    finalIndicator.textContent = '✨ Resultado Final';
+                    finalIndicator.className = 'pass-indicator';
+                }
+
+                // Mostrar resultado final
+                const finalUrl = URL.createObjectURL(finalFile);
+                document.getElementById('finalImage').src = finalUrl;
+                document.getElementById('finalSize').textContent = formatBytes(finalFile.size);
+
+                const finalImg = new Image();
+                finalImg.src = finalUrl;
+                await finalImg.decode();
+                document.getElementById('finalDimensions').textContent = `${finalImg.width} × ${finalImg.height}px`;
+
+                const finalSavings = ((file.size - finalFile.size) / file.size * 100).toFixed(1);
+                document.getElementById('finalSavings').textContent = `${finalSavings}%`;
+
+                const savingsElement = document.getElementById('savings');
+                savingsElement.textContent = `💾 Ahorro total: ${finalSavings}% (${formatBytes(file.size - finalFile.size)} menos)`;
+
+                log(`🎉 Proceso completado. Tamaño final: ${formatBytes(finalFile.size)}`, 'success');
+
+                loading.classList.add('hidden');
+                results.classList.remove('hidden');
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                console.error('Error:', error);
+                alert('Error al procesar la imagen: ' + error.message);
+                loading.classList.add('hidden');
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+    </script>
+</body>
+
+</html>

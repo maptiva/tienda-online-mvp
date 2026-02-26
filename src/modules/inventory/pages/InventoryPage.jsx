@@ -22,7 +22,7 @@ const InventoryPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Determinar el ID objetivo (Usuario impersonado o logueado)
-  const targetId = impersonatedUser || user?.id;
+  const targetId = impersonatedUser?.id || user?.id;
 
   // Cargar datos extendidos de inventario
   useEffect(() => {

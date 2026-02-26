@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import logoTitle from '../assets/titulo1.png';
 import { useCart } from '../context/CartContext';
 import { MdOutlineShoppingCart } from 'react-icons/md';
 import { HiOutlineSun, HiOutlineMoon } from 'react-icons/hi';
+import { FiInfo } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import SearchBar from './SearchBar';
 import { useSearchState } from '../store/useSearchStore';
+import AboutModal from './public/AboutModal';
 
 const Header = ({ storeData, onCartClick }) => {
   const { cart } = useCart();
   const { storeName } = useParams();
   const { theme, toggleTheme } = useTheme();
   const { searchTerm, setSearchTerm } = useSearchState();
+  const [showAbout, setShowAbout] = useState(false);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -35,7 +38,7 @@ const Header = ({ storeData, onCartClick }) => {
           <div className="flex items-center gap-3 flex-1 min-w-0 mr-4">
             {/* Contenedor para el botón de Clicando en Desktop */}
             <div id="clicando-brand-button-container" className="hidden md:flex md:items-center"></div>
-            
+
             {/* Link de la Tienda */}
             <Link
               to={`/${storeName}`}
@@ -65,11 +68,21 @@ const Header = ({ storeData, onCartClick }) => {
             />
           </div>
 
-          {/* Derecha: Carrito + Tema */}
+          {/* Derecha: Carrito + Tema + Info */}
           <div
-            className="flex items-center gap-6"
+            className="flex items-center gap-4 md:gap-6"
             style={{ color: theme === 'dark' ? '#f1f5f9' : 'var(--color-text-light)' }}
           >
+
+            {/* Icono Info (Nosotros) - Visible en ambos desktop y móvil */}
+            <button
+              onClick={() => setShowAbout(true)}
+              className="cursor-pointer hover:opacity-80 transition-opacity p-1"
+              aria-label="Información"
+              title="Nosotros"
+            >
+              <FiInfo size={22} />
+            </button>
 
             {/* Carrito */}
             <div onClick={onCartClick} className="cursor-pointer hover:opacity-80 transition-opacity">
@@ -94,6 +107,14 @@ const Header = ({ storeData, onCartClick }) => {
           </div>
         </div>
       </div>
+
+      {/* Modal Nosotros */}
+      <AboutModal
+        isOpen={showAbout}
+        onClose={() => setShowAbout(false)}
+        storeName={displayStoreName}
+        storeAboutText={storeData?.about_text}
+      />
     </header>
   );
 };
