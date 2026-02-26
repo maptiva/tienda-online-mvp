@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { orderService, OrderResult } from '../../modules/orders/services/orderService';
+import { orderService, OrderResult, Order } from '../../modules/orders/services/orderService';
+import { OrderDetailModal } from '../../modules/orders/components/OrderDetailModal';
 import { useCurrentStore } from '../../hooks/useCurrentStore';
 import { FaBoxOpen, FaCheckCircle, FaTimesCircle, FaClock, FaMoneyBillWave, FaUniversity } from 'react-icons/fa';
 
@@ -8,9 +9,13 @@ export const OrdersDashboard: React.FC = () => {
     const { user } = useAuth();
     const { storeId, loading: storeLoading, error: storeError } = useCurrentStore();
 
-    const [orders, setOrders] = useState<any[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Modal state
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -35,6 +40,11 @@ export const OrdersDashboard: React.FC = () => {
             setLoading(false);
         }
     }, [user, storeId, storeLoading]);
+
+    const handleViewDetail = (order: Order) => {
+        setSelectedOrder(order);
+        setIsDetailOpen(true);
+    };
 
     // Combined Loading & Error Display
     if (storeLoading || loading) return <div className="p-8 text-center text-gray-500">Cargando pedidos...</div>;
@@ -99,7 +109,12 @@ export const OrdersDashboard: React.FC = () => {
                                             </span>
                                         </td>
                                         <td className="p-4 text-right">
-                                            <button className="text-blue-500 hover:text-blue-700 text-sm font-bold">Ver detalle</button>
+                                            <button
+                                                onClick={() => handleViewDetail(order)}
+                                                className="text-blue-500 hover:text-blue-700 text-sm font-bold"
+                                            >
+                                                Ver detalle
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -108,6 +123,12 @@ export const OrdersDashboard: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            <OrderDetailModal
+                isOpen={isDetailOpen}
+                order={selectedOrder}
+                onClose={() => setIsDetailOpen(false)}
+            />
         </div>
     );
 };

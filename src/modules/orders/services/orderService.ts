@@ -22,6 +22,16 @@ export interface OrderData {
     discountApplied: number;
 }
 
+export interface Order extends OrderData {
+    id: string | number;
+    created_at: string;
+    status: 'pending' | 'completed' | 'cancelled';
+    store_id: number | string;
+    customer_info: CustomerInfo;
+    payment_method: string;
+    discount_applied: number;
+}
+
 export interface OrderResult {
     success: boolean;
     data?: any;
