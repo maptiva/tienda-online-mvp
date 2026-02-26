@@ -5,21 +5,49 @@ import { MdOutlineDelete } from 'react-icons/md';
 import { useTheme } from '../context/ThemeContext';
 import Swal from 'sweetalert2';
 import { inventoryService } from '../modules/inventory/services/inventoryService';
+import { useDiscounts, DiscountSettings } from '../modules/discounts/hooks/useDiscounts';
+import { PaymentMethodSelector } from '../modules/discounts/components/PaymentMethodSelector';
+import { orderService } from '../modules/orders/services/orderService';
 
-const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled }) => {
-  const { cart, removeFromCart, clearCart } = useCart();
-  const { theme } = useTheme();
+interface CartModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  whatsappNumber: string;
+  storeSlug: string;
+  stockEnabled: boolean;
+  storeId: number | string;
+  discountSettings: DiscountSettings;
+}
+
+const CartModal: React.FC<CartModalProps> = ({
+  isOpen,
+  onClose,
+  whatsappNumber,
+  storeSlug,
+  stockEnabled,
+  storeId,
+  discountSettings
+}) => {
+  const { cart, removeFromCart, clearCart } = useCart() as any;
+  const { theme } = useTheme() as any;
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer' | 'other'>('other');
+
+  const subtotal = cart.reduce((sum: number, item: any) => sum + item.product.price * item.quantity, 0);
+  const { calculateDiscount, getPercentageFor } = useDiscounts(discountSettings, subtotal);
+  const discountAmount = calculateDiscount(paymentMethod);
+  const finalTotal = subtotal - discountAmount;
 
   if (!isOpen) return null;
 
   const handleWhatsAppOrder = async (retriesLeft = 1) => {
     const isDev = import.meta.env.MODE !== 'production';
-    if (isDev) console.debug('🔍 [CART DEBUG]: handleWhatsAppOrder iniciado', { 
+    if (isDev) console.debug('🔍 [CART DEBUG]: handleWhatsAppOrder iniciado', {
       cartLength: cart.length,
-      cartItems: cart.map(item => ({
+      cartItems: cart.map((item: any) => ({
         name: item.product.name,
         id: item.product.id,
         quantity: item.quantity
@@ -46,6 +74,8 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
       return;
     }
 
+    setIsSubmitting(true);
+
     if (!whatsappNumber) {
       Swal.fire({
         icon: 'error',
@@ -62,15 +92,22 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
       message += `\n*Dirección:* ${address}`;
     }
 
+    const payMethodLabel = paymentMethod === 'cash' ? 'Efectivo' : (paymentMethod === 'transfer' ? 'Transferencia' : 'Otro/A convenir');
+    message += `\n*Método de Pago:* ${payMethodLabel}`;
+
     message += `\n\n*Pedido:*`;
 
-    cart.forEach(item => {
+    cart.forEach((item: any) => {
       const productRef = item.product.sku ? item.product.sku : `#${item.product.display_id || item.product.id}`;
       message += `\n- ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(item.product.price * item.quantity).toFixed(2)}`;
     });
 
-    const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    message += `\n\n*Total:* $${total.toFixed(2)}`;
+    message += `\n\n*Resumen:*`;
+    message += `\nSubtotal: $${subtotal.toFixed(2)}`;
+    if (discountAmount > 0) {
+      message += `\nDescuento (${getPercentageFor(paymentMethod)}%): -$${discountAmount.toFixed(2)}`;
+    }
+    message += `\n*Total a Pagar: $${finalTotal.toFixed(2)}*`;
 
     // Si el stock está habilitado, descontar antes de redirigir
     if (isDev) console.debug('🔍 [STOCK DEBUG]: Verificando si se procesa stock', {
@@ -87,7 +124,7 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
       });
 
       try {
-        const itemsToProcess = cart.map(item => ({
+        const itemsToProcess = cart.map((item: any) => ({
           product_id: item.product.id,
           quantity: item.quantity
         }));
@@ -95,16 +132,16 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
         if (isDev) console.debug('🔍 [STOCK DEBUG]: Items a procesar:', itemsToProcess);
         if (isDev) console.debug('🔍 [STOCK DEBUG]: Llamando a processPublicCartSale...');
 
-        const result = await inventoryService.processPublicCartSale(storeSlug, itemsToProcess, `Pedido de ${name}`);
+        const result = await (inventoryService as any).processPublicCartSale(storeSlug, itemsToProcess, `Pedido de ${name}`);
         if (isDev) console.debug('🔍 [STOCK DEBUG]: Resultado del procesamiento:', result);
 
         if (!result.success) {
           if (isDev) console.error('🔥 [STOCK ERROR]: Procesamiento fallido');
 
           const resArray = Array.isArray(result.results) ? result.results : (result.results ? JSON.parse(result.results) : []);
-          const failedItems = resArray.filter(item => !item.success);
-          const errorMessage = failedItems.map(item => {
-            const cartItem = cart.find(c => c.product.id === item.product_id);
+          const failedItems = resArray.filter((item: any) => !item.success);
+          const errorMessage = failedItems.map((item: any) => {
+            const cartItem = cart.find((c: any) => c.product.id === item.product_id);
             const productName = cartItem ? cartItem.product.name : `Producto #${item.product_id}`;
             return `• ${productName}: ${item.error}`;
           }).join('\n');
@@ -122,21 +159,30 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
 
           if (swalRes.isConfirmed) {
             proceedToWhatsApp();
+          } else {
+            setIsSubmitting(false);
           }
           return;
         }
 
         if (isDev) console.debug('✅ [STOCK SUCCESS]: Stock descontado correctamente');
 
-        await Swal.fire({
+        // Notificación no bloqueante (opcional, para feedback visual rápido)
+        Swal.fire({
           icon: 'success',
-          title: '✅ Stock Reservado',
-          text: 'Tu stock ha sido reservado correctamente. Ahora serás redirigido a WhatsApp.',
-          timer: 2000,
-          showConfirmButton: false
+          title: '✅ ¡Pedido Confirmado!',
+          text: 'Redirigiendo a WhatsApp...',
+          showConfirmButton: false,
+          timer: 1500,
+          toast: true,
+          position: 'top-end'
         });
 
+        // Redirección inmediata
+        proceedToWhatsApp();
+
       } catch (error) {
+        setIsSubmitting(false);
         if (isDev) console.error('🔥 [STOCK CRITICAL ERROR]:', error);
 
         const swalRes = await Swal.fire({
@@ -153,26 +199,42 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
           if (retriesLeft > 0) {
             await handleWhatsAppOrder(retriesLeft - 1);
           } else {
-            await Swal.fire({icon: 'error', title: 'No se pudo reservar stock', text: 'Por favor intenta más tarde o contacta al vendedor.'});
+            await Swal.fire({ icon: 'error', title: 'No se pudo reservar stock', text: 'Por favor intenta más tarde o contacta al vendedor.' });
           }
         }
         return;
       }
+    } else {
+      // Si el stock NO está habilitado, vamos directo a WhatsApp sin demora
+      proceedToWhatsApp();
     }
 
     // Función auxiliar para continuar a WhatsApp
-    const proceedToWhatsApp = () => {
+    function proceedToWhatsApp() {
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-      window.open(whatsappUrl, '_blank');
+
+      // En móviles, location.href suele abrir la App directamente de forma más fluida
+      window.location.href = whatsappUrl;
+
+      // Registrar pedido en la DB (Silent fail if error, we don't want to block the user)
+      orderService.createOrder({
+        storeId,
+        customerInfo: { name, phone, address },
+        items: cart.map((item: any) => ({
+          product_id: item.product.id,
+          name: item.product.name,
+          quantity: item.quantity,
+          price: item.product.price
+        })),
+        total: finalTotal,
+        paymentMethod: paymentMethod,
+        discountApplied: discountAmount
+      });
+
       onClose();
       clearCart();
-    };
-
-    // Si no hay stock habilitado o se procesó correctamente, continuar con WhatsApp (una sola llamada)
-    proceedToWhatsApp();
+    }
   };
-
-  const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   return (
     <div className={styles.overlay}>
@@ -202,9 +264,18 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
           />
         </div>
 
+        <PaymentMethodSelector
+          selectedMethod={paymentMethod}
+          onChange={(method) => setPaymentMethod(method as any)}
+          discounts={{
+            cash: getPercentageFor('cash'),
+            transfer: getPercentageFor('transfer')
+          }}
+        />
+
         {cart.length > 0 ? (
           <div className={styles.cartItems}>
-            {cart.map(item => (
+            {cart.map((item: any) => (
               <div key={item.product.id} className={styles.productItem}>
                 <img src={item.product.image_url} alt={item.product.name} className={styles.productImage} />
                 <div className={styles.productDetails}>
@@ -230,12 +301,28 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
               Vaciar carrito
             </button>
           )}
-          <div className={styles.total}>
-            Total: ${total.toFixed(2)}
+          <div className={`${styles.total} flex flex-col items-end`}>
+            {discountAmount > 0 && (
+              <span className="text-sm text-gray-400 line-through">Subtotal: ${subtotal.toFixed(2)}</span>
+            )}
+            <div className="flex items-center gap-2">
+              {discountAmount > 0 && (
+                <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">
+                  -{getPercentageFor(paymentMethod)}%
+                </span>
+              )}
+              <span className="font-black text-xl">Total: ${finalTotal.toFixed(2)}</span>
+            </div>
           </div>
         </div>
 
-        <button className={styles.whatsappButton} onClick={handleWhatsAppOrder}>Confirmar Pedido por WhatsApp</button>
+        <button
+          className={styles.whatsappButton}
+          onClick={() => handleWhatsAppOrder()}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Procesando pedido...' : 'Confirmar Pedido por WhatsApp'}
+        </button>
       </div>
     </div>
   );
