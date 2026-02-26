@@ -1,20 +1,12 @@
 import { QueryClient } from '@tanstack/react-query';
 
-<<<<<<< HEAD
-export const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            refetchOnWindowFocus: false,
-            retry: 1,
-            staleTime: 5 * 60 * 1000, // 5 minutes
-=======
 /**
  * QueryClient configuration for TanStack Query
  * 
  * staleTime: Time in ms before data is considered stale (needs refetch)
  * gcTime: Time in ms before unused data is garbage collected
  * refetchOnWindowFocus: Refetch when user returns to the tab
- * refetchOnReconnect: Refetch when network reconnects
+ * refetchOnReconnect: Refetch mechanism when network reconnects
  * retry: Number of retry attempts on failure
  */
 export const queryClient = new QueryClient({
@@ -26,7 +18,6 @@ export const queryClient = new QueryClient({
             refetchOnReconnect: true,
             retry: 2,
             retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
->>>>>>> main
         },
     },
 });

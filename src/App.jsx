@@ -9,9 +9,7 @@ import ProductDetail from './components/ProductDetail';
 import { CartProvider } from './context/CartContext';
 import ScrollToTop from './components/ScrollToTop';
 import LazyLoadFallback from './components/LazyLoadFallback';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { queryClient } from './lib/queryClient';
+
 
 // Critical routes - loaded immediately
 import PublicLayout from './components/PublicLayout';
