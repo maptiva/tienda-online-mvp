@@ -8,6 +8,7 @@ import { inventoryService } from '../modules/inventory/services/inventoryService
 import { useDiscounts, DiscountSettings } from '../modules/discounts/hooks/useDiscounts';
 import { PaymentMethodSelector } from '../modules/discounts/components/PaymentMethodSelector';
 import { orderService } from '../modules/orders/services/orderService';
+import { useShopStats } from '../modules/stats/hooks/useShopStats';
 
 interface CartModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ const CartModal: React.FC<CartModalProps> = ({
 }) => {
   const { cart, removeFromCart, clearCart } = useCart() as any;
   const { theme } = useTheme() as any;
+  const { trackWhatsAppClick, trackOrder } = useShopStats(storeId);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -45,14 +47,6 @@ const CartModal: React.FC<CartModalProps> = ({
 
   const handleWhatsAppOrder = async (retriesLeft = 1) => {
     const isDev = import.meta.env.MODE !== 'production';
-    if (isDev) console.debug('🔍 [CART DEBUG]: handleWhatsAppOrder iniciado', {
-      cartLength: cart.length,
-      cartItems: cart.map((item: any) => ({
-        name: item.product.name,
-        id: item.product.id,
-        quantity: item.quantity
-      }))
-    });
 
     if (cart.length === 0) {
       Swal.fire({
@@ -76,6 +70,14 @@ const CartModal: React.FC<CartModalProps> = ({
 
     setIsSubmitting(true);
 
+    // Registrar intención de compra (Métricas)
+    trackWhatsAppClick({
+      subtotal,
+      finalTotal,
+      paymentMethod,
+      itemsCount: cart.length
+    });
+
     if (!whatsappNumber) {
       Swal.fire({
         icon: 'error',
@@ -83,18 +85,15 @@ const CartModal: React.FC<CartModalProps> = ({
         text: 'No hay número de WhatsApp configurado para esta tienda.',
         confirmButtonColor: 'var(--color-primary)'
       });
+      setIsSubmitting(false);
       return;
     }
 
     let message = `Hola, me gustaría hacer el siguiente pedido:\n\n*Nombre:* ${name}\n*Teléfono:* ${phone}`;
-
-    if (address) {
-      message += `\n*Dirección:* ${address}`;
-    }
+    if (address) message += `\n*Dirección:* ${address}`;
 
     const payMethodLabel = paymentMethod === 'cash' ? 'Efectivo' : (paymentMethod === 'transfer' ? 'Transferencia' : 'Otro/A convenir');
     message += `\n*Método de Pago:* ${payMethodLabel}`;
-
     message += `\n\n*Pedido:*`;
 
     cart.forEach((item: any) => {
@@ -109,116 +108,10 @@ const CartModal: React.FC<CartModalProps> = ({
     }
     message += `\n*Total a Pagar: $${finalTotal.toFixed(2)}*`;
 
-    // Si el stock está habilitado, descontar antes de redirigir
-    if (isDev) console.debug('🔍 [STOCK DEBUG]: Verificando si se procesa stock', {
-      stockEnabled,
-      storeSlug,
-      shouldProcess: !!(stockEnabled && storeSlug)
-    });
-
-    if (stockEnabled && storeSlug) {
-      if (isDev) console.debug('🔍 [STOCK DEBUG]: Iniciando procesamiento de stock', {
-        stockEnabled,
-        storeSlug,
-        cartSize: cart.length
-      });
-
-      try {
-        const itemsToProcess = cart.map((item: any) => ({
-          product_id: item.product.id,
-          quantity: item.quantity
-        }));
-
-        if (isDev) console.debug('🔍 [STOCK DEBUG]: Items a procesar:', itemsToProcess);
-        if (isDev) console.debug('🔍 [STOCK DEBUG]: Llamando a processPublicCartSale...');
-
-        const result = await (inventoryService as any).processPublicCartSale(storeSlug, itemsToProcess, `Pedido de ${name}`);
-        if (isDev) console.debug('🔍 [STOCK DEBUG]: Resultado del procesamiento:', result);
-
-        if (!result.success) {
-          if (isDev) console.error('🔥 [STOCK ERROR]: Procesamiento fallido');
-
-          const resArray = Array.isArray(result.results) ? result.results : (result.results ? JSON.parse(result.results) : []);
-          const failedItems = resArray.filter((item: any) => !item.success);
-          const errorMessage = failedItems.map((item: any) => {
-            const cartItem = cart.find((c: any) => c.product.id === item.product_id);
-            const productName = cartItem ? cartItem.product.name : `Producto #${item.product_id}`;
-            return `• ${productName}: ${item.error}`;
-          }).join('\n');
-
-          const swalRes = await Swal.fire({
-            icon: 'warning',
-            title: '⚠️ Problemas con el Stock',
-            html: `<div style="text-align: left; white-space: pre-line; font-size:14px;">\n              <strong>No pudimos reservar algunos productos:</strong><br><br>\n              ${errorMessage}\n            </div>`,
-            width: '500px',
-            confirmButtonColor: 'var(--color-primary)',
-            showCancelButton: true,
-            cancelButtonText: 'Cancelar pedido',
-            confirmButtonText: 'Continuar de todas formas'
-          });
-
-          if (swalRes.isConfirmed) {
-            proceedToWhatsApp();
-          } else {
-            setIsSubmitting(false);
-          }
-          return;
-        }
-
-        if (isDev) console.debug('✅ [STOCK SUCCESS]: Stock descontado correctamente');
-
-        // Notificación no bloqueante (opcional, para feedback visual rápido)
-        Swal.fire({
-          icon: 'success',
-          title: '✅ ¡Pedido Confirmado!',
-          text: 'Redirigiendo a WhatsApp...',
-          showConfirmButton: false,
-          timer: 1500,
-          toast: true,
-          position: 'top-end'
-        });
-
-        // Redirección inmediata
-        proceedToWhatsApp();
-
-      } catch (error) {
-        setIsSubmitting(false);
-        if (isDev) console.error('🔥 [STOCK CRITICAL ERROR]:', error);
-
-        const swalRes = await Swal.fire({
-          icon: 'error',
-          title: 'Error del Sistema',
-          text: 'Hubo un error al reservar tu stock. Por favor, intenta nuevamente.',
-          confirmButtonColor: 'var(--color-primary)',
-          showCancelButton: true,
-          cancelButtonText: 'Cancelar',
-          confirmButtonText: 'Intentar de nuevo'
-        });
-
-        if (swalRes.isConfirmed) {
-          if (retriesLeft > 0) {
-            await handleWhatsAppOrder(retriesLeft - 1);
-          } else {
-            await Swal.fire({ icon: 'error', title: 'No se pudo reservar stock', text: 'Por favor intenta más tarde o contacta al vendedor.' });
-          }
-        }
-        return;
-      }
-    } else {
-      // Si el stock NO está habilitado, vamos directo a WhatsApp sin demora
-      proceedToWhatsApp();
-    }
-
-    // Función auxiliar para continuar a WhatsApp
-    // CAMBIO IMPORTANTE: Usamos window.location.href en lugar de window.open
-    // Esto es mucho más confiable en móviles y evita el bloqueo de popups después de un proceso asíncrono
-    async function proceedToWhatsApp() {
-      // 1. Mostrar estado de carga si es necesario
+    // Redirección con registro de pedido
+    const proceedToWhatsApp = async () => {
       setIsSubmitting(true);
-
       try {
-        // 2. Registrar pedido en la DB PRIMERO
-        // Usamos await para asegurar que se guarde antes de cualquier redirección
         const result = await orderService.createOrder({
           storeId,
           customerInfo: { name, phone, address },
@@ -233,23 +126,89 @@ const CartModal: React.FC<CartModalProps> = ({
           discountApplied: discountAmount
         });
 
-        if (isDev) console.debug('💾 [DB SUCCESS]: Pedido registrado', result);
+        if (result.success) {
+          trackOrder({
+            orderId: result.data?.id,
+            total: finalTotal,
+            discountApplied: discountAmount
+          });
+        }
 
-        // 3. Redirigir a WhatsApp
         const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
         window.location.href = whatsappUrl;
-
-        // 4. Limpiar y cerrar
         onClose();
         clearCart();
       } catch (err) {
         console.error('🔥 [ORDER DB ERROR]:', err);
-        // Dejamos que el usuario vaya a WhatsApp igual si falla la DB, para no perder la venta
         const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
         window.location.href = whatsappUrl;
       } finally {
         setIsSubmitting(false);
       }
+    };
+
+    // Lógica de Stock
+    if (stockEnabled && storeSlug) {
+      try {
+        const itemsToProcess = cart.map((item: any) => ({
+          product_id: item.product.id,
+          quantity: item.quantity
+        }));
+
+        const result = await (inventoryService as any).processPublicCartSale(storeSlug, itemsToProcess, `Pedido de ${name}`);
+
+        if (!result.success) {
+          const resArray = Array.isArray(result.results) ? result.results : (result.results ? JSON.parse(result.results) : []);
+          const failedItems = resArray.filter((item: any) => !item.success);
+          const errorMessage = failedItems.map((item: any) => {
+            const cartItem = cart.find((c: any) => c.product.id === item.product_id);
+            return `• ${cartItem ? cartItem.product.name : `Producto #${item.product_id}`}: ${item.error}`;
+          }).join('\n');
+
+          const swalRes = await Swal.fire({
+            icon: 'warning',
+            title: '⚠️ Problemas con el Stock',
+            html: `<div style="text-align: left; white-space: pre-line; font-size:14px;"><strong>No pudimos reservar algunos productos:</strong><br><br>${errorMessage}</div>`,
+            width: '500px',
+            confirmButtonColor: 'var(--color-primary)',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar pedido',
+            confirmButtonText: 'Continuar de todas formas'
+          });
+
+          if (swalRes.isConfirmed) await proceedToWhatsApp();
+          else setIsSubmitting(false);
+          return;
+        }
+
+        Swal.fire({
+          icon: 'success',
+          title: '✅ ¡Pedido Confirmado!',
+          text: 'Redirigiendo a WhatsApp...',
+          showConfirmButton: false,
+          timer: 1500,
+          toast: true,
+          position: 'top-end'
+        });
+
+        await proceedToWhatsApp();
+      } catch (error) {
+        setIsSubmitting(false);
+        const swalRes = await Swal.fire({
+          icon: 'error',
+          title: 'Error del Sistema',
+          text: 'Hubo un error al reservar tu stock.',
+          confirmButtonColor: 'var(--color-primary)',
+          showCancelButton: true,
+          confirmButtonText: 'Intentar de nuevo'
+        });
+
+        if (swalRes.isConfirmed && retriesLeft > 0) {
+          await handleWhatsAppOrder(retriesLeft - 1);
+        }
+      }
+    } else {
+      await proceedToWhatsApp();
     }
   };
 
@@ -261,24 +220,9 @@ const CartModal: React.FC<CartModalProps> = ({
 
         <div className={styles.form}>
           <h3>Completa tus datos para el pedido</h3>
-          <input
-            type="text"
-            placeholder="Nombre y Apellido"
-            value={name}
-            onChange={e => setName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Teléfono de Contacto"
-            value={phone}
-            onChange={e => setPhone(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Dirección de Envío (Opcional)"
-            value={address}
-            onChange={e => setAddress(e.target.value)}
-          />
+          <input type="text" placeholder="Nombre y Apellido" value={name} onChange={e => setName(e.target.value)} />
+          <input type="text" placeholder="Teléfono de Contacto" value={phone} onChange={e => setPhone(e.target.value)} />
+          <input type="text" placeholder="Dirección de Envío (Opcional)" value={address} onChange={e => setAddress(e.target.value)} />
         </div>
 
         <PaymentMethodSelector
@@ -314,9 +258,7 @@ const CartModal: React.FC<CartModalProps> = ({
 
         <div className={styles.totalSection}>
           {cart.length > 0 && (
-            <button className={styles.clearAllButton} onClick={clearCart}>
-              Vaciar carrito
-            </button>
+            <button className={styles.clearAllButton} onClick={clearCart}>Vaciar carrito</button>
           )}
           <div className={`${styles.total} flex flex-col items-end`}>
             {discountAmount > 0 && (
@@ -333,11 +275,7 @@ const CartModal: React.FC<CartModalProps> = ({
           </div>
         </div>
 
-        <button
-          className={styles.whatsappButton}
-          onClick={() => handleWhatsAppOrder()}
-          disabled={isSubmitting}
-        >
+        <button className={styles.whatsappButton} onClick={() => handleWhatsAppOrder()} disabled={isSubmitting}>
           {isSubmitting ? 'Procesando pedido...' : 'Confirmar Pedido por WhatsApp'}
         </button>
       </div>

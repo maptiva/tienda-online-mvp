@@ -9,6 +9,7 @@ import CartModal from './CartModal';
 import CategoriaList from './public/CategoriaList';
 import { useStoreByName } from '../hooks/useStoreByName';
 import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
+import { useShopStats } from '../modules/stats/hooks/useShopStats';
 import SEO from './shared/SEO';
 
 export interface StoreData {
@@ -29,14 +30,7 @@ const PublicLayout: React.FC = () => {
   const { store, loading, error } = useStoreByName(storeName) as { store: StoreData | null, loading: boolean, error: any };
   const { stockEnabled } = useStoreConfig() as { stockEnabled: boolean };
 
-  // Invalidar cache cuando cambia la tienda
-  useEffect(() => {
-    if (storeName) {
-      queryClient.invalidateQueries({ queryKey: ['storeConfig'] });
-      queryClient.invalidateQueries({ queryKey: ['inventory'] });
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-    }
-  }, [storeName, queryClient]);
+  const { trackVisit } = useShopStats(store?.id);
 
   // Invalidar cache cuando cambia la tienda
   useEffect(() => {
@@ -46,6 +40,13 @@ const PublicLayout: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
     }
   }, [storeName, queryClient]);
+
+  // Registrar visita una sola vez por tienda cargada
+  useEffect(() => {
+    if (store?.id) {
+      trackVisit();
+    }
+  }, [store?.id]);
 
   // Verificar si estamos en la página de lista de productos
   const isProductListPage = location.pathname === `/${storeName}` || location.pathname === `/${storeName}/`;
