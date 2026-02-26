@@ -29,7 +29,8 @@ function StoreSettings() {
     longitude: null, // New field
     city: '', // New field for GIS
     category: '', // New field for GIS
-    show_map: false // New field
+    show_map: false, // New field
+    about_text: '' // New field for About Us
   });
 
   const [geocoding, setGeocoding] = useState(false); // State for map search loading
@@ -88,7 +89,8 @@ function StoreSettings() {
           longitude: data.longitude ? parseFloat(data.longitude) : null,
           show_map: data.show_map || false,
           city: data.city || '',
-          category: (data.category === 'Veterinaria' || data.category === 'Petshop') ? 'Pet Shop' : (data.category || '')
+          category: (data.category === 'Veterinaria' || data.category === 'Petshop') ? 'Pet Shop' : (data.category || ''),
+          about_text: data.about_text || ''
         });
 
         if (data.latitude && data.longitude) {
@@ -304,6 +306,28 @@ function StoreSettings() {
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="Ej: Los mejores budines caseros de la zona."
             />
+          </div>
+
+          {/* Store Story / About Us */}
+          <div>
+            <label className="block text-sm font-medium mb-2 flex justify-between">
+              <span>Historia de la Tienda / Nosotros</span>
+              <span className={`text-xs ${(storeData.about_text?.length || 0) >= 600 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                {storeData.about_text?.length || 0}/600
+              </span>
+            </label>
+            <textarea
+              name="about_text"
+              value={storeData.about_text || ''}
+              onChange={handleInputChange}
+              rows="4"
+              maxLength={600}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-scrollbar"
+              placeholder="Contanos sobre tu negocio, tu historia y qué te hace único..."
+            />
+            <p className="text-xs text-gray-400 mt-1 italic">
+              * Este texto aparecerá cuando los clientes hagan clic en el icono de información (i) en tu tienda.
+            </p>
           </div>
 
           {/* Address */}
