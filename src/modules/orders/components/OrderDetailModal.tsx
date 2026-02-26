@@ -1,15 +1,55 @@
 import React from 'react';
-import { Order } from '../services/orderService';
-import { FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaMoneyBillWave, FaUniversity, FaCalendarAlt, FaShoppingBag } from 'react-icons/fa';
+import { Order, orderService } from '../services/orderService';
+import { FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaMoneyBillWave, FaUniversity, FaCalendarAlt, FaShoppingBag, FaSave } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 
 interface OrderDetailModalProps {
     order: Order | null;
     isOpen: boolean;
     onClose: () => void;
+    onStatusUpdate: () => void;
 }
 
-export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, isOpen, onClose }) => {
+export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, isOpen, onClose, onStatusUpdate }) => {
+    const [status, setStatus] = React.useState<string>('pending');
+    const [isSaving, setIsSaving] = React.useState(false);
+
+    React.useEffect(() => {
+        if (order) {
+            setStatus(order.status);
+        }
+    }, [order]);
+
     if (!isOpen || !order) return null;
+
+    const handleSaveStatus = async () => {
+        setIsSaving(true);
+        try {
+            const result = await orderService.updateOrderStatus(order.id.toString(), status);
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Estado actualizado',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+                onStatusUpdate();
+                onClose();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo actualizar el estado.'
+                });
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const subtotal = order.total + (order.discount_applied || 0);
 
@@ -139,17 +179,42 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, isOpe
                 </div>
 
                 {/* Footer / Actions */}
-                <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-2 rounded-xl font-bold text-gray-500 hover:bg-gray-200 transition-colors"
-                    >
-                        Cerrar
-                    </button>
-                    {/* Aquí podrían ir botones para cambiar estado en el futuro */}
-                    <button className="px-6 py-2 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/20 active:scale-95">
-                        Guardar cambios
-                    </button>
+                <div className="p-6 bg-gray-50 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-3 w-full md:w-auto">
+                        <label className="text-xs font-bold uppercase text-gray-400">Estado:</label>
+                        <select
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                            className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-blue-500/20"
+                        >
+                            <option value="pending">⏳ Pendiente</option>
+                            <option value="completed">✅ Completado</option>
+                            <option value="cancelled">❌ Cancelado</option>
+                        </select>
+                    </div>
+
+                    <div className="flex gap-3 w-full md:w-auto justify-end">
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-2 rounded-xl font-bold text-gray-500 hover:bg-gray-200 transition-colors"
+                        >
+                            Cerrar
+                        </button>
+                        <button
+                            onClick={handleSaveStatus}
+                            disabled={isSaving || status === order.status}
+                            className={`px-6 py-2 rounded-xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg ${status === order.status
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                                : 'bg-blue-500 text-white hover:bg-blue-600 shadow-blue-500/20'
+                                }`}
+                        >
+                            {isSaving ? 'Guardando...' : (
+                                <>
+                                    <FaSave /> Guardar cambios
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

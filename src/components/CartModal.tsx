@@ -212,28 +212,44 @@ const CartModal: React.FC<CartModalProps> = ({
     // Función auxiliar para continuar a WhatsApp
     // CAMBIO IMPORTANTE: Usamos window.location.href en lugar de window.open
     // Esto es mucho más confiable en móviles y evita el bloqueo de popups después de un proceso asíncrono
-    function proceedToWhatsApp() {
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    async function proceedToWhatsApp() {
+      // 1. Mostrar estado de carga si es necesario
+      setIsSubmitting(true);
 
-      // En móviles, location.href suele abrir la App directamente de forma más fluida
-      window.location.href = whatsappUrl;
+      try {
+        // 2. Registrar pedido en la DB PRIMERO
+        // Usamos await para asegurar que se guarde antes de cualquier redirección
+        const result = await orderService.createOrder({
+          storeId,
+          customerInfo: { name, phone, address },
+          items: cart.map((item: any) => ({
+            product_id: item.product.id,
+            name: item.product.name,
+            quantity: item.quantity,
+            price: item.product.price
+          })),
+          total: finalTotal,
+          paymentMethod: paymentMethod,
+          discountApplied: discountAmount
+        });
 
-      // Registrar pedido en la DB (Silent fail if error, we don't want to block the user)
-      orderService.createOrder({
-        storeId,
-        customerInfo: { name, phone, address },
-        items: cart.map((item: any) => ({
-          product_id: item.product.id,
-          name: item.product.name,
-          quantity: item.quantity,
-          price: item.product.price
-        })),
-        total: finalTotal,
-        paymentMethod: paymentMethod,
-        discountApplied: discountAmount
-      });
-      onClose();
-      clearCart();
+        if (isDev) console.debug('💾 [DB SUCCESS]: Pedido registrado', result);
+
+        // 3. Redirigir a WhatsApp
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.location.href = whatsappUrl;
+
+        // 4. Limpiar y cerrar
+        onClose();
+        clearCart();
+      } catch (err) {
+        console.error('🔥 [ORDER DB ERROR]:', err);
+        // Dejamos que el usuario vaya a WhatsApp igual si falla la DB, para no perder la venta
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        window.location.href = whatsappUrl;
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
