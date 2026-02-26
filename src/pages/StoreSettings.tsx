@@ -31,6 +31,7 @@ interface StoreData {
     city: string;
     category: string;
     show_map: boolean;
+    about_text: string;
     discount_settings: DiscountSettings;
     store_slug?: string;
     id?: string;
@@ -59,6 +60,7 @@ const StoreSettings = () => {
         city: '',
         category: '',
         show_map: false,
+        about_text: '',
         discount_settings: {
             enabled: false,
             cash_discount: 0,
@@ -115,6 +117,7 @@ const StoreSettings = () => {
                     show_map: data.show_map || false,
                     city: data.city || '',
                     category: (data.category === 'Veterinaria' || data.category === 'Petshop') ? 'Pet Shop' : (data.category || ''),
+                    about_text: data.about_text || '',
                     discount_settings: data.discount_settings || { enabled: false, cash_discount: 0, transfer_discount: 0 }
                 });
 
@@ -298,6 +301,28 @@ const StoreSettings = () => {
                             </span>
                         </label>
                         <input type="text" name="short_description" value={storeData.short_description || ''} onChange={handleInputChange} maxLength={50} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej: Los mejores budines caseros de la zona." />
+                    </div>
+
+                    {/* Store Story / About Us */}
+                    <div>
+                        <label className="block text-sm font-medium mb-2 flex justify-between">
+                            <span>Historia de la Tienda / Nosotros</span>
+                            <span className={`text-xs ${(storeData.about_text?.length || 0) >= 600 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                                {storeData.about_text?.length || 0}/600
+                            </span>
+                        </label>
+                        <textarea
+                            name="about_text"
+                            value={storeData.about_text || ''}
+                            onChange={handleInputChange}
+                            rows={4}
+                            maxLength={600}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-scrollbar"
+                            placeholder="Contanos sobre tu negocio, tu historia y qué te hace único..."
+                        />
+                        <p className="text-xs text-gray-400 mt-1 italic">
+                            * Este texto aparecerá cuando los clientes hagan clic en el icono de información (i) en tu tienda.
+                        </p>
                     </div>
 
                     {/* Location */}
