@@ -48,22 +48,23 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                         key={method.id}
                         type="button"
                         onClick={() => onChange(method.id)}
-                        className={`flex items-center justify-between p-3 rounded-xl border-2 transition-all ${selectedMethod === method.id
-                                ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-sm'
-                                : 'border-gray-200 hover:border-gray-300 bg-white text-gray-600'
+                        className={`relative flex items-center justify-between p-4 rounded-xl border-2 transition-all ${selectedMethod === method.id
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-md transform scale-[1.02]'
+                            : 'border-gray-200 hover:border-gray-300 bg-white text-gray-600'
                             }`}
                     >
-                        <div className="flex items-center gap-2 font-bold">
-                            <span className={selectedMethod === method.id ? 'text-emerald-600' : 'text-gray-400'}>
+                        {method.info && (
+                            <div className="absolute -top-3 -right-2 bg-emerald-500 text-white text-[10px] px-2 py-1 rounded-lg font-black shadow-lg animate-bounce flex flex-col items-center leading-none">
+                                <span>{discounts[method.id as keyof typeof discounts]}%</span>
+                                <span className="text-[7px]">AHORRO</span>
+                            </div>
+                        )}
+                        <div className="flex items-center gap-3 font-bold text-sm">
+                            <span className={`text-xl ${selectedMethod === method.id ? 'text-emerald-600' : 'text-gray-400'}`}>
                                 {method.icon}
                             </span>
                             {method.label}
                         </div>
-                        {method.info && (
-                            <span className="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black animate-pulse">
-                                {method.info}
-                            </span>
-                        )}
                     </button>
                 ))}
             </div>

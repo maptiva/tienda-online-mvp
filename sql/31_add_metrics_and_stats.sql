@@ -2,6 +2,7 @@
 -- Migración: Tabla de Estadísticas de Tiendas (shop_stats)
 -- Fecha: 2026-02-26
 -- Descripción: Almacena eventos de visitas, clics y pedidos para métricas.
+-- Versión: 2 (Corregida tabla SuperAdmin)
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS public.shop_stats (
@@ -20,11 +21,13 @@ CREATE INDEX IF NOT EXISTS idx_shop_stats_created_at ON public.shop_stats(create
 -- RLS (Seguridad)
 ALTER TABLE public.shop_stats ENABLE ROW LEVEL SECURITY;
 
--- Permiso para insertar (Público/Anónimo) - Permite rastrear sin loguearse
+-- 1. Permiso para insertar (Público/Anónimo) - Permite rastrear sin loguearse
+DROP POLICY IF EXISTS "Public can insert stats" ON public.shop_stats;
 CREATE POLICY "Public can insert stats" ON public.shop_stats
     FOR INSERT WITH CHECK (true);
 
--- Permisología para lectura (Solo Clientes dueños y Admin)
+-- 2. Permisología para lectura (Solo Clientes dueños)
+DROP POLICY IF EXISTS "Clients can view own store stats" ON public.shop_stats;
 CREATE POLICY "Clients can view own store stats" ON public.shop_stats
     FOR SELECT USING (
         EXISTS (
@@ -34,10 +37,11 @@ CREATE POLICY "Clients can view own store stats" ON public.shop_stats
         )
     );
 
--- Facilitar lectura a administradores maestros
-CREATE POLICY "Super admins can view all stats" ON public.shop_stats
-    FOR SELECT USING (
-        (auth.jwt() ->> 'email') IN (SELECT email FROM crm_clients WHERE is_super_admin = true)
-    );
+-- 3. Llave maestra para Administrador Maestro
+DROP POLICY IF EXISTS "Master admin can view all stats" ON public.shop_stats;
+CREATE POLICY "Master admin can view all stats"
+  ON public.shop_stats FOR SELECT
+  TO authenticated
+  USING (auth.jwt() ->> 'email' = 'maptiva.sig.app@gmail.com');
 
 COMMENT ON TABLE shop_stats IS 'Eventos de interacción del usuario con las tiendas para analítica.';

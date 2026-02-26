@@ -214,7 +214,7 @@ const CartModal: React.FC<CartModalProps> = ({
 
   return (
     <div className={styles.overlay}>
-      <div className={`${styles.modal} ${theme === 'light' ? styles.light : ''}`}>
+      <div className={`${styles.modal} ${theme === 'light' ? styles.light : ''} custom-scrollbar`}>
         <button className={styles.closeButton} onClick={onClose}>X</button>
         <h2><strong>Tu Pedido</strong></h2>
 

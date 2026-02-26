@@ -174,16 +174,6 @@ const StoreSettings = () => {
         }));
     };
 
-    const handleDiscountChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setStoreData(prev => ({
-            ...prev,
-            discount_settings: {
-                ...prev.discount_settings,
-                [name]: type === 'checkbox' ? checked : parseFloat(value) || 0
-            }
-        }));
-    };
 
     const handleLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -355,56 +345,6 @@ const StoreSettings = () => {
                         </div>
                     </div>
 
-                    {/* Discount Settings Section */}
-                    <div className="border-t border-gray-200 pt-6">
-                        <h3 className="text-lg font-semibold mb-4 text-emerald-700 flex items-center gap-2">
-                            💰 Descuentos por Medio de Pago
-                        </h3>
-                        <div className="flex items-center mb-4">
-                            <input
-                                type="checkbox"
-                                id="discount_enabled"
-                                name="enabled"
-                                checked={storeData.discount_settings?.enabled}
-                                onChange={handleDiscountChange}
-                                className="h-4 w-4 text-emerald-600 border-gray-300 rounded cursor-pointer"
-                            />
-                            <label htmlFor="discount_enabled" className="ml-2 block text-sm font-medium text-gray-700 cursor-pointer">
-                                Activar sistema de descuentos automáticos
-                            </label>
-                        </div>
-                        {storeData.discount_settings?.enabled && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100 animate-fade-in">
-                                <div>
-                                    <label className="block text-xs font-bold text-emerald-800 uppercase mb-2">Descuento Efectivo (%)</label>
-                                    <input
-                                        type="number"
-                                        name="cash_discount"
-                                        value={storeData.discount_settings.cash_discount}
-                                        onChange={handleDiscountChange}
-                                        min="0"
-                                        max="100"
-                                        className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-emerald-800 uppercase mb-2">Descuento Transferencia (%)</label>
-                                    <input
-                                        type="number"
-                                        name="transfer_discount"
-                                        value={storeData.discount_settings.transfer_discount}
-                                        onChange={handleDiscountChange}
-                                        min="0"
-                                        max="100"
-                                        className="w-full p-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white"
-                                    />
-                                </div>
-                                <p className="md:col-span-2 text-xs text-emerald-600 italic">
-                                    * Los descuentos se aplicarán automáticamente al subtotal en el carrito según el medio de pago seleccionado.
-                                </p>
-                            </div>
-                        )}
-                    </div>
 
                     {/* Contact Info */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-gray-200">
@@ -437,7 +377,7 @@ const StoreSettings = () => {
                     {/* WhatsApp Message */}
                     <div>
                         <label className="block text-sm font-medium mb-2">Mensaje de WhatsApp</label>
-                        <textarea name="whatsapp_message" value={storeData.whatsapp_message} onChange={handleInputChange} rows="2" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                        <textarea name="whatsapp_message" value={storeData.whatsapp_message} onChange={handleInputChange} rows={2} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
                     </div>
 
                     <button type="submit" disabled={saving} className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition-colors uppercase tracking-wider">
