@@ -116,6 +116,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, isOpe
                             <table className="w-full text-left">
                                 <thead className="bg-gray-50 text-[10px] uppercase font-bold text-gray-400 border-b border-gray-100">
                                     <tr>
+                                        <th className="px-4 py-2">ID</th>
                                         <th className="px-4 py-2">Producto</th>
                                         <th className="px-4 py-2 text-center">Cant.</th>
                                         <th className="px-4 py-2 text-right">Precio</th>
@@ -125,6 +126,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, isOpe
                                 <tbody className="divide-y divide-gray-50">
                                     {order.items.map((item, idx) => (
                                         <tr key={idx} className="text-sm">
+                                            <td className="px-4 py-3 text-gray-500 font-mono text-xs">#{item.product_id}</td>
                                             <td className="px-4 py-3 font-medium text-gray-800">{item.name}</td>
                                             <td className="px-4 py-3 text-center text-gray-600">x{item.quantity}</td>
                                             <td className="px-4 py-3 text-right text-gray-600">${item.price}</td>
