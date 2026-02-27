@@ -14,7 +14,7 @@ interface AsideBarProps {
 export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) => {
     const navigate = useNavigate();
     const { signOut, user } = useAuth();
-    const { stockEnabled } = useStoreConfig();
+    const { stockEnabled, discountEnabled } = useStoreConfig();
     const location = useLocation();
     const isMaster = isSuperAdmin(user);
 
@@ -91,7 +91,14 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
                     className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">🏷️</span>
-                    <span>Descuentos</span>
+                    <div className="flex items-center gap-2">
+                        <span>Descuentos</span>
+                        {discountEnabled && (
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px] font-black animate-pulse shadow-sm border border-amber-200" title="Sistema de descuentos activo">
+                                !
+                            </span>
+                        )}
+                    </div>
                 </NavLink>
 
                 <NavLink
