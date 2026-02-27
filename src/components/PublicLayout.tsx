@@ -9,15 +9,28 @@ import CartModal from './CartModal';
 import CategoriaList from './public/CategoriaList';
 import { useStoreByName } from '../hooks/useStoreByName';
 import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
+import { useShopStats } from '../modules/stats/hooks/useShopStats';
 import SEO from './shared/SEO';
 
-const PublicLayout = () => {
+export interface StoreData {
+  id: number | string;
+  user_id: string;
+  store_name: string;
+  logo_url?: string;
+  whatsapp_number: string;
+  whatsapp_message?: string;
+  discount_settings?: any;
+}
+
+const PublicLayout: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { storeName } = useParams();
+  const { storeName = '' } = useParams<{ storeName: string }>();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const { store, loading, error } = useStoreByName(storeName);
-  const { stockEnabled } = useStoreConfig();
+  const { store, loading, error } = useStoreByName(storeName) as { store: StoreData | null, loading: boolean, error: any };
+  const { stockEnabled } = useStoreConfig() as { stockEnabled: boolean };
+
+  const { trackVisit } = useShopStats(store?.id);
 
   // Invalidar cache cuando cambia la tienda
   useEffect(() => {
@@ -27,6 +40,13 @@ const PublicLayout = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
     }
   }, [storeName, queryClient]);
+
+  // Registrar visita una sola vez por tienda cargada
+  useEffect(() => {
+    if (store?.id) {
+      trackVisit();
+    }
+  }, [store?.id]);
 
   // Verificar si estamos en la página de lista de productos
   const isProductListPage = location.pathname === `/${storeName}` || location.pathname === `/${storeName}/`;
@@ -73,12 +93,12 @@ const PublicLayout = () => {
         schema={jsonLd}
         siteName={store.store_name}
       />
-      <Header storeData={store} onCartClick={() => setIsCartOpen(true)} />
+      <Header storeData={store as any} onCartClick={() => setIsCartOpen(true)} />
       {isProductListPage && <CategoriaList userId={store.user_id} />}
       <main className="!mt-0 flex-grow">
         <Outlet context={{ store }} />
       </main>
-      <Footer storeName={store.store_name} storeData={store} />
+      <Footer storeName={store.store_name} storeData={store as any} />
       <WhatsAppButton
         phoneNumber={store.whatsapp_number}
         customMessage={store.whatsapp_message}
@@ -90,6 +110,8 @@ const PublicLayout = () => {
         whatsappNumber={store.whatsapp_number}
         storeSlug={storeName}
         stockEnabled={stockEnabled}
+        storeId={store.id}
+        discountSettings={store.discount_settings}
       />
     </div>
   );
