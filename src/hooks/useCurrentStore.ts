@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 export const useCurrentStore = () => {
     const { user, impersonatedUser } = useAuth();
-    const targetId = impersonatedUser || user?.id;
+    const targetId = impersonatedUser?.id || user?.id;
 
     const [storeId, setStoreId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);

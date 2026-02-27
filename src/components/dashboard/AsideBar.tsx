@@ -57,7 +57,7 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
         >
             <h3 className='text-2xl font-bold mb-2 border-b pb-2'>Menu</h3>
 
-            <nav className='flex flex-col flex-1 gap-1 overflow-y-auto'>
+            <nav className='flex flex-col flex-1 gap-1 overflow-y-auto overflow-x-hidden custom-scrollbar'>
                 <NavLink
                     to={'/admin/categoria'}
                     onClick={handleNavClick}
