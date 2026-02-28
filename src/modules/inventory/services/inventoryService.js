@@ -187,23 +187,5 @@ export const inventoryService = {
     }
 
     return data?.enable_stock || false;
-  },
-
-  // Obtener configuración general de la tienda para el Sidebar
-  async getStoreSidebarConfig(userId) {
-    const { data, error } = await supabase
-      .from('stores')
-      .select('enable_stock, discount_settings')
-      .eq('user_id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      throw error;
-    }
-
-    return {
-      stockEnabled: data?.enable_stock || false,
-      discountEnabled: data?.discount_settings?.enabled || false
-    };
   }
 };

@@ -6,7 +6,7 @@ import { QueryClient } from '@tanstack/react-query';
  * staleTime: Time in ms before data is considered stale (needs refetch)
  * gcTime: Time in ms before unused data is garbage collected
  * refetchOnWindowFocus: Refetch when user returns to the tab
- * refetchOnReconnect: Refetch mechanism when network reconnects
+ * refetchOnReconnect: Refetch when network reconnects
  * retry: Number of retry attempts on failure
  */
 export const queryClient = new QueryClient({

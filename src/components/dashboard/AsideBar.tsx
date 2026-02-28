@@ -14,7 +14,7 @@ interface AsideBarProps {
 export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) => {
     const navigate = useNavigate();
     const { signOut, user } = useAuth();
-    const { stockEnabled, discountEnabled } = useStoreConfig();
+    const { stockEnabled } = useStoreConfig();
     const location = useLocation();
     const isMaster = isSuperAdmin(user);
 
@@ -57,7 +57,7 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
         >
             <h3 className='text-2xl font-bold mb-2 border-b pb-2'>Menu</h3>
 
-            <nav className='flex flex-col flex-1 gap-1 overflow-y-auto overflow-x-hidden custom-scrollbar'>
+            <nav className='flex flex-col flex-1 gap-1 overflow-y-auto'>
                 <NavLink
                     to={'/admin/categoria'}
                     onClick={handleNavClick}
@@ -74,40 +74,6 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">📦</span>
                     <span>Productos</span>
-                </NavLink>
-
-                <NavLink
-                    to={'/admin/pedidos'}
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
-                >
-                    <span className="text-xl group-hover:scale-110 transition-transform">🛍️</span>
-                    <span>Pedidos</span>
-                </NavLink>
-
-                <NavLink
-                    to={'/admin/descuentos'}
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
-                >
-                    <span className="text-xl group-hover:scale-110 transition-transform">🏷️</span>
-                    <div className="flex items-center gap-2">
-                        <span>Descuentos</span>
-                        {discountEnabled && (
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-[10px] font-black animate-pulse shadow-sm border border-amber-200" title="Sistema de descuentos activo">
-                                !
-                            </span>
-                        )}
-                    </div>
-                </NavLink>
-
-                <NavLink
-                    to={'/admin/stats'}
-                    onClick={handleNavClick}
-                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
-                >
-                    <span className="text-xl group-hover:scale-110 transition-transform">📈</span>
-                    <span>Estadísticas</span>
                 </NavLink>
 
                 <NavLink

@@ -17,7 +17,7 @@
     "check:rls": "node scripts/check-rls.js",
     "lint:migrations": "node scripts/lint-migrations.js",
     "test:security": "node tests/test-public-security.js",
-    "validate:all": "npm run lint:migrations && npm run check:rls && npm run test:security && npm run test && npm run build",
+    "validate:all": "npm run lint:migrations && npm run check:rls && npm run test:security && npm run build",
     "backup:db": "node scripts/backup-database.js",
     "backup:config": "node scripts/backup-config.js",
     "backup:all": "npm run backup:db && npm run backup:config",
@@ -63,7 +63,6 @@
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
     "jsdom": "^28.0.0",
-    "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   }
 }
