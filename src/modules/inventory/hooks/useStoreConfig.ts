@@ -18,31 +18,30 @@ export const useStoreConfig = () => {
     // Determinar el ID objetivo (Usuario impersonado o logueado)
     const targetId = impersonatedUser?.id || user?.id;
 
-    // Query para obtener configuración de la tienda (stock y descuentos)
-    const { data: config, isLoading, error, refetch } = useQuery({
+    // Query para obtener configuración de stock
+    const { data: stockEnabled, isLoading, error, refetch } = useQuery({
         queryKey: ['storeConfig', storeName || targetId],
         queryFn: async () => {
+            // Usar store_slug para vista pública, user_id para admin
             if (storeName) {
-                // Para vista pública seguimos con stock solo por ahora
-                const stockEnabled = await inventoryService.checkStoreStockEnabledBySlug(storeName);
-                return { stockEnabled, discountEnabled: false };
+                return await inventoryService.checkStoreStockEnabledBySlug(storeName);
             }
-            return await inventoryService.getStoreSidebarConfig(targetId!);
+            return await inventoryService.checkStoreStockEnabled(targetId!);
         },
         enabled: !!(storeName || targetId),
-        staleTime: storeName ? 30 * 1000 : 5 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
+        staleTime: storeName ? 30 * 1000 : 5 * 60 * 1000, // 30s público, 5min admin
+        gcTime: 30 * 60 * 1000, // 30 minutos
         refetchOnWindowFocus: true,
         refetchOnReconnect: true,
     });
 
     const clearCache = () => {
+        // TanStack Query maneja la invalidación automáticamente
         refetch();
     };
 
     return {
-        stockEnabled: config?.stockEnabled ?? false,
-        discountEnabled: config?.discountEnabled ?? false,
+        stockEnabled: stockEnabled ?? false,
         loading: isLoading,
         error: error?.message || null,
         refetch,

@@ -10,7 +10,6 @@ import { CartProvider } from './context/CartContext';
 import ScrollToTop from './components/ScrollToTop';
 import LazyLoadFallback from './components/LazyLoadFallback';
 
-
 // Critical routes - loaded immediately
 import PublicLayout from './components/PublicLayout';
 import AdminLayout from './components/AdminLayout';
@@ -27,12 +26,9 @@ const Error404 = lazy(() => import('./pages/Error404'));
 
 // Admin routes - lazy loaded
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const StatsPage = lazy(() => import('./pages/admin/StatsPage'));
-const OrdersDashboard = lazy(() => import('./pages/admin/OrdersDashboard').then(module => ({ default: module.OrdersDashboard })));
 const ProductForm = lazy(() => import('./components/ProductForm'));
 const CategoriaPage = lazy(() => import('./pages/dashboard/CategoriaPage.tsx'));
 const StoreSettings = lazy(() => import('./pages/StoreSettings'));
-const DiscountSettingsPage = lazy(() => import('./pages/admin/DiscountSettingsPage'));
 const BulkPriceUpdate = lazy(() => import('./pages/admin/BulkPriceUpdate'));
 const InventoryPage = lazy(() => import('./modules/inventory/pages/InventoryPage'));
 
@@ -66,11 +62,8 @@ function App() {
 
             <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />
-              <Route path="categoria" element={<CategoriaPage />} />
               <Route path="producto" element={<AdminDashboard />} />
-              <Route path="pedidos" element={<OrdersDashboard />} />
-              <Route path="descuentos" element={<DiscountSettingsPage />} />
-              <Route path="stats" element={<StatsPage />} />
+              <Route path="categoria" element={<CategoriaPage />} />
               <Route path="settings" element={<StoreSettings />} />
               <Route path="new" element={<ProductForm />} />
               <Route path="edit/:productId" element={<ProductForm />} />
