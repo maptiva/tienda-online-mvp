@@ -77,6 +77,33 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
                 </NavLink>
 
                 <NavLink
+                    to={'/admin/orders'}
+                    onClick={handleNavClick}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">📋</span>
+                    <span>Pedidos</span>
+                </NavLink>
+
+                <NavLink
+                    to={'/admin/discounts'}
+                    onClick={handleNavClick}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">🏷️</span>
+                    <span>Descuentos</span>
+                </NavLink>
+
+                <NavLink
+                    to={'/admin/stats'}
+                    onClick={handleNavClick}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">📊</span>
+                    <span>Estadísticas</span>
+                </NavLink>
+
+                <NavLink
                     to={'/admin/inventario'}
                     onClick={handleNavClick}
                     className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}

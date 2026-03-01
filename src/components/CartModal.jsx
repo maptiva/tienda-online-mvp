@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import styles from './CartModal.module.css';
 import { MdOutlineDelete } from 'react-icons/md';
 import { useTheme } from '../context/ThemeContext';
 import Swal from 'sweetalert2';
 import { inventoryService } from '../modules/inventory/services/inventoryService';
+import { orderService } from '../modules/orders/services/orderService';
+import PaymentMethodSelector from '../modules/discounts/components/PaymentMethodSelector';
+import { supabase } from '../services/supabase';
+import { statsService } from '../modules/stats/services/statsService';
 
 const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled }) => {
   const { cart, removeFromCart, clearCart } = useCart();
@@ -13,177 +17,166 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Estados para descuentos
+  const [discountSettings, setDiscountSettings] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('whatsapp');
+
+  // Cargar configuración de descuentos al abrir el modal
+  useEffect(() => {
+    if (isOpen && storeSlug) {
+      const fetchDiscountSettings = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('stores')
+            .select('discount_settings')
+            .eq('store_slug', storeSlug)
+            .single();
+          
+          if (data?.discount_settings) {
+            setDiscountSettings(data.discount_settings);
+            // Si hay descuentos habilitados, poner 'cash' por defecto si tiene descuento
+            if (data.discount_settings.enabled) {
+              setPaymentMethod('cash');
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching discounts:', error);
+        }
+      };
+      fetchDiscountSettings();
+    }
+  }, [isOpen, storeSlug]);
 
   if (!isOpen) return null;
 
+  // Cálculos de totales y descuentos
+  const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  
+  const getDiscountPercentage = () => {
+    if (!discountSettings || !discountSettings.enabled) return 0;
+    if (paymentMethod === 'cash') return discountSettings.cash_discount || 0;
+    if (paymentMethod === 'transfer') return discountSettings.transfer_discount || 0;
+    return 0;
+  };
+
+  const discountPercentage = getDiscountPercentage();
+  const discountAmount = subtotal * (discountPercentage / 100);
+  const finalTotal = subtotal - discountAmount;
+
   const handleWhatsAppOrder = async (retriesLeft = 1) => {
     const isDev = import.meta.env.MODE !== 'production';
-    if (isDev) console.debug('🔍 [CART DEBUG]: handleWhatsAppOrder iniciado', {
-      cartLength: cart.length,
-      cartItems: cart.map(item => ({
-        name: item.product.name,
-        id: item.product.id,
-        quantity: item.quantity
-      }))
-    });
-
+    
     if (cart.length === 0) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Carrito vacío',
-        text: 'Tu carrito está vacío.',
-        confirmButtonColor: 'var(--color-primary)'
-      });
+      Swal.fire({ icon: 'info', title: 'Carrito vacío', text: 'Tu carrito está vacío.', confirmButtonColor: 'var(--color-primary)' });
       return;
     }
 
     if (!name || !phone) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Datos incompletos',
-        text: 'Por favor, completa tu nombre y teléfono.',
-        confirmButtonColor: 'var(--color-primary)'
-      });
+      Swal.fire({ icon: 'warning', title: 'Datos incompletos', text: 'Por favor, completa tu nombre y teléfono.', confirmButtonColor: 'var(--color-primary)' });
       return;
     }
 
     setIsSubmitting(true);
 
     if (!whatsappNumber) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error de configuración',
-        text: 'No hay número de WhatsApp configurado para esta tienda.',
-        confirmButtonColor: 'var(--color-primary)'
-      });
+      Swal.fire({ icon: 'error', title: 'Error de configuración', text: 'No hay número de WhatsApp configurado para esta tienda.', confirmButtonColor: 'var(--color-primary)' });
+      setIsSubmitting(false);
       return;
     }
 
-    let message = `Hola, me gustaría hacer el siguiente pedido:\n\n*Nombre:* ${name}\n*Teléfono:* ${phone}`;
+    let orderId = null;
 
-    if (address) {
-      message += `\n*Dirección:* ${address}`;
+    // 1. Guardar el pedido en la Base de Datos
+    try {
+      const orderData = { name, phone, address };
+      const itemsForOrder = cart.map(item => ({
+        product_id: item.product.id,
+        name: item.product.name,
+        quantity: item.quantity,
+        price: item.product.price
+      }));
+
+      const resOrder = await orderService.createPublicOrder(
+        storeSlug,
+        orderData,
+        itemsForOrder,
+        finalTotal,
+        paymentMethod,
+        discountAmount
+      );
+
+      if (resOrder.success) {
+        orderId = resOrder.order_id;
+        // Registrar evento de pedido en estadÃ­sticas
+        const { data: stData } = await supabase.from('stores').select('id').eq('store_slug', storeSlug).single();
+        if (stData) {
+          statsService.trackEvent(stData.id, 'order');
+        }
+      }
+    } catch (err) {
+      console.error('🔥 [ORDER ERROR]:', err);
     }
 
-    message += `\n\n*Pedido:*`;
-
-    cart.forEach(item => {
-      const productRef = item.product.sku ? item.product.sku : `#${item.product.display_id || item.product.id}`;
-      message += `\n- ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(item.product.price * item.quantity).toFixed(2)}`;
-    });
-
-    const total = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-    message += `\n\n*Total:* $${total.toFixed(2)}`;
-
-    // Si el stock está habilitado, descontar antes de redirigir
-    if (isDev) console.debug('🔍 [STOCK DEBUG]: Verificando si se procesa stock', {
-      stockEnabled,
-      storeSlug,
-      shouldProcess: !!(stockEnabled && storeSlug)
-    });
-
+    // 2. Procesar Stock (Si aplica)
     if (stockEnabled && storeSlug) {
-      if (isDev) console.debug('🔍 [STOCK DEBUG]: Iniciando procesamiento de stock', {
-        stockEnabled,
-        storeSlug,
-        cartSize: cart.length
-      });
-
       try {
         const itemsToProcess = cart.map(item => ({
           product_id: item.product.id,
           quantity: item.quantity
         }));
 
-        if (isDev) console.debug('🔍 [STOCK DEBUG]: Items a procesar:', itemsToProcess);
-        if (isDev) console.debug('🔍 [STOCK DEBUG]: Llamando a processPublicCartSale...');
-
-        const result = await inventoryService.processPublicCartSale(storeSlug, itemsToProcess, `Pedido de ${name}`);
-        if (isDev) console.debug('🔍 [STOCK DEBUG]: Resultado del procesamiento:', result);
+        const result = await inventoryService.processPublicCartSale(
+          storeSlug, 
+          itemsToProcess, 
+          `Pedido #${orderId || 'WEB'} - ${name}`
+        );
 
         if (!result.success) {
-          if (isDev) console.error('🔥 [STOCK ERROR]: Procesamiento fallido');
-
-          const resArray = Array.isArray(result.results) ? result.results : (result.results ? JSON.parse(result.results) : []);
-          const failedItems = resArray.filter(item => !item.success);
-          const errorMessage = failedItems.map(item => {
-            const cartItem = cart.find(c => c.product.id === item.product_id);
-            const productName = cartItem ? cartItem.product.name : `Producto #${item.product_id}`;
-            return `• ${productName}: ${item.error}`;
-          }).join('\n');
-
           const swalRes = await Swal.fire({
             icon: 'warning',
             title: '⚠️ Problemas con el Stock',
-            html: `<div style="text-align: left; white-space: pre-line; font-size:14px;">\n              <strong>No pudimos reservar algunos productos:</strong><br><br>\n              ${errorMessage}\n            </div>`,
-            width: '500px',
-            confirmButtonColor: 'var(--color-primary)',
+            text: 'No pudimos reservar algunos productos, ¿deseas continuar?',
             showCancelButton: true,
-            cancelButtonText: 'Cancelar pedido',
             confirmButtonText: 'Continuar de todas formas'
           });
 
-          if (swalRes.isConfirmed) {
-            proceedToWhatsApp();
-          } else {
-            setIsSubmitting(false);
-          }
+          if (swalRes.isConfirmed) proceedToWhatsApp(orderId);
+          else setIsSubmitting(false);
           return;
         }
-
-        if (isDev) console.debug('✅ [STOCK SUCCESS]: Stock descontado correctamente');
-
-        // Notificación no bloqueante (opcional, para feedback visual rápido)
-        Swal.fire({
-          icon: 'success',
-          title: '✅ ¡Pedido Confirmado!',
-          text: 'Redirigiendo a WhatsApp...',
-          showConfirmButton: false,
-          timer: 1500,
-          toast: true,
-          position: 'top-end'
-        });
-
-        // Redirección inmediata
-        proceedToWhatsApp();
-
+        proceedToWhatsApp(orderId);
       } catch (error) {
-        setIsSubmitting(false);
-        if (isDev) console.error('🔥 [STOCK CRITICAL ERROR]:', error);
-
-        const swalRes = await Swal.fire({
-          icon: 'error',
-          title: 'Error del Sistema',
-          text: 'Hubo un error al reservar tu stock. Por favor, intenta nuevamente.',
-          confirmButtonColor: 'var(--color-primary)',
-          showCancelButton: true,
-          cancelButtonText: 'Cancelar',
-          confirmButtonText: 'Intentar de nuevo'
-        });
-
-        if (swalRes.isConfirmed) {
-          if (retriesLeft > 0) {
-            await handleWhatsAppOrder(retriesLeft - 1);
-          } else {
-            await Swal.fire({ icon: 'error', title: 'No se pudo reservar stock', text: 'Por favor intenta más tarde o contacta al vendedor.' });
-          }
-        }
-        return;
+        proceedToWhatsApp(orderId);
       }
     } else {
-      // Si el stock NO está habilitado, vamos directo a WhatsApp sin demora
-      proceedToWhatsApp();
+      proceedToWhatsApp(orderId);
     }
 
-    // Función auxiliar para continuar a WhatsApp
-    // CAMBIO IMPORTANTE: Usamos window.location.href en lugar de window.open
-    // Esto es mucho más confiable en móviles y evita el bloqueo de popups después de un proceso asíncrono
-    function proceedToWhatsApp() {
+    function proceedToWhatsApp(finalOrderId) {
+      let message = `Hola, me gustaría hacer el siguiente pedido:\n\n*Pedido:* #${finalOrderId ? finalOrderId.slice(-6).toUpperCase() : 'WEB'}\n*Nombre:* ${name}\n*Teléfono:* ${phone}`;
+
+      if (address) message += `\n*Dirección:* ${address}`;
+      
+      const paymentLabels = { cash: 'Efectivo', transfer: 'Transferencia', whatsapp: 'WhatsApp' };
+      message += `\n*Pago:* ${paymentLabels[paymentMethod] || 'WhatsApp'}`;
+
+      message += `\n\n*Productos:*`;
+      cart.forEach(item => {
+        message += `\n- ${item.quantity}x ${item.product.name} (ID: ${item.product.id}) - $${(item.product.price * item.quantity).toFixed(2)}`;
+      });
+
+      if (discountAmount > 0) {
+        message += `\n\n*Subtotal:* $${subtotal.toFixed(2)}`;
+        message += `\n*Descuento (${discountPercentage}%):* -$${discountAmount.toFixed(2)}`;
+      }
+      
+      message += `\n\n*TOTAL:* $${finalTotal.toFixed(2)}`;
+
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-
-      // En móviles, location.href suele abrir la App directamente de forma más fluida
+      
+      Swal.fire({ icon: 'success', title: '¡Pedido Confirmado!', showConfirmButton: false, timer: 1500, toast: true, position: 'top-end' });
       window.location.href = whatsappUrl;
-
       onClose();
       clearCart();
     }
@@ -233,6 +226,13 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
                 </button>
               </div>
             ))}
+            
+            {/* Selector de Método de Pago con Descuentos */}
+            <PaymentMethodSelector 
+              selectedMethod={paymentMethod}
+              onMethodChange={setPaymentMethod}
+              discountSettings={discountSettings}
+            />
           </div>
         ) : (
           <div className={styles.emptyCartMessage}>
@@ -247,8 +247,21 @@ const CartModal = ({ isOpen, onClose, whatsappNumber, storeSlug, stockEnabled })
               Vaciar carrito
             </button>
           )}
-          <div className={styles.total}>
-            Total: ${total.toFixed(2)}
+          
+          <div className="flex flex-col items-end gap-1">
+            {discountAmount > 0 && (
+              <>
+                <div className="text-sm text-gray-500 line-through">
+                  Subtotal: ${subtotal.toFixed(2)}
+                </div>
+                <div className="text-sm text-emerald-600 font-bold">
+                  Ahorro ({discountPercentage}%): -${discountAmount.toFixed(2)}
+                </div>
+              </>
+            )}
+            <div className={styles.total}>
+              Total: ${finalTotal.toFixed(2)}
+            </div>
           </div>
         </div>
 
