@@ -1,13 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { orderService } from '../services/orderService';
-import { FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaMoneyBillWave, FaUniversity, FaCalendarAlt, FaShoppingBag, FaSave } from 'react-icons/fa';
+import { 
+    FaTimes, FaUser, FaPhone, FaMapMarkerAlt, 
+    FaMoneyBillWave, FaUniversity, FaCalendarAlt, 
+    FaShoppingBag, FaSave 
+} from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { supabase } from '../../../services/supabase';
 
-export const OrderDetailModal = ({ order, isOpen, onClose, onStatusUpdate }) => {
-    const [status, setStatus] = useState('pending');
+// --- Interfaces de Datos ---
+
+interface CustomerInfo {
+    name: string;
+    phone: string;
+    address?: string;
+}
+
+interface OrderItem {
+    product_id: number;
+    display_id?: number;
+    sku?: string | null;
+    name: string;
+    quantity: number;
+    price: number;
+}
+
+interface Order {
+    id: string | number;
+    created_at: string;
+    status: 'pending' | 'completed' | 'cancelled' | string;
+    customer_info: CustomerInfo;
+    items: OrderItem[];
+    total: number;
+    payment_method?: string;
+    discount_applied?: number;
+    store_id?: number | string;
+}
+
+interface OrderDetailModalProps {
+    order: Order | null;
+    isOpen: boolean;
+    onClose: () => void;
+    onStatusUpdate: () => void;
+}
+
+export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ 
+    order, 
+    isOpen, 
+    onClose, 
+    onStatusUpdate 
+}) => {
+    const [status, setStatus] = useState<string>('pending');
     const [isSaving, setIsSaving] = useState(false);
-    const [enrichedItems, setEnrichedItems] = useState([]);
+    const [enrichedItems, setEnrichedItems] = useState<OrderItem[]>([]);
 
     useEffect(() => {
         if (order) {
@@ -17,22 +62,17 @@ export const OrderDetailModal = ({ order, isOpen, onClose, onStatusUpdate }) => 
             const fetchShortIds = async () => {
                 if (!order.items || !Array.isArray(order.items)) return;
 
-                // Crear una copia de los items para trabajar con ella
                 const items = [...order.items];
-                
-                // Obtener todos los product_ids únicos que necesitamos buscar
                 const productIds = items.map(item => item.product_id).filter(id => id);
 
                 if (productIds.length > 0) {
                     try {
-                        // Buscar display_id y sku en una sola consulta para todos los productos
                         const { data, error } = await supabase
                             .from('products')
                             .select('id, display_id, sku')
                             .in('id', productIds);
 
                         if (data && !error) {
-                            // Mapear los resultados para enriquecer los items
                             const enriched = items.map(item => {
                                 const prodData = data.find(p => p.id === item.product_id);
                                 if (prodData) {
@@ -66,7 +106,7 @@ export const OrderDetailModal = ({ order, isOpen, onClose, onStatusUpdate }) => 
     const handleSaveStatus = async () => {
         setIsSaving(true);
         try {
-            const result = await orderService.updateOrderStatus(order.id, status);
+            const result = await (orderService as any).updateOrderStatus(order.id, status);
             if (result.success) {
                 Swal.fire({
                     icon: 'success',
@@ -176,7 +216,8 @@ export const OrderDetailModal = ({ order, isOpen, onClose, onStatusUpdate }) => 
                                             <td className="px-4 py-3 text-right font-bold text-gray-800">${(Number(item.price) * item.quantity).toFixed(2)}</td>
                                         </tr>
                                     ))}
-                                </tbody>                            </table>
+                                </tbody>
+                            </table>
                         </div>
                     </section>
 

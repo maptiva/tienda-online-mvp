@@ -10,6 +10,7 @@ export const productSchema = z.object({
   sku: z.string().nullable().optional(),
   name: z.string().min(1, 'El nombre del producto es requerido'),
   price: z.number().nonnegative('El precio no puede ser negativo'),
+  compare_at_price: z.number().nonnegative().optional().nullable(),
   category_id: z.number().int().positive(),
   image_url: z.string().url('URL de imagen inválida').optional().or(z.literal('')).nullable(),
   categories: z.object({
@@ -31,6 +32,7 @@ export type Product = z.infer<typeof productSchema>;
 export const createProductSchema = productSchema.pick({
   name: true,
   price: true,
+  compare_at_price: true,
   category_id: true,
   image_url: true,
   description: true,

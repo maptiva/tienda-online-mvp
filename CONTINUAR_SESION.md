@@ -1,20 +1,21 @@
-# 🏁 Punto de Control - Sesión 01/03/2026 (Finalizada)
+# ⏭️ Continuar Sesión - Plan de Acción
 
-## ✅ Logros de Hoy
-1.  **Seguridad Blindada (V3.1):** La base de datos ahora tiene la autoridad total sobre los precios de los pedidos. Bloqueo 100% verificado contra manipulación de precios y fraude de descuentos.
-2.  **Módulo de Estadísticas:** Visitas, Clics en WhatsApp y Pedidos ya se contabilizan y muestran en tiempo real en el Admin.
-3.  **Fix SuperAdmin:** Corregida la fuga de datos en el portal maestro. Ahora la impersonación de tiendas funciona correctamente para Pedidos, Descuentos y Estadísticas.
-4.  **Limpieza y Orden:** Proyecto profesionalizado con carpetas `docs/internal` y `docs/audit`. Raíz despejada.
-5.  **GitHub Pro:** Automatización de "Safety Check" activa en todas las ramas y autolimpieza de backups activada.
+## Estado Actual
+La rama `feature/pedidos-estables` contiene ahora tanto la seguridad crítica de pedidos (V3.1) como el nuevo Módulo de Marketing. Todo está validado por `npm run validate:all`.
 
-## 🚧 Pendiente para Mañana (Prioridad en Orden)
-1.  **Módulo de Promociones (Marketing):**
-    - Añadir columna `compare_at_price` (Precio tachado).
-    - Permitir aplicar descuentos masivos como "Oferta" (manteniendo el precio original visible).
-    - Crear labels dinámicos en el catálogo para atraer al cliente (Llamadores de pago).
-2.  **Consolidación Final:**
-    - Realizar el Merge de `feature/pedidos-estables` a `main`.
-    - Despliegue oficial a Producción.
+## Tareas Pendientes / Próximos Pasos
+
+1.  **Merge a Main:**
+    - Realizar el merge final una vez que el usuario confirme la estabilidad en el entorno local.
+    - Borrar ramas de feature obsoletas.
+
+2.  **Despliegue:**
+    - `git push origin main`
+    - `npm run deploy` (GitHub Pages).
+
+3.  **Futuras Mejoras (Sugeridas):**
+    - Implementar un sistema de "Cupones de Descuento" (opcional).
+    - Mejorar el Dashboard de Estadísticas para que contemple las ventas generadas por promociones.
 
 ---
-**Nota para mañana:** Empezar revisando el archivo `PLAN_PROMOCIONES_Y_LLAMADORES.md`. ¡Todo el sistema de seguridad ya está validado por stress tests!
+**Nota:** El sistema ya es consistente con las marcas y preposiciones ("en" efectivo, "con" transferencia). Todo el flujo de marketing masivo está blindado contra errores de usuario.

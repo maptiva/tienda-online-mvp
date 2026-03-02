@@ -1,30 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import { useProductById } from '../hooks/useProductById';
 import styles from './ProductDetail.module.css';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import SEO from './shared/SEO';
 import ProductImage from './shared/ProductImage';
-import { FaWhatsapp } from 'react-icons/fa';
+import { FaWhatsapp, FaTag } from 'react-icons/fa';
 import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import StockBadge from '../modules/inventory/components/StockBadge';
 import { useStock } from '../modules/inventory/hooks/useStock';
 import Swal from 'sweetalert2';
 
-const ProductDetail = () => {
-  const { store } = useOutletContext();
-  const { productId } = useParams();
-  const { product, loading, error } = useProductById(productId);
+interface Product {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  compare_at_price?: number | null;
+  image_url?: string;
+  gallery_images?: string[];
+  price_on_request?: boolean;
+  store_whatsapp?: string;
+  sku?: string;
+  display_id?: number;
+}
+
+const ProductDetail: React.FC = () => {
+  const { store } = useOutletContext() as any;
+  const { productId, storeName } = useParams<{ productId: string; storeName: string }>();
+  const navigate = useNavigate();
+  const { product, loading, error } = useProductById(productId || '') as any;
   const { addToCart } = useCart();
   const { theme } = useTheme();
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [quantity, setQuantity] = useState<string | number>(1);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  const { storeName } = useParams();
-  const { stockEnabled } = useStoreConfig();
-  const { inventory } = useStock(product?.id, storeName);
+  const { stockEnabled } = useStoreConfig() as any;
+  const { inventory } = useStock(product?.id, storeName || '') as any;
 
   // Bloquear scroll cuando el modal está abierto
   useEffect(() => {
@@ -72,7 +86,7 @@ const ProductDetail = () => {
   const displayImage = selectedImage || imageUrl;
 
   const handleAddToCart = () => {
-    const numQuantity = parseInt(quantity, 10);
+    const numQuantity = typeof quantity === 'string' ? parseInt(quantity, 10) : (quantity as number);
     if (isNaN(numQuantity) || numQuantity < 1) {
       Swal.fire({
         icon: 'warning',
@@ -98,7 +112,24 @@ const ProductDetail = () => {
     addToCart(product, numQuantity);
   };
 
-  // Preparar datos para SEO (Schema.org / JSON-LD)
+  // --- Lógica de Promoción (Catálogo) ---
+  const isOffer = product.compare_at_price && product.compare_at_price > product.price;
+  const discountPercentage = isOffer 
+    ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
+    : 0;
+
+  // --- Lógica de Descuento por Pago Dinámico ---
+  const cashDisc = store?.discount_settings?.enabled ? (store.discount_settings.cash_discount || 0) : 0;
+  const transferDisc = store?.discount_settings?.enabled ? (store.discount_settings.transfer_discount || 0) : 0;
+  
+  const bestDiscount = Math.max(cashDisc, transferDisc);
+  const incentivePrice = product.price * (1 - bestDiscount / 100);
+  
+  const discountLabel = cashDisc === transferDisc 
+    ? 'en efectivo / con transferencia' 
+    : (cashDisc > transferDisc ? 'en efectivo' : 'con transferencia');
+
+  // Preparar datos para SEO
   const nextYear = new Date();
   nextYear.setFullYear(nextYear.getFullYear() + 1);
   const priceValidUntil = nextYear.toISOString().split('T')[0];
@@ -115,26 +146,7 @@ const ProductDetail = () => {
       "price": product.price || 0,
       "priceValidUntil": priceValidUntil,
       "availability": "https://schema.org/InStock",
-      "url": window.location.href,
-      "hasMerchantReturnPolicy": {
-        "@type": "MerchantReturnPolicy",
-        "applicableCountry": "AR",
-        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 30,
-        "returnMethod": "https://schema.org/ReturnInStore"
-      },
-      "shippingDetails": {
-        "@type": "OfferShippingDetails",
-        "shippingRate": {
-          "@type": "MonetaryAmount",
-          "value": 0,
-          "currency": "ARS"
-        },
-        "shippingDestination": {
-          "@type": "DefinedRegion",
-          "addressCountry": "AR"
-        }
-      }
+      "url": window.location.href
     }
   };
 
@@ -149,6 +161,7 @@ const ProductDetail = () => {
           url={window.location.href}
           schema={jsonLd}
         />
+        
         <div className={styles.imageContainer}>
           {/* Imagen Principal */}
           <div
@@ -163,9 +176,25 @@ const ProductDetail = () => {
               showHoverEffect={false}
               className="rounded-xl"
             />
+
+            {/* Badge de Oferta sobre Imagen */}
+            {isOffer && !product.price_on_request && (
+              <div className="absolute top-4 left-4 z-10 animate-bounce">
+                <div 
+                  className="flex items-center gap-1 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-xl"
+                  style={{ 
+                      backgroundColor: 'var(--color-primary)', 
+                      color: 'var(--color-primary-text)' 
+                  }}
+                >
+                  <FaTag size={12} />
+                  {discountPercentage}% OFF
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Galería de Miniaturas (Solo si hay más de 1 imagen) */}
+          {/* Galería de Miniaturas */}
           {allImages.length > 1 && (
             <div className="grid grid-cols-5 gap-2">
               {allImages.map((img, idx) => (
@@ -173,7 +202,6 @@ const ProductDetail = () => {
                   key={idx}
                   onClick={() => {
                     setSelectedImage(img);
-                    // Scroll suave hacia arriba para ver la imagen principal
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className={`flex justify-center items-center aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${displayImage === img
@@ -191,23 +219,21 @@ const ProductDetail = () => {
             </div>
           )}
         </div>
+
         <div className={styles.detailsContainer}>
           <h1 style={{ color: 'var(--color-text-main)' }}>{product.name}</h1>
 
-          {/* Identificador de producto sutil */}
           <p className="text-sm font-bold uppercase tracking-widest opacity-60 mb-4" style={{ color: 'var(--color-text-light)' }}>
             {product.sku ? `COD: ${product.sku}` : `REF: #${product.display_id || product.id}`}
           </p>
 
-          {/* Stock Badge */}
           {stockEnabled && (
             <div className="mb-6 flex justify-start">
-              <StockBadge productId={product.id} storeSlug={storeName} className="text-sm scale-110 origin-left" />
+              <StockBadge productId={product.id} storeSlug={storeName || ''} className="text-sm scale-110 origin-left" />
             </div>
           )}
 
           {product.price_on_request ? (
-            // Mostrar botón "Consultar Precio"
             <a
               href={`https://wa.me/${store?.whatsapp_number}?text=${encodeURIComponent(
                 `Hola! Me interesa el producto "${product.name}" (REF: ${product.sku ? product.sku : '#' + (product.display_id || product.id)}) y quisiera consultar el precio.`
@@ -219,32 +245,43 @@ const ProductDetail = () => {
                 backgroundColor: 'var(--color-primary)',
                 color: 'var(--color-primary-text)'
               }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = 'var(--color-primary-darker)';
-                e.target.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'var(--color-primary)';
-                e.target.style.transform = 'translateY(0)';
-              }}
             >
               <FaWhatsapp size={24} />
               Consultar Precio
             </a>
           ) : (
-            // Mostrar precio y botón agregar (comportamiento normal)
-            <>
-              <p
-                className='font-bold text-3xl my-4'
-                style={{
-                  color: theme === 'light' ? 'var(--color-primary-darker)' : 'var(--color-primary)'
-                }}
-              >
-                ${product.price ? product.price.toFixed(2) : '0.00'}
-              </p>
+            <div className="my-6">
+              {/* Visualización de Precios con Promo */}
+              <div className="flex flex-col mb-4">
+                {isOffer && (
+                  <span className="text-lg font-bold text-gray-400 line-through opacity-70 mb-1">
+                    Antes: ${product.compare_at_price?.toFixed(2)}
+                  </span>
+                )}
+                <p
+                  className='font-black text-4xl leading-none'
+                  style={{
+                    color: theme === 'light' ? 'var(--color-primary-darker)' : 'var(--color-primary)'
+                  }}
+                >
+                  ${product.price ? product.price.toFixed(2) : '0.00'}
+                </p>
+
+                {/* Llamador de Descuento por Pago Dinámico */}
+                {bestDiscount > 0 && (
+                  <div className="mt-3 flex items-center gap-2 bg-emerald-50 self-start px-4 py-2 rounded-xl border border-emerald-100 shadow-sm">
+                      <span className="text-sm font-black text-emerald-700">
+                          Págalo a ${incentivePrice.toFixed(2)} {discountLabel}
+                      </span>
+                      <span className="bg-emerald-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm">
+                          -{bestDiscount}%
+                      </span>
+                  </div>
+                )}
+              </div>
 
               <h3
-                className='text-xl font-bold mt-6 mb-3'
+                className='text-xl font-bold mt-8 mb-3'
                 style={{ color: 'var(--color-text-main)' }}
               >
                 Descripción:
@@ -268,12 +305,6 @@ const ProductDetail = () => {
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   min="1"
-                  onFocus={(e) => {
-                    e.target.style.borderColor = 'var(--color-primary)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'var(--color-border)';
-                  }}
                 />
                 <button
                   onClick={handleAddToCart}
@@ -284,24 +315,13 @@ const ProductDetail = () => {
                     color: (stockEnabled && inventory?.quantity <= 0) ? '#6b7280' : 'var(--color-primary-text)',
                     cursor: (stockEnabled && inventory?.quantity <= 0) ? 'not-allowed' : 'pointer'
                   }}
-                  onMouseEnter={(e) => {
-                    if (!(stockEnabled && inventory?.quantity <= 0)) {
-                      e.target.style.backgroundColor = 'var(--color-primary-darker)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!(stockEnabled && inventory?.quantity <= 0)) {
-                      e.target.style.backgroundColor = 'var(--color-primary)';
-                    }
-                  }}
                 >
                   {stockEnabled && inventory?.quantity <= 0 ? 'Agotado' : 'Agregar al Pedido'}
                 </button>
               </div>
-            </>
+            </div>
           )}
 
-          {/* Mostrar descripción siempre si hay "Consultar Precio" */}
           {product.price_on_request && (
             <>
               <h3
@@ -333,7 +353,6 @@ const ProductDetail = () => {
               e.stopPropagation();
               setIsLightboxOpen(false);
             }}
-            aria-label="Cerrar vista ampliada"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

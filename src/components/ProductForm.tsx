@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -8,36 +8,62 @@ import { compressImage } from '../utils/imageCompression';
 import { getStoragePath } from '../utils/storageUtils';
 import Swal from 'sweetalert2';
 
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface ProductFormData {
+  id?: string | number;
+  sku?: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  compare_at_price?: number | null;
+  price_on_request?: boolean;
+  category_id: number | string;
+  image_url?: string | null;
+  gallery_images?: string[];
+  backup_price?: number | null;
+  [key: string]: any;
+}
 
 function ProductForm() {
-  const { productId } = useParams();
+  const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
-  const { user, impersonatedUser } = useAuth();
-  const [formData, setFormData] = useState({});
+  const { user, impersonatedUser } = useAuth() as any;
+  const [formData, setFormData] = useState<ProductFormData>({
+    name: '',
+    price: 0,
+    category_id: '',
+  });
 
   // Determinar el ID objetivo (Usuario impersonado o logueado)
   const targetId = impersonatedUser?.id || user?.id;
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [originalImageUrl, setOriginalImageUrl] = useState(null);
-  const [categories, setCategories] = useState([]);
+  const [error, setError] = useState<string | null>(null);
+  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const STORAGE_KEY = `product-form-draft-${productId || 'new'}`;
 
-
-  const [galleryFiles, setGalleryFiles] = useState([]);
-  const [galleryPreviews, setGalleryPreviews] = useState([]);
-  const [existingGalleryImages, setExistingGalleryImages] = useState([]);
-  const [galleryImagesToDelete, setGalleryImagesToDelete] = useState([]);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+  const [existingGalleryImages, setExistingGalleryImages] = useState<string[]>([]);
+  const [galleryImagesToDelete, setGalleryImagesToDelete] = useState<string[]>([]);
 
   useEffect(() => {
     // Intentar recuperar datos guardados de localStorage
     const savedData = localStorage.getItem(STORAGE_KEY);
 
-    const initialData = {};
+    const initialData: ProductFormData = {
+        name: '',
+        price: 0,
+        category_id: '',
+    };
+    
     formConfig.forEach(field => {
-      // Si el campo es 'price', empezamos con 0 para evitar errores de tipo numeric
       if (field.name === 'price') {
         initialData[field.name] = 0;
       } else {
@@ -45,7 +71,6 @@ function ProductForm() {
       }
     });
 
-    // Si hay datos guardados y no estamos editando, usarlos
     if (savedData && !productId) {
       try {
         const parsed = JSON.parse(savedData);
@@ -61,7 +86,6 @@ function ProductForm() {
       try {
         let query = supabase.from('categories').select('*');
 
-        // Filtrar categorías por el ID objetivo (contempla impersonación)
         if (targetId) {
           query = query.eq('user_id', targetId);
         }
@@ -69,7 +93,7 @@ function ProductForm() {
         const { data, error } = await query;
         if (error) throw error;
         setCategories(data || []);
-      } catch (err) {
+      } catch (err: any) {
         setError(`Error al cargar categorías: ${err.message}`);
         console.error('Error fetching categories:', err);
       }
@@ -91,11 +115,10 @@ function ProductForm() {
 
           setFormData(data);
           setOriginalImageUrl(data.image_url);
-          // Cargar galería existente si existe
           if (data.gallery_images && Array.isArray(data.gallery_images)) {
             setExistingGalleryImages(data.gallery_images);
           }
-        } catch (err) {
+        } catch (err: any) {
           setError(`Error al cargar el producto: ${err.message}`);
           console.error('Error fetching product:', err);
         } finally {
@@ -106,15 +129,15 @@ function ProductForm() {
     } else {
       setLoading(false);
     }
-  }, [productId, user]);
+  }, [productId, user, targetId]);
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'image_url' && files && files[0]) {
-      setImageFile(files[0]);
-    } else if (name === 'gallery_images' && files) {
-      // Manejar selección múltiple
-      const newFiles = Array.from(files);
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    
+    if (name === 'image_url' && 'files' in e.target && e.target.files?.[0]) {
+      setImageFile(e.target.files[0]);
+    } else if (name === 'gallery_images' && 'files' in e.target && e.target.files) {
+      const newFiles = Array.from(e.target.files);
       const totalImages = existingGalleryImages.length + galleryFiles.length + newFiles.length;
 
       if (totalImages > 4) {
@@ -128,26 +151,25 @@ function ProductForm() {
       }
 
       setGalleryFiles(prev => [...prev, ...newFiles]);
-
-      // Generar previsualizaciones locales
       const newPreviews = newFiles.map(file => URL.createObjectURL(file));
       setGalleryPreviews(prev => [...prev, ...newPreviews]);
 
     } else {
-      const { type, checked } = e.target;
-      let val = type === 'checkbox' ? checked : value;
+      const type = e.target.type;
+      const checked = (e.target as HTMLInputElement).checked;
+      let val: any = type === 'checkbox' ? checked : value;
+
+      // Conversión numérica para campos de precio
+      if (type === 'number') {
+        val = value === '' ? 0 : parseFloat(value);
+      }
 
       let newData = { ...formData, [name]: val };
 
-      // Lógica especial para "Consultar Precio"
       if (name === 'price_on_request') {
         if (checked) {
-          // Si activa "Consultar Precio", respaldamos el precio actual
           newData.backup_price = formData.price;
-          // Opcional: Podríamos resetear el precio a 0 si quisiéramos, 
-          // pero el backup_price ya lo guarda para la restauración.
         } else {
-          // Si desactiva, restauramos desde el backup si existe
           if (formData.backup_price !== undefined && formData.backup_price !== null) {
             newData.price = formData.backup_price;
           }
@@ -162,42 +184,39 @@ function ProductForm() {
     }
   };
 
-  const removeGalleryImage = (index, isExisting) => {
+  const removeGalleryImage = (index: number, isExisting: boolean) => {
     if (isExisting) {
       const imageUrl = existingGalleryImages[index];
       setGalleryImagesToDelete(prev => [...prev, imageUrl]);
       setExistingGalleryImages(prev => prev.filter((_, i) => i !== index));
-      // Nota: La eliminación física del storage se hará al guardar para evitar errores si cancela
     } else {
       setGalleryFiles(prev => prev.filter((_, i) => i !== index));
       setGalleryPreviews(prev => {
-        // Liberar URL objeto
         URL.revokeObjectURL(prev[index]);
         return prev.filter((_, i) => i !== index);
       });
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     let finalFormData = { ...formData };
 
-    // Sanitización de campos numéricos para evitar errores de Supabase (PostgreSQL)
-    // El tipo 'numeric' en DB no acepta strings vacíos ""
-    if (finalFormData.price === '' || finalFormData.price === undefined) {
+    if (finalFormData.price === undefined) {
       finalFormData.price = 0;
     }
-    if (finalFormData.backup_price === '' || finalFormData.backup_price === undefined) {
-      finalFormData.backup_price = null;
+    
+    // compare_at_price puede ser null
+    if (finalFormData.compare_at_price === 0) {
+        finalFormData.compare_at_price = null;
     }
 
     let newImageUrl = null;
     let newGalleryUrls = [...existingGalleryImages];
 
-    // 1. Subir imagen principal si cambió
     if (imageFile) {
       try {
         const compressedFile = await compressImage(imageFile);
@@ -217,14 +236,13 @@ function ProductForm() {
 
         newImageUrl = publicUrlData.publicUrl;
         finalFormData.image_url = newImageUrl;
-      } catch (err) {
+      } catch (err: any) {
         setError(`Error al subir imagen principal: ${err.message}`);
         setLoading(false);
         return;
       }
     }
 
-    // 2. Subir imágenes de galería nuevas
     if (galleryFiles.length > 0) {
       try {
         const uploadPromises = galleryFiles.map(async (file) => {
@@ -249,7 +267,7 @@ function ProductForm() {
         const uploadedUrls = await Promise.all(uploadPromises);
         newGalleryUrls = [...newGalleryUrls, ...uploadedUrls];
 
-      } catch (err) {
+      } catch (err: any) {
         setError(`Error al subir galería: ${err.message}`);
         setLoading(false);
         return;
@@ -258,41 +276,29 @@ function ProductForm() {
 
     finalFormData.gallery_images = newGalleryUrls;
 
-    // 3. Limpieza de imágenes en Storage
     try {
-      // 3a. Limpiar imagen principal antigua si cambió
       if (productId && newImageUrl && originalImageUrl) {
         const oldImagePath = getStoragePath(originalImageUrl, 'product-images');
         if (oldImagePath) {
-          console.log('[Storage] Intentando eliminar imagen principal antigua:', oldImagePath);
-          const { error: removeError } = await supabase.storage.from('product-images').remove([oldImagePath]);
-          if (removeError) console.warn('[Storage] Error al borrar imagen principal antigua:', removeError);
-          else console.log('[Storage] Imagen principal antigua eliminada.');
+          await supabase.storage.from('product-images').remove([oldImagePath]);
         }
       }
 
-      // 3b. Limpiar imágenes de galería marcadas para borrar
       if (galleryImagesToDelete.length > 0) {
         const pathsToDelete = galleryImagesToDelete
           .map(url => getStoragePath(url, 'product-images'))
-          .filter(Boolean);
+          .filter((p): p is string => !!p);
 
         if (pathsToDelete.length > 0) {
-          console.log('[Storage] Intentando eliminar imágenes de galería:', pathsToDelete);
-          const { error: galleryRemoveError } = await supabase.storage.from('product-images').remove(pathsToDelete);
-          if (galleryRemoveError) console.warn('[Storage] Error al borrar galería:', galleryRemoveError);
-          else console.log('[Storage] Imágenes de galería eliminadas con éxito.');
+          await supabase.storage.from('product-images').remove(pathsToDelete);
         }
       }
     } catch (cleanupErr) {
       console.warn('[Storage] Error no crítico durante la limpieza:', cleanupErr);
-      // No bloqueamos el flujo principal por errores de limpieza
     }
 
     try {
       const { id, ...updateData } = finalFormData;
-      // Convertir gallery_images a formato PostgreSQL array si es necesario (supabase js suele manejar array js bien)
-
       const dataToSave = productId ? updateData : { ...finalFormData, user_id: targetId };
 
       let operation;
@@ -316,7 +322,7 @@ function ProductForm() {
       });
 
       navigate('/admin');
-    } catch (err) {
+    } catch (err: any) {
       setError(`Error al guardar: ${err.message}`);
       console.error('Database error:', err);
     } finally {
@@ -360,11 +366,10 @@ function ProductForm() {
                     />
                     {originalImageUrl && !imageFile && (
                       <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200 inline-block">
-                        Imagen actual: <a href={originalImageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-bold ml-1">Ver imagen</a>
+                        Imagen actual: <a href={originalImageUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-bold ml-1">Ver imagen</a>       
                       </div>
                     )}
 
-                    {/* Sección de Galería Adicional */}
                     <div className="mt-6 pt-6 border-t border-gray-200">
                       <label className="block text-sm font-bold text-gray-700 mb-3">Galería Adicional (Máx 4)</label>
                       <input
@@ -376,10 +381,8 @@ function ProductForm() {
                         className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-[#5FAFB8] file:text-white hover:file:bg-[#4A9BA4] transition-all cursor-pointer"
                       />
 
-                      {/* Grid de Previsualización */}
                       {(existingGalleryImages.length > 0 || galleryPreviews.length > 0) && (
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                          {/* Imágenes Existentes */}
                           {existingGalleryImages.map((url, idx) => (
                             <div key={`existing-${idx}`} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 shadow-sm">
                               <img src={url} alt="Galeria" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
@@ -393,7 +396,6 @@ function ProductForm() {
                             </div>
                           ))}
 
-                          {/* Nuevas Imágenes */}
                           {galleryPreviews.map((url, idx) => (
                             <div key={`new-${idx}`} className="relative group aspect-square rounded-lg overflow-hidden border-2 border-[#5FAFB8] shadow-sm">
                               <img src={url} alt="Nueva" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
@@ -430,9 +432,8 @@ function ProductForm() {
                     </div>
                   </div>
                 ) : field.type === 'checkbox' ? (
-                  <div className="flex items-start gap-3 mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => {
-                    // Hack para permitir click en todo el contenedor
-                    const checkbox = document.getElementById(field.name);
+                  <div className="flex items-start gap-3 mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => {       
+                    const checkbox = document.getElementById(field.name) as HTMLInputElement;
                     if (checkbox) checkbox.click();
                   }}>
                     <div className="flex items-center h-5">
@@ -442,7 +443,7 @@ function ProductForm() {
                         name={field.name}
                         checked={formData[field.name] || false}
                         onChange={handleChange}
-                        onClick={(e) => e.stopPropagation()} // Evitar doble evento
+                        onClick={(e) => e.stopPropagation()} 
                         className="w-5 h-5 text-[#5FAFB8] border-gray-300 rounded focus:ring-[#5FAFB8] cursor-pointer"
                       />
                     </div>
@@ -462,7 +463,7 @@ function ProductForm() {
                     type={field.type}
                     id={field.name}
                     name={field.name}
-                    value={formData[field.name] || ''}
+                    value={formData[field.name] ?? ''}
                     onChange={handleChange}
                     required={field.name === 'price' && formData.price_on_request ? false : field.required}
                     disabled={field.name === 'price' && formData.price_on_request}

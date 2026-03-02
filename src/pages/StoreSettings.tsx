@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
@@ -8,12 +8,34 @@ import StoreMap from '../components/StoreMap'; // Import StoreMap component
 import { useShopCategories } from '../hooks/useShopCategories';
 import QRKit from '../components/dashboard/QRKit'; // Restaurar QRKit
 
+interface StoreData {
+  store_name: string;
+  logo_url: string;
+  address: string;
+  business_hours: string;
+  contact_phone: string;
+  instagram_url: string;
+  facebook_url: string;
+  tiktok_url: string;
+  whatsapp_number: string;
+  whatsapp_message: string;
+  short_description: string;
+  latitude: number | null;
+  longitude: number | null;
+  city: string;
+  category: string;
+  show_map: boolean;
+  about_text: string;
+  store_slug?: string;
+  id?: string | number;
+}
+
 function StoreSettings() {
-  const { user } = useAuth();
-  const { categories: shopCategories, loading: categoriesLoading } = useShopCategories();
+  const { user } = useAuth() as any;
+  const { categories: shopCategories, loading: categoriesLoading } = useShopCategories() as any;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [storeData, setStoreData] = useState({
+  const [storeData, setStoreData] = useState<StoreData>({
     store_name: '',
     logo_url: '',
     address: '',
@@ -24,28 +46,24 @@ function StoreSettings() {
     tiktok_url: '',
     whatsapp_number: '',
     whatsapp_message: 'Hola, estoy interesado en sus productos.',
-    short_description: '', // New field for Carousel
-    latitude: null, // New field
-    longitude: null, // New field
-    city: '', // New field for GIS
-    category: '', // New field for GIS
-    show_map: false, // New field
-    about_text: '' // New field for About Us
+    short_description: '',
+    latitude: null,
+    longitude: null,
+    city: '',
+    category: '',
+    show_map: false,
+    about_text: ''
   });
 
-  const [geocoding, setGeocoding] = useState(false); // State for map search loading
-  const [showMapPreview, setShowMapPreview] = useState(false); // State to show/hide map preview
-
-  const [logoFile, setLogoFile] = useState(null);
+  const [geocoding, setGeocoding] = useState(false);
+  const [showMapPreview, setShowMapPreview] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   useEffect(() => {
-    // Al cargar, intentar recuperar desde sessionStorage
     const savedData = sessionStorage.getItem('storeSettingsForm');
 
     if (savedData) {
       const parsedData = JSON.parse(savedData);
-
-      // Critical Security Check: Ensure the cached data belongs to the current user
       if (parsedData.user_id === user?.id) {
         setStoreData(parsedData);
         setLoading(false);
@@ -59,7 +77,6 @@ function StoreSettings() {
   }, [user]);
 
   useEffect(() => {
-    // Guardar en sessionStorage cada vez que storeData cambie
     if (!loading && user) {
       const dataToStore = {
         ...storeData,
@@ -76,7 +93,6 @@ function StoreSettings() {
         .select('*')
         .eq('user_id', user.id)
         .single();
-
 
       if (error && error.code !== 'PGRST116') {
         throw error;
@@ -141,7 +157,7 @@ function StoreSettings() {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setStoreData(prev => ({
       ...prev,
@@ -149,14 +165,14 @@ function StoreSettings() {
     }));
   };
 
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
+  const handleLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       setLogoFile(file);
     }
   };
 
-  const uploadLogo = async () => {
+  const uploadLogo = async (): Promise<string> => {
     if (!logoFile) return storeData.logo_url;
 
     try {
@@ -183,12 +199,12 @@ function StoreSettings() {
         .getPublicUrl(fileName);
 
       return publicUrl;
-    } catch (compressionError) {
+    } catch (compressionError: any) {
       throw new Error(`Error al procesar el logo: ${compressionError.message}`);
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
@@ -226,7 +242,7 @@ function StoreSettings() {
         timer: 2000
       });
 
-    } catch (error) {
+    } catch (error: any) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -320,7 +336,7 @@ function StoreSettings() {
               name="about_text"
               value={storeData.about_text || ''}
               onChange={handleInputChange}
-              rows="4"
+              rows={4}
               maxLength={600}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 custom-scrollbar"
               placeholder="Contanos sobre tu negocio, tu historia y qué te hace único..."
@@ -372,7 +388,7 @@ function StoreSettings() {
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
             >
               <option value="">{categoriesLoading ? 'Cargando rubros...' : 'Selecciona una categoría'}</option>
-              {shopCategories.map(cat => (
+              {shopCategories.map((cat: any) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.label}
                 </option>
@@ -405,7 +421,7 @@ function StoreSettings() {
                     storeName={storeData.store_name}
                     address={storeData.address}
                     draggable={true}
-                    onPositionChange={(newPos) => {
+                    onPositionChange={(newPos: any) => {
                       setStoreData(prev => ({
                         ...prev,
                         latitude: newPos.lat,
@@ -529,7 +545,7 @@ function StoreSettings() {
               name="whatsapp_message"
               value={storeData.whatsapp_message}
               onChange={handleInputChange}
-              rows="2"
+              rows={2}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
