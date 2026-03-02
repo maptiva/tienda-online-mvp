@@ -102,19 +102,23 @@ const CartModal: React.FC<CartModalProps> = ({
     try {
       const orderData = { name, phone, address };
       const itemsForOrder = cart.map((item: any) => ({
-        product_id: item.product.id,
+        product_id: Number(item.product.id), // Asegurar que sea número
         name: item.product.name,
-        quantity: item.quantity,
-        price: item.product.price
+        quantity: Number(item.quantity),
+        price: Number(item.product.price)
       }));
 
+      // Redondear a 2 decimales para evitar discrepancias de micro-centavos
+      const roundedTotal = parseFloat(finalTotal.toFixed(2));
+      const roundedDiscount = parseFloat(discountAmount.toFixed(2));
+
       const resOrder = await orderService.createPublicOrder(
-        storeSlug,
+        storeSlug.trim(), // Limpiar posibles espacios
         orderData,
         itemsForOrder,
-        finalTotal,
+        roundedTotal,
         paymentMethod,
-        discountAmount
+        roundedDiscount
       );
 
       if (resOrder.success) {
@@ -124,6 +128,16 @@ const CartModal: React.FC<CartModalProps> = ({
         if (stData) {
           statsService.trackEvent(stData.id, 'order');
         }
+      } else {
+        // Mostrar error real de la base de datos si falla el blindaje
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al procesar pedido',
+          text: resOrder.error || 'No se pudo guardar el pedido por una inconsistencia de datos.',
+          confirmButtonColor: 'var(--color-primary)'
+        });
+        setIsSubmitting(false);
+        return;
       }
     } catch (err) {
       console.error('🔥 [ORDER ERROR]:', err);

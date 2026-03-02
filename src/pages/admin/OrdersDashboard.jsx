@@ -6,31 +6,33 @@ import { FaBoxOpen, FaCheckCircle, FaTimesCircle, FaClock, FaMoneyBillWave, FaUn
 import { supabase } from '../../services/supabase';
 
 const OrdersDashboard = () => {
-    const { user } = useAuth();
+    const { user, impersonatedUser } = useAuth();
     const [storeId, setStoreId] = useState(null);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Determinar el usuario objetivo (Impersonado o logueado)
+    const targetUser = impersonatedUser || user;
+
     // Modal state
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
 
-    // Obtener storeId del usuario actual
+    // Obtener storeId del usuario objetivo
     useEffect(() => {
         const getStoreId = async () => {
-            if (!user) return;
+            if (!targetUser) return;
             const { data, error } = await supabase
                 .from('stores')
                 .select('id')
-                .eq('user_id', user.id)
+                .eq('user_id', targetUser.id)
                 .single();
-            
+
             if (data) setStoreId(data.id);
         };
         getStoreId();
-    }, [user]);
-
+    }, [targetUser]);
     const fetchOrders = useCallback(async () => {
         if (!storeId) {
             setLoading(false);

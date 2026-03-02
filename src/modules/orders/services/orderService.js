@@ -16,7 +16,7 @@ export const orderService = {
         p_store_slug: storeSlug,
         p_customer_info: customerInfo,
         p_items: items,
-        p_total: total,
+        p_client_total: total,
         p_payment_method: paymentMethod,
         p_discount_applied: discountApplied
       });

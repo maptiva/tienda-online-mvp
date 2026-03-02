@@ -6,27 +6,31 @@ import LazyLoadFallback from '../../components/LazyLoadFallback';
 import { FaPercent, FaMoneyBillWave, FaUniversity, FaToggleOn } from 'react-icons/fa';
 
 const DiscountSettingsPage = () => {
-    const { user } = useAuth();
+    const { user, impersonatedUser } = useAuth();
     const [storeId, setStoreId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+
+    // Determinar el usuario objetivo (Impersonado o logueado)
+    const targetUser = impersonatedUser || user;
+
     const [discountSettings, setDiscountSettings] = useState({
         enabled: false,
         cash_discount: 0,
         transfer_discount: 0
     });
 
-    // 1. Obtener el storeId del usuario logueado directamente
+    // 1. Obtener el storeId del usuario objetivo directamente
     useEffect(() => {
         const getStoreId = async () => {
-            if (!user) return;
+            if (!targetUser) return;
             try {
                 const { data, error } = await supabase
                     .from('stores')
                     .select('id')
-                    .eq('user_id', user.id)
+                    .eq('user_id', targetUser.id)
                     .single();
-                
+
                 if (error) throw error;
                 if (data) {
                     setStoreId(data.id);
@@ -39,8 +43,7 @@ const DiscountSettingsPage = () => {
             }
         };
         getStoreId();
-    }, [user]);
-
+    }, [targetUser]);
     // 2. Cargar la configuración de descuentos una vez tengamos el storeId
     useEffect(() => {
         if (storeId) {
