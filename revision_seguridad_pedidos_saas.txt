@@ -1,0 +1,47 @@
+## Revisión de la Arquitectura de Seguridad — Pedidos SaaS
+
+El informe describe un diseño sólido. Aquí está mi análisis:
+
+---
+
+### ✅ Lo que está bien implementado
+
+**Patrón RPC con `SECURITY DEFINER`** es la elección correcta para este problema. Al encapsular la lógica en una función PostgreSQL, eliminás la superficie de ataque directa sobre la tabla `orders`. Las inserciones parametrizadas dentro de la función evitan SQL injection por diseño.
+
+**RLS bien pensado para `shop_stats`:** Separar INSERT público del SELECT restringido al dueño es el patrón canónico correcto.
+
+**Trigger de stock con aislamiento por `user_id`:** El enfoque de buscar el stock vinculado al dueño de la tienda del pedido, no al solicitante, es el aislamiento multi-tenant correcto.
+
+---
+
+### ⚠️ Vectores a validar antes de producción
+
+**1. Validación de totales (el punto más crítico)**
+El informe menciona que el total viene del cliente y la validación de precios es "Fase 2". Esto es el mayor riesgo actual. Un atacante puede enviar `total: 0.01` con ítems reales. Aunque no puedan modificar la tabla directamente, la función RPC aceptaría el pedido con precio manipulado. Recomendación: recalcular el total dentro de la función cruzando los `items` con una tabla de precios autoritativa en el servidor.
+
+**2. Rate limiting sobre la función RPC**
+`create_public_order` es pública y anónima. Sin rate limiting a nivel de API Gateway (Supabase Edge o similar), es vulnerable a spam de pedidos aunque sean "válidos". Verificar si hay configuración de rate limit en el proyecto de Supabase.
+
+**3. `SECURITY DEFINER` — el vector real a auditar**
+La solicitud del informe es correcta: revisar `sql/30_orders_and_public_rpc.sql`. Los riesgos típicos son:
+- ¿La función usa `search_path` fijado? (`SET search_path = public, pg_temp` al inicio). Sin esto, un usuario malicioso podría crear funciones en esquemas que interfieran.
+- ¿Los parámetros JSONB se validan con `jsonb_typeof()` antes de iterar? Un array malformado podría causar comportamiento inesperado.
+
+**4. Exposición de `store_id` interno**
+La función recibe `store_slug` y resuelve internamente el `store_id` — esto es correcto. Confirmar que el `store_id` nunca se devuelve en la respuesta RPC, solo el `order_id` público.
+
+---
+
+### 📋 Recomendaciones por prioridad
+
+| Prioridad | Acción                                                        |
+|-----------|---------------------------------------------------------------|
+| 🔴 Alta   | Recalcular total en servidor antes de insertar                |
+| 🔴 Alta   | Agregar `SET search_path` en la función DEFINER               |
+| 🟡 Media  | Configurar rate limiting en el endpoint RPC                   |
+| 🟡 Media  | Validar estructura JSONB de `items` dentro de la función      |
+| 🟢 Baja   | Agregar columna `created_at` con `DEFAULT now()` en logs      |
+
+---
+
+La arquitectura base es production-ready para el modelo de seguridad de acceso. El único punto que yo no dejaría para Fase 2 es la validación del total — ese es el riesgo de negocio más concreto e inmediato.
