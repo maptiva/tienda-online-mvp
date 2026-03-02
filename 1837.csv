@@ -1,9 +1,0 @@
-schemaname,tablename,policyname,permissive,roles,cmd,qual,with_check
-public,orders,Master admin can do everything on orders,PERMISSIVE,{authenticated},ALL,((auth.jwt() ->> 'email'::text) = 'maptiva.sig.app@gmail.com'::text),null
-public,orders,orders_owner_select,PERMISSIVE,{public},SELECT,"(store_id IN ( SELECT stores.id
-   FROM stores
-  WHERE (stores.user_id = auth.uid())))",null
-public,orders,orders_owner_update,PERMISSIVE,{public},UPDATE,"(store_id IN ( SELECT stores.id
-   FROM stores
-  WHERE (stores.user_id = auth.uid())))",null
-public,orders,orders_public_insert,PERMISSIVE,"{anon,authenticated}",INSERT,null,true

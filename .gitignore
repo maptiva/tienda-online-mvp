@@ -57,3 +57,12 @@ Thumbs.db
 # 9. Skills de IA (PERMITIDOS)
 # Esto es el "cerebro" para que los agentes trabajen correctamente
 !.agent/skills/
+
+# 10. Archivos de Datos y Temporales (NUNCA SUBIR)
+# CSVs de trabajo, exports e importaciones de datos
+*.csv
+# Archivos temporales de herramientas externas (Supabase CLI)
+supabase/.temp/
+# Archivos de resumen y debug de sesiones
+resumen_*.txt
+debug-*.js
