@@ -1,0 +1,9 @@
+policyname,cmd,qual,with_check
+Master admin can do everything on orders,ALL,((auth.jwt() ->> 'email'::text) = 'maptiva.sig.app@gmail.com'::text),null
+orders_owner_select,SELECT,"(store_id IN ( SELECT stores.id
+   FROM stores
+  WHERE (stores.user_id = auth.uid())))",null
+orders_owner_update,UPDATE,"(store_id IN ( SELECT stores.id
+   FROM stores
+  WHERE (stores.user_id = auth.uid())))",null
+orders_public_insert,INSERT,null,true

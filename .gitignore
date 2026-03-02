@@ -1,41 +1,49 @@
-# Documentation (Specific MD files)
+# --- PROYECTO CLICANDO: CONFIGURACIÓN DE REPOSITORIO PROFESIONAL ---
+
+# 1. Documentación Externa (Pública)
 *.md
 !README.md
-!DEVELOPMENT_WORKFLOWS.md
-!FUNCIONALIDADES_VIGENTES.md
-!PLAN*.md
-!GUIA*.md
-!INSTRUCTIVO*.md
-!AUDIT_REPORT.md
-!STOCK*.md
-!reporte-motor-stock.md
-!docs/PLAN_BACKUP.md
-!docs/SESION_BACKUP_*.md
 
-# Supabase structural migrations (KEEP THESE)
-!supabase/migrations/*.sql
-
-# Database utilities and reports (KEEP THESE)
-!sql/*.sql
-!sql/archive/*.sql
-
-# Database files to ignore (local schema and data)
-schema.sql
-schema_sql.json
-leads.csv
-*.csv
-*.xlsx
-/dist/
+# 2. Documentación Interna y Auditoría (PRIVADO)
+# Estos archivos contienen estrategias, planes y auditorías sensibles
+docs/internal/
+docs/audit/
+plans/
+SESION_BACKUP_*.md
+Algosaliomal.txt
+CODE_REVIEW.txt
 *.log
 
-# Dependencies
-/node_modules
-.vite/
-npm-debug.log*
+# 3. Base de Datos y Herramientas SQL (PRIVADO)
+# Solo permitimos las migraciones estructurales de Supabase
+scripts/sql_tools/
+sql/
+!supabase/migrations/*.sql
+
+# 4. Archivos de Testing y Stress Test (PRIVADO)
+tests/security-stress-test.js
+tests/test-stats-insert.js
+
+# 5. Secretos y Entorno (CRÍTICO)
 .env
 .env*.local
 .env.development
 .env.production
+.env.example
+.env.local.example
+.env.template
+
+# 6. Backups (NUNCA SUBIR)
+backups/
+!.gitkeep
+
+# 7. Dependencias y Compilación
+/node_modules
+/dist
+.vite/
+npm-debug.log*
+
+# 8. IDEs y Sistema
 .vscode
 .idea
 *.suo
@@ -43,11 +51,9 @@ npm-debug.log*
 *.njsproj
 *.sln
 *.sw?
-/jules-scratch
-.opencode/
-supabase/.temp
-captura*.png
+.DS_Store
+Thumbs.db
 
-# Backups - NUNCA subir al repo (contiene datos sensibles)
-backups/
-!.gitkeep
+# 9. Skills de IA (PERMITIDOS)
+# Esto es el "cerebro" para que los agentes trabajen correctamente
+!.agent/skills/
