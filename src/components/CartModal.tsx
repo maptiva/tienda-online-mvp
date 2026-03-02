@@ -102,7 +102,9 @@ const CartModal: React.FC<CartModalProps> = ({
     try {
       const orderData = { name, phone, address };
       const itemsForOrder = cart.map((item: any) => ({
-        product_id: Number(item.product.id), // Asegurar que sea número
+        product_id: Number(item.product.id), // ID real para integridad referencial
+        display_id: item.product.display_id,  // ID corto (#1, #2...)
+        sku: item.product.sku,                // SKU personalizado
         name: item.product.name,
         quantity: Number(item.quantity),
         price: Number(item.product.price)

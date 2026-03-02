@@ -434,7 +434,7 @@ function StoreSettings() {
           </div>
 
           {/* Contact Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">
                 Horarios de Atención
@@ -460,6 +460,20 @@ function StoreSettings() {
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="5491112345678"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Teléfono de Contacto
+              </label>
+              <input
+                type="text"
+                name="contact_phone"
+                value={storeData.contact_phone || ''}
+                onChange={handleInputChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="Ej: 11 1234-5678"
               />
             </div>
           </div>

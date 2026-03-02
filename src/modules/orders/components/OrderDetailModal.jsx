@@ -1,15 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { orderService } from '../services/orderService';
 import { FaTimes, FaUser, FaPhone, FaMapMarkerAlt, FaMoneyBillWave, FaUniversity, FaCalendarAlt, FaShoppingBag, FaSave } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import { supabase } from '../../../services/supabase';
 
 export const OrderDetailModal = ({ order, isOpen, onClose, onStatusUpdate }) => {
-    const [status, setStatus] = React.useState('pending');
-    const [isSaving, setIsSaving] = React.useState(false);
+    const [status, setStatus] = useState('pending');
+    const [isSaving, setIsSaving] = useState(false);
+    const [enrichedItems, setEnrichedItems] = useState([]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (order) {
             setStatus(order.status);
+            
+            // Enriquecer items para mostrar IDs cortos (#8) en lugar de IDs internos (#928)
+            const fetchShortIds = async () => {
+                if (!order.items || !Array.isArray(order.items)) return;
+
+                // Crear una copia de los items para trabajar con ella
+                const items = [...order.items];
+                
+                // Obtener todos los product_ids únicos que necesitamos buscar
+                const productIds = items.map(item => item.product_id).filter(id => id);
+
+                if (productIds.length > 0) {
+                    try {
+                        // Buscar display_id y sku en una sola consulta para todos los productos
+                        const { data, error } = await supabase
+                            .from('products')
+                            .select('id, display_id, sku')
+                            .in('id', productIds);
+
+                        if (data && !error) {
+                            // Mapear los resultados para enriquecer los items
+                            const enriched = items.map(item => {
+                                const prodData = data.find(p => p.id === item.product_id);
+                                if (prodData) {
+                                    return {
+                                        ...item,
+                                        display_id: prodData.display_id,
+                                        sku: prodData.sku
+                                    };
+                                }
+                                return item;
+                            });
+                            setEnrichedItems(enriched);
+                        } else {
+                            setEnrichedItems(items);
+                        }
+                    } catch (err) {
+                        console.error("Error al enriquecer items:", err);
+                        setEnrichedItems(items);
+                    }
+                } else {
+                    setEnrichedItems(items);
+                }
+            };
+
+            fetchShortIds();
         }
     }, [order]);
 
@@ -109,6 +157,7 @@ export const OrderDetailModal = ({ order, isOpen, onClose, onStatusUpdate }) => 
                             <table className="w-full text-left">
                                 <thead className="bg-gray-50 text-[10px] uppercase font-bold text-gray-400 border-b border-gray-100">
                                     <tr>
+                                        <th className="px-4 py-2">ID</th>
                                         <th className="px-4 py-2">Producto</th>
                                         <th className="px-4 py-2 text-center">Cant.</th>
                                         <th className="px-4 py-2 text-right">Precio</th>
@@ -116,16 +165,18 @@ export const OrderDetailModal = ({ order, isOpen, onClose, onStatusUpdate }) => 
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {Array.isArray(order.items) && order.items.map((item, idx) => (
+                                    {(enrichedItems.length > 0 ? enrichedItems : (order.items || [])).map((item, idx) => (       
                                         <tr key={idx} className="text-sm">
+                                            <td className="px-4 py-3 text-gray-500 font-mono text-xs">
+                                                {item.sku ? item.sku : `#${item.display_id || item.product_id}`}
+                                            </td>
                                             <td className="px-4 py-3 font-medium text-gray-800">{item.name}</td>
                                             <td className="px-4 py-3 text-center text-gray-600">x{item.quantity}</td>
                                             <td className="px-4 py-3 text-right text-gray-600">${Number(item.price).toFixed(2)}</td>
-                                            <td className="px-4 py-3 text-right font-bold text-gray-800">${(Number(item.price) * item.quantity).toFixed(2)}</td> 
+                                            <td className="px-4 py-3 text-right font-bold text-gray-800">${(Number(item.price) * item.quantity).toFixed(2)}</td>
                                         </tr>
                                     ))}
-                                </tbody>
-                            </table>
+                                </tbody>                            </table>
                         </div>
                     </section>
 
