@@ -4,6 +4,7 @@ export interface Product {
     sku?: string;
     name: string;
     price: number;
+    compare_at_price?: number | null;
     category_id: number;
     image_url: string;
     categories: { name: string };

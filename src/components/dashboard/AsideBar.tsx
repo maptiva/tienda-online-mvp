@@ -1,6 +1,5 @@
 import React from 'react'
 import { BiLogOut } from 'react-icons/bi'
-import { MdShoppingCart } from 'react-icons/md'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useStoreConfig } from '../../modules/inventory/hooks/useStoreConfig'
@@ -57,7 +56,7 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
         >
             <h3 className='text-2xl font-bold mb-2 border-b pb-2'>Menu</h3>
 
-            <nav className='flex flex-col flex-1 gap-1 overflow-y-auto'>
+            <nav className='flex flex-col flex-1 gap-1 overflow-y-auto overflow-x-hidden custom-scrollbar'>
                 <NavLink
                     to={'/admin/categoria'}
                     onClick={handleNavClick}
@@ -74,6 +73,33 @@ export const AsideBar: React.FC<AsideBarProps> = ({ isOpen = true, onClose }) =>
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">📦</span>
                     <span>Productos</span>
+                </NavLink>
+
+                <NavLink
+                    to={'/admin/orders'}
+                    onClick={handleNavClick}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">🛍️</span>
+                    <span>Pedidos</span>
+                </NavLink>
+
+                <NavLink
+                    to={'/admin/discounts'}
+                    onClick={handleNavClick}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">🏷️</span>
+                    <span>Descuentos</span>
+                </NavLink>
+
+                <NavLink
+                    to={'/admin/stats'}
+                    onClick={handleNavClick}
+                    className={({ isActive }) => `${commonClass} ${isActive ? activeClass : inactiveClass}`}
+                >
+                    <span className="text-xl group-hover:scale-110 transition-transform">📈</span>
+                    <span>Estadísticas</span>
                 </NavLink>
 
                 <NavLink

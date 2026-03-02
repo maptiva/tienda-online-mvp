@@ -26,13 +26,13 @@ on:
         required: false
         type: string
 
-  # Ejecutar antes de merges a main
+  # Ejecutar en cada push a cualquier rama para garantizar seguridad
   push:
-    branches: [ 'main' ]
+    branches: [ '**' ]
 
-  # Ejecutar en PRs a main
+  # Ejecutar en todos los Pull Requests
   pull_request:
-    branches: [ 'main' ]
+    branches: [ '**' ]
 
 jobs:
   safety-check:
@@ -196,9 +196,8 @@ jobs:
           git branch -r | grep "backup/auto-" || echo "No hay branches de backup"
           
           # Mantener solo los últimos 10 backups
-          # (descomentar para activar limpieza automática)
-          # BACKUP_BRANCHES=$(git branch -r | grep "backup/auto-" | sort -r | tail -n +11)
-          # for branch in $BACKUP_BRANCHES; do
-          #   echo "Eliminando branch antiguo: $branch"
-          #   git push origin --delete "${branch#origin/}"
-          # done
+          BACKUP_BRANCHES=$(git branch -r | grep "backup/auto-" | sort -r | tail -n +11)
+          for branch in $BACKUP_BRANCHES; do
+            echo "Eliminando branch antiguo: $branch"
+            git push origin --delete "${branch#origin/}"
+          done

@@ -10,6 +10,7 @@ import CategoriaList from './public/CategoriaList';
 import { useStoreByName } from '../hooks/useStoreByName';
 import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import SEO from './shared/SEO';
+import { statsService } from '../modules/stats/services/statsService';
 
 const PublicLayout = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -18,6 +19,20 @@ const PublicLayout = () => {
   const queryClient = useQueryClient();
   const { store, loading, error } = useStoreByName(storeName);
   const { stockEnabled } = useStoreConfig();
+
+  // Tracking de visitas
+  useEffect(() => {
+    if (store && !loading && !error) {
+      // Registrar visita una sola vez por sesiÃ³n/tienda
+      const sessionKey = `tracked_visit_${store.id}`;
+      const alreadyTracked = sessionStorage.getItem(sessionKey);
+      
+      if (!alreadyTracked && store.id) {
+        statsService.trackEvent(store.id, 'visit');
+        sessionStorage.setItem(sessionKey, 'true');
+      }
+    }
+  }, [store?.id, loading, error]);
 
   // Invalidar cache cuando cambia la tienda
   useEffect(() => {
@@ -82,6 +97,7 @@ const PublicLayout = () => {
       <WhatsAppButton
         phoneNumber={store.whatsapp_number}
         customMessage={store.whatsapp_message}
+        storeId={store.id}
       />
       {isProductListPage && <ClicandoBrandButton />}
       <CartModal
