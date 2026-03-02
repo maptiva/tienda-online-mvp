@@ -1,69 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap');
 @import "tailwindcss";
+
 /* =====================================================
    NUEVO SISTEMA DE COLORES - TEMA CLARO Y OSCURO
    ===================================================== */
 
 /* Variables para Tema CLARO (Pastel/Suave) */
 :root:not(.dark) {
-    /* Colores principales */
     --color-primary: #5FAFB8;
-    /* Turquesa más oscuro (antes #A7D8DE) */
     --color-primary-darker: #4A9BA4;
-    /* Hover state más oscuro */
     --color-primary-text: #1e293b;
-    /* Texto sobre primary (slate-800) */
-
-    /* Fondos */
     --color-background-light: #E8E2DB;
-    /* Arena/Tierra claro - fondo página (antes #FDF6F6 rosa) */
     --color-surface: #FFFFFF;
-    /* Blanco - cards, header */
-
-    /* Textos */
     --color-text-main: #544A59;
-    /* Morado apagado - títulos */
     --color-text-light: #8E8193;
-    /* Gris morado - descripciones */
-
-    /* Acento */
     --color-accent: #C9B8A8;
-    /* Tierra cálido - detalles decorativos (antes #F4BFBF rosa) */
-
-    /* Bordes */
     --color-border: #e5e7eb;
-    /* gray-200 */
 }
 
 /* Variables para Tema DARK (Moderno/Profesional) */
 :root.dark {
-    /* Colores principales */
     --color-primary: #38bdf8;
-    /* Sky blue 400 */
     --color-primary-darker: #0ea5e9;
-    /* Sky 500 - hover */
     --color-primary-text: #f8fafc;
-    /* Slate 50 - texto sobre primary */
-
-    /* Fondos */
     --color-background: #0f172a;
-    /* Slate 900 - fondo página */
     --color-surface: #1e293b;
-    /* Slate 800 - cards, header */
-
-    /* Textos */
     --color-text-main: #f1f5f9;
-    /* Slate 100 - títulos */
     --color-text-light: #94a3b8;
-    /* Slate 400 - descripciones */
-
-    /* Acento */
     --color-accent: #f472b6;
-    /* Pink 400 - detalles decorativos */
-
-    /* Bordes */
     --color-border: #334155;
-    /* Slate 700 */
 }
 
 /* =====================================================
@@ -77,19 +42,16 @@ body {
     transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* Tema CLARO - Fondo */
 :root:not(.dark) body {
     background: var(--color-background-light);
     color: var(--color-text-main);
 }
 
-/* Tema DARK - Fondo */
 :root.dark body {
     background: var(--color-background);
     color: var(--color-text-main);
 }
 
-/* Títulos h2 */
 h2 {
     color: var(--color-text-main);
     transition: color 0.3s ease;
@@ -116,28 +78,47 @@ h2 {
 }
 
 /* =====================================================
+   SCROLLBARS MODERNOS (Clicando Style)
+   ===================================================== */
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Firefox */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+/* =====================================================
    CAROUSEL ANIMATIONS
    ===================================================== */
 
 @keyframes scroll {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(-50%);
-    }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar {
     -ms-overflow-style: none;
-    /* IE and Edge */
     scrollbar-width: none;
-    /* Firefox */
 }

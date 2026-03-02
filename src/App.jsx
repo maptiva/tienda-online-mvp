@@ -31,6 +31,9 @@ const CategoriaPage = lazy(() => import('./pages/dashboard/CategoriaPage.tsx'));
 const StoreSettings = lazy(() => import('./pages/StoreSettings'));
 const BulkPriceUpdate = lazy(() => import('./pages/admin/BulkPriceUpdate'));
 const InventoryPage = lazy(() => import('./modules/inventory/pages/InventoryPage'));
+const OrdersDashboard = lazy(() => import('./pages/admin/OrdersDashboard'));
+const DiscountSettingsPage = lazy(() => import('./pages/admin/DiscountSettingsPage'));
+const StatsPage = lazy(() => import('./modules/stats/pages/StatsPage'));
 
 // CRM routes - lazy loaded
 const CRMDashboard = lazy(() => import('./pages/admin/crm/Dashboard'));
@@ -69,6 +72,9 @@ function App() {
               <Route path="edit/:productId" element={<ProductForm />} />
               <Route path="precios" element={<BulkPriceUpdate />} />
               <Route path="inventario" element={<InventoryPage />} />
+              <Route path="orders" element={<OrdersDashboard />} />
+              <Route path="discounts" element={<DiscountSettingsPage />} />
+              <Route path="stats" element={<StatsPage />} />
 
               {/* CRM Routes - PROTECTED BY SUPER ADMIN ROUTE */}
               <Route path="crm" element={<SuperAdminRoute><Outlet /></SuperAdminRoute>}>
