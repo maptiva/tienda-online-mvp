@@ -31,7 +31,8 @@ interface StoreData {
 }
 
 function StoreSettings() {
-  const { user } = useAuth() as any;
+  const { user, impersonatedUser } = useAuth() as any;
+  const targetId = impersonatedUser?.id || user?.id;
   const { categories: shopCategories, loading: categoriesLoading } = useShopCategories() as any;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -64,34 +65,34 @@ function StoreSettings() {
 
     if (savedData) {
       const parsedData = JSON.parse(savedData);
-      if (parsedData.user_id === user?.id) {
+      if (parsedData.user_id === targetId) {
         setStoreData(parsedData);
         setLoading(false);
       } else {
         sessionStorage.removeItem('storeSettingsForm');
         loadStoreData();
       }
-    } else if (user) {
+    } else if (targetId) {
       loadStoreData();
     }
-  }, [user]);
+  }, [targetId]);
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && targetId) {
       const dataToStore = {
         ...storeData,
-        user_id: user.id
+        user_id: targetId
       };
       sessionStorage.setItem('storeSettingsForm', JSON.stringify(dataToStore));
     }
-  }, [storeData, loading, user]);
+  }, [storeData, loading, targetId]);
 
   const loadStoreData = async () => {
     try {
       const { data, error } = await supabase
         .from('stores')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', targetId)
         .single();
 
       if (error && error.code !== 'PGRST116') {
@@ -184,7 +185,7 @@ function StoreSettings() {
       }
 
       const compressedFile = await compressLogo(logoFile);
-      const fileName = `${user.id}/logo-${Date.now()}.webp`;
+      const fileName = `${targetId}/logo-${Date.now()}.webp`;
 
       const { error } = await supabase.storage
         .from('store-logos')
@@ -214,18 +215,18 @@ function StoreSettings() {
       const dataToSave = {
         ...storeData,
         logo_url: logoUrl,
-        user_id: user.id
+        user_id: targetId
       };
 
       const { data: existingStore } = await supabase
         .from('stores')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('user_id', targetId)
         .single();
 
       let result;
       if (existingStore) {
-        result = await supabase.from('stores').update(dataToSave).eq('user_id', user.id);
+        result = await supabase.from('stores').update(dataToSave).eq('user_id', targetId);
       } else {
         result = await supabase.from('stores').insert([dataToSave]);
       }
