@@ -44,6 +44,7 @@ const ProductDetail: React.FC = () => {
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const imgRef = React.useRef<HTMLImageElement>(null);
   const [dynamicScale, setDynamicScale] = useState(1.8);
+  const [lastTap, setLastTap] = useState(0);
 
   const { stockEnabled } = useStoreConfig() as any;
   const { inventory } = useStock(product?.id, storeName || '') as any;
@@ -135,11 +136,18 @@ const ProductDetail: React.FC = () => {
         }
 
         // Calculamos el scale para que 1px de imagen = 1px de pantalla (CSS)
-        // Bajamos el mínimo a 1.1 para que no "explote" si la imagen es justa
         const calculatedScale = Math.min(Math.max(img.naturalWidth / renderedWidth, 1.1), 3);
         setDynamicScale(calculatedScale);
       }
       setShowMagnifier(true);
+    }
+  };
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (showMagnifier) {
+      setShowMagnifier(false);
+      setOffset({ x: 0, y: 0 });
     }
   };
 
@@ -163,6 +171,24 @@ const ProductDetail: React.FC = () => {
 
   // Soporte para dispositivos móviles (Touch)
   const handleTouchStart = (e: React.TouchEvent) => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap < DOUBLE_TAP_DELAY) {
+      // Doble toque detectado
+      e.preventDefault();
+      if (showMagnifier) {
+        setShowMagnifier(false);
+        setOffset({ x: 0, y: 0 });
+      } else {
+        // Si no está ampliado, ampliamos
+        toggleZoom({ stopPropagation: () => { } } as any);
+      }
+      setLastTap(0);
+      return;
+    }
+    setLastTap(now);
+
     if (!showMagnifier) return;
     setIsDragging(true);
     const touch = e.touches[0];
@@ -483,6 +509,7 @@ const ProductDetail: React.FC = () => {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
+            onDoubleClick={handleDoubleClick}
             onClick={!showMagnifier ? toggleZoom : undefined}
           >
             <img
