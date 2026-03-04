@@ -18,12 +18,12 @@ interface CartModalProps {
   stockEnabled: boolean;
 }
 
-const CartModal: React.FC<CartModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  whatsappNumber, 
-  storeSlug, 
-  stockEnabled 
+const CartModal: React.FC<CartModalProps> = ({
+  isOpen,
+  onClose,
+  whatsappNumber,
+  storeSlug,
+  stockEnabled
 }) => {
   const { cart, removeFromCart, clearCart } = useCart() as any;
   const { theme } = useTheme() as any;
@@ -36,28 +36,36 @@ const CartModal: React.FC<CartModalProps> = ({
   const [discountSettings, setDiscountSettings] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('whatsapp');
 
-  // Cargar configuración de descuentos al abrir el modal
+  // Cargar configuración y datos persistidos al abrir el modal
   useEffect(() => {
-    if (isOpen && storeSlug) {
-      const fetchDiscountSettings = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('stores')
-            .select('discount_settings')
-            .eq('store_slug', storeSlug)
-            .single();
+    if (isOpen) {
+      // Recuperar datos del comprador del localStorage
+      const savedName = localStorage.getItem('clicando_customer_name');
+      const savedPhone = localStorage.getItem('clicando_customer_phone');
+      if (savedName) setName(savedName);
+      if (savedPhone) setPhone(savedPhone);
 
-          if (data?.discount_settings) {
-            setDiscountSettings(data.discount_settings);
-            if (data.discount_settings.enabled) {
-              setPaymentMethod('cash');
+      if (storeSlug) {
+        const fetchDiscountSettings = async () => {
+          try {
+            const { data, error } = await supabase
+              .from('stores')
+              .select('discount_settings')
+              .eq('store_slug', storeSlug)
+              .single();
+
+            if (data?.discount_settings) {
+              setDiscountSettings(data.discount_settings);
+              if (data.discount_settings.enabled) {
+                setPaymentMethod('cash');
+              }
             }
+          } catch (error) {
+            console.error('Error fetching discounts:', error);
           }
-        } catch (error) {
-          console.error('Error fetching discounts:', error);
-        }
-      };
-      fetchDiscountSettings();
+        };
+        fetchDiscountSettings();
+      }
     }
   }, [isOpen, storeSlug]);
 
@@ -220,15 +228,19 @@ const CartModal: React.FC<CartModalProps> = ({
 
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-      Swal.fire({ 
-        icon: 'success', 
-        title: '¡Pedido Confirmado!', 
-        showConfirmButton: false, 
-        timer: 1500, 
-        toast: true, 
-        position: 'top-end' 
+      Swal.fire({
+        icon: 'success',
+        title: '¡Pedido Confirmado!',
+        showConfirmButton: false,
+        timer: 1500,
+        toast: true,
+        position: 'top-end'
       });
-      
+
+      // Guardar datos en localStorage para la próxima vez
+      localStorage.setItem('clicando_customer_name', name);
+      localStorage.setItem('clicando_customer_phone', phone);
+
       window.location.href = whatsappUrl;
       onClose();
       clearCart();
@@ -253,7 +265,11 @@ const CartModal: React.FC<CartModalProps> = ({
             type="text"
             placeholder="Teléfono de Contacto"
             value={phone}
-            onChange={e => setPhone(e.target.value)}
+            onChange={e => {
+              // Solo permitir números
+              const val = e.target.value.replace(/\D/g, '');
+              setPhone(val);
+            }}
           />
           <input
             type="text"
