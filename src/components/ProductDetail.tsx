@@ -6,7 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import SEO from './shared/SEO';
 import ProductImage from './shared/ProductImage';
-import { FaWhatsapp, FaTag } from 'react-icons/fa';
+import { FaWhatsapp, FaTag, FaChevronLeft, FaChevronRight, FaSearchPlus, FaSearchMinus, FaTimes } from 'react-icons/fa';
 import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import StockBadge from '../modules/inventory/components/StockBadge';
 import { useStock } from '../modules/inventory/hooks/useStock';
@@ -36,21 +36,41 @@ const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState<string | number>(1);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [showMagnifier, setShowMagnifier] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const imgRef = React.useRef<HTMLImageElement>(null);
+  const [dynamicScale, setDynamicScale] = useState(1.8);
 
   const { stockEnabled } = useStoreConfig() as any;
   const { inventory } = useStock(product?.id, storeName || '') as any;
 
-  // Bloquear scroll cuando el modal está abierto
+  // Bloquear scroll y manejar teclado
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isLightboxOpen) return;
+      if (e.key === 'Escape') setIsLightboxOpen(false);
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
+    };
+
     if (isLightboxOpen) {
       document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
     } else {
       document.body.style.overflow = 'unset';
+      setShowMagnifier(false);
+      setZoomLevel(1);
+      setOffset({ x: 0, y: 0 });
     }
     return () => {
       document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isLightboxOpen]);
+  }, [isLightboxOpen, currentIndex]);
 
   if (loading) {
     return (
@@ -79,11 +99,88 @@ const ProductDetail: React.FC = () => {
   const imageUrl = product.image_url;
 
   // Combinar imagen principal y galería
-  const allImages = imageUrl
+  const allImages: string[] = imageUrl
     ? [imageUrl, ...(product.gallery_images || [])].filter(Boolean)
     : [...(product.gallery_images || [])].filter(Boolean);
 
-  const displayImage = selectedImage || imageUrl;
+  const displayImage = allImages[currentIndex] || imageUrl;
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+    setShowMagnifier(false);
+    setOffset({ x: 0, y: 0 });
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+    setShowMagnifier(false);
+    setOffset({ x: 0, y: 0 });
+  };
+
+  const toggleZoom = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (showMagnifier) {
+      setShowMagnifier(false);
+      setOffset({ x: 0, y: 0 });
+    } else {
+      if (imgRef.current) {
+        const img = imgRef.current;
+        const containerAspect = img.clientWidth / img.clientHeight;
+        const imageAspect = img.naturalWidth / img.naturalHeight;
+
+        let renderedWidth = img.clientWidth;
+        if (imageAspect < containerAspect) {
+          // La imagen es más alta que el contenedor (limitada por el alto)
+          renderedWidth = img.clientHeight * imageAspect;
+        }
+
+        // Calculamos el scale para que 1px de imagen = 1px de pantalla (CSS)
+        // Bajamos el mínimo a 1.1 para que no "explote" si la imagen es justa
+        const calculatedScale = Math.min(Math.max(img.naturalWidth / renderedWidth, 1.1), 3);
+        setDynamicScale(calculatedScale);
+      }
+      setShowMagnifier(true);
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!showMagnifier) return;
+    setIsDragging(true);
+    setStartPos({ x: e.clientX - offset.x, y: e.clientY - offset.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !showMagnifier) return;
+    setOffset({
+      x: e.clientX - startPos.x,
+      y: e.clientY - startPos.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Soporte para dispositivos móviles (Touch)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!showMagnifier) return;
+    setIsDragging(true);
+    const touch = e.touches[0];
+    setStartPos({ x: touch.clientX - offset.x, y: touch.clientY - offset.y });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !showMagnifier) return;
+    const touch = e.touches[0];
+    setOffset({
+      x: touch.clientX - startPos.x,
+      y: touch.clientY - startPos.y
+    });
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
 
   const handleAddToCart = () => {
     const numQuantity = typeof quantity === 'string' ? parseInt(quantity, 10) : (quantity as number);
@@ -114,19 +211,19 @@ const ProductDetail: React.FC = () => {
 
   // --- Lógica de Promoción (Catálogo) ---
   const isOffer = product.compare_at_price && product.compare_at_price > product.price;
-  const discountPercentage = isOffer 
+  const discountPercentage = isOffer
     ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
     : 0;
 
   // --- Lógica de Descuento por Pago Dinámico ---
   const cashDisc = store?.discount_settings?.enabled ? (store.discount_settings.cash_discount || 0) : 0;
   const transferDisc = store?.discount_settings?.enabled ? (store.discount_settings.transfer_discount || 0) : 0;
-  
+
   const bestDiscount = Math.max(cashDisc, transferDisc);
   const incentivePrice = product.price * (1 - bestDiscount / 100);
-  
-  const discountLabel = cashDisc === transferDisc 
-    ? 'en efectivo / con transferencia' 
+
+  const discountLabel = cashDisc === transferDisc
+    ? 'en efectivo / con transferencia'
     : (cashDisc > transferDisc ? 'en efectivo' : 'con transferencia');
 
   // Preparar datos para SEO
@@ -155,13 +252,14 @@ const ProductDetail: React.FC = () => {
       <div className={`${styles.container} min-h-[80vh]`}>
         <SEO
           title={product.name}
+          name={product.name}
           description={product.description}
           image={imageUrl}
           type="product"
           url={window.location.href}
           schema={jsonLd}
         />
-        
+
         <div className={styles.imageContainer}>
           {/* Imagen Principal */}
           <div
@@ -175,16 +273,17 @@ const ProductDetail: React.FC = () => {
               variant="detail"
               showHoverEffect={false}
               className="rounded-xl"
+              onClick={() => imageUrl && setIsLightboxOpen(true)}
             />
 
             {/* Badge de Oferta sobre Imagen */}
             {isOffer && !product.price_on_request && (
               <div className="absolute top-4 left-4 z-10 animate-bounce">
-                <div 
+                <div
                   className="flex items-center gap-1 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-xl"
-                  style={{ 
-                      backgroundColor: 'var(--color-primary)', 
-                      color: 'var(--color-primary-text)' 
+                  style={{
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-primary-text)'
                   }}
                 >
                   <FaTag size={12} />
@@ -197,14 +296,13 @@ const ProductDetail: React.FC = () => {
           {/* Galería de Miniaturas */}
           {allImages.length > 1 && (
             <div className="grid grid-cols-5 gap-2">
-              {allImages.map((img, idx) => (
+              {allImages.map((img: string, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => {
-                    setSelectedImage(img);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setCurrentIndex(idx);
                   }}
-                  className={`flex justify-center items-center aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${displayImage === img
+                  className={`flex justify-center items-center aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentIndex === idx
                     ? 'border-[var(--color-primary)] ring-2 ring-[var(--color-primary)] ring-opacity-20 transform scale-95'
                     : 'border-transparent hover:border-gray-300'
                     }`}
@@ -270,12 +368,12 @@ const ProductDetail: React.FC = () => {
                 {/* Llamador de Descuento por Pago Dinámico */}
                 {bestDiscount > 0 && (
                   <div className="mt-3 flex items-center gap-2 bg-emerald-50 self-start px-4 py-2 rounded-xl border border-emerald-100 shadow-sm">
-                      <span className="text-sm font-black text-emerald-700">
-                          Págalo a ${incentivePrice.toFixed(2)} {discountLabel}
-                      </span>
-                      <span className="bg-emerald-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm">
-                          -{bestDiscount}%
-                      </span>
+                    <span className="text-sm font-black text-emerald-700">
+                      Págalo a ${incentivePrice.toFixed(2)} {discountLabel}
+                    </span>
+                    <span className="bg-emerald-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm">
+                      -{bestDiscount}%
+                    </span>
                   </div>
                 )}
               </div>
@@ -341,29 +439,83 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Visualizador de Imagen a Pantalla Completa (Lightbox) */}
+      {/* Visualizador de Imagen Premium (Lightbox + Pan-Zoom) */}
       {isLightboxOpen && displayImage && (
         <div
-          className="fixed inset-0 z-[10000] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out animate-in fade-in duration-300"
-          onClick={() => setIsLightboxOpen(false)}
+          className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-300"
+          onKeyDown={(e) => e.key === 'ArrowLeft' && handlePrev()}
         >
-          <button
-            className="absolute top-6 right-6 text-white hover:text-gray-300 transition-colors bg-black/50 p-3 rounded-full z-10"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsLightboxOpen(false);
-            }}
-          >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          {/* Botones de acción arriba */}
+          <div className="absolute top-6 right-6 flex items-center gap-4 z-[10010]">
+            <button
+              className="text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-3 rounded-full backdrop-blur-md"
+              onClick={toggleZoom}
+              title={showMagnifier ? "Reducir" : "Ampliar"}
+            >
+              {showMagnifier ? <FaSearchMinus size={22} /> : <FaSearchPlus size={22} />}
+            </button>
+            <button
+              className="text-white/80 hover:text-red-400 transition-colors bg-white/10 hover:bg-white/20 p-3 rounded-full backdrop-blur-md"
+              onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(false); }}
+            >
+              <FaTimes size={22} />
+            </button>
+          </div>
 
-          <img
-            src={displayImage}
-            alt={product.name}
-            className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-300"
-          />
+          {/* Navegación Izquierda */}
+          {allImages.length > 1 && !showMagnifier && (
+            <button
+              className="absolute left-6 top-1/2 -translate-y-1/2 z-50 text-white/40 hover:text-white transition-all bg-white/5 hover:bg-white/10 p-4 rounded-full"
+              onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+            >
+              <FaChevronLeft size={28} />
+            </button>
+          )}
+
+          {/* Contenedor de Imagen Central */}
+          <div
+            className={`relative w-full h-full flex items-center justify-center overflow-hidden transition-all duration-300 ${showMagnifier ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'
+              }`}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onClick={!showMagnifier ? toggleZoom : undefined}
+          >
+            <img
+              ref={imgRef}
+              src={displayImage}
+              alt={product.name}
+              className="max-w-full max-h-[85vh] object-contain transition-transform duration-300 ease-out select-none"
+              style={{
+                transform: showMagnifier
+                  ? `translate(${offset.x}px, ${offset.y}px) scale(${dynamicScale})`
+                  : 'translate(0, 0) scale(1)',
+                cursor: showMagnifier ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'
+              }}
+              draggable={false}
+            />
+
+            {/* Caption / Contador */}
+            {!showMagnifier && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/40 text-white/90 text-[10px] px-3 py-1 rounded-full font-bold tracking-widest uppercase backdrop-blur-md">
+                {currentIndex + 1} / {allImages.length}
+              </div>
+            )}
+          </div>
+
+          {/* Navegación Derecha */}
+          {allImages.length > 1 && !showMagnifier && (
+            <button
+              className="absolute right-6 top-1/2 -translate-y-1/2 z-50 text-white/40 hover:text-white transition-all bg-white/5 hover:bg-white/10 p-4 rounded-full"
+              onClick={(e) => { e.stopPropagation(); handleNext(); }}
+            >
+              <FaChevronRight size={28} />
+            </button>
+          )}
         </div>
       )}
     </>
