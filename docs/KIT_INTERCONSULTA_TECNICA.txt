@@ -1,0 +1,89 @@
+KIT DE INTERCONSULTA TÉCNICA - PROYECTO TIENDA ONLINE SAAS
+Fecha: 02 de Marzo de 2026
+Estado de la Rama: feature/pedidos-estables (Candidate for Main)
+
+========================================================================
+1. CONTEXTO BÁSICO DEL PROYECTO
+========================================================================
+Plataforma SaaS Multi-tenant para tiendas online.
+Stack: React 19 + Vite + Tailwind CSS 4 + TanStack Query.
+Backend: Supabase (Auth, PostgreSQL con RLS, Storage).
+Arquitectura: Single-codebase, shared-database, aislamiento mediante RLS y store_slug.
+
+========================================================================
+2. HITOS RECIENTES Y MEJORAS CRÍTICAS
+========================================================================
+
+A. SEGURIDAD DE PEDIDOS (AUTORIDAD EN SERVIDOR):
+Se migró de inserción directa por el cliente a una función RPC segura ('create_public_order'). 
+El servidor ahora valida precios y recalcula totales en tiempo real, bloqueando cualquier 
+intento de manipulación de precios desde el navegador.
+
+B. AUDITORÍA DE SEGURIDAD RLS:
+Se blindaron 12 tablas clave (stores, products, orders, inventory, etc.). 
+Se han implementado políticas de aislamiento por store_id y user_id.
+Resultado: ✅ SECURE (Validado por script check-rls.js).
+
+C. MÓDULO DE MARKETING Y PRECIOS:
+- Implementación de 'compare_at_price' (precio tachado).
+- Nuevo motor de 'Actualización Masiva' que permite aplicar promos por % o valor fijo.
+- Lógica de protección: Detecta si un producto ya está en oferta para evitar 
+  descuentos acumulativos erróneos sobre precios ya rebajados.
+- UI: Llamadores de oferta animados y precios de incentivo por método de pago 
+  dinámicos (Efectivo/Transferencia).
+
+D. MIGRACIÓN A TYPESCRIPT:
+Migración masiva de componentes core a .tsx:
+- ProductCard, ProductDetail, ProductForm, BulkPriceUpdate, StoreSettings, OrderDetailModal.
+Interfaces de datos estrictas para Product, Store, Order y OrderItem.
+
+========================================================================
+3. RESULTADOS DE VALIDACIÓN TÉCNICA
+========================================================================
+Se ejecutó 'npm run validate:all' con los siguientes resultados:
+- Lint de Migraciones SQL: ✅ PASSED
+- Auditoría RLS: ✅ PASSED (12/12 tablas seguras)
+- Stress Test de Seguridad: ✅ PASSED (RPC bloquea ataques cruzados)
+- Build de Producción (Vite): ✅ EXITOSO (Cero errores de tipos o sintaxis)
+
+========================================================================
+4. PREGUNTAS PARA EL EXPERTO (INTERCONSULTA)
+========================================================================
+
+1. ¿Es prudente realizar el merge a 'main' ahora dado que la rama actual tiene 
+   una seguridad superior (RPC) pero introduce cambios masivos de tipos (TS)?
+2. ¿Sugiere algún "Smoke Test" adicional para el entorno de producción?
+3. Estrategia de Lanzamiento: ¿Es conveniente marcar las nuevas funciones 
+   de marketing como "VERSIÓN BETA" para los usuarios actuales?
+4. Continuidad de TS: ¿Es recomendable forzar el 100% de migración de archivos 
+   restantes o el enfoque híbrido actual es sostenible para producción?
+
+========================================================================
+5. GUÍA DE EJECUCIÓN (SAFE MERGE PATH)
+========================================================================
+
+Si tras la auditoría se decide proceder, este es el workflow sugerido:
+
+# Sincronización y validación final
+git checkout feature/pedidos-estables
+npm run validate:all
+
+# Merge a main (no fast-forward para trazabilidad)
+git checkout main
+git pull origin main
+git merge feature/pedidos-estables --no-ff -m "Merge: Seguridad V3.1, Marketing y Migración TS"
+
+# Build final en main
+npm run build
+
+# Despliegue
+git push origin main
+npm run deploy
+
+========================================================================
+6. UBICACIÓN DE ARCHIVOS SQL
+========================================================================
+- Historial oficial: supabase/migrations/
+- Scripts históricos y de desarrollo: sql/archive/
+- Backup actual de estructura: sql/31_add_compare_at_price.sql
+========================================================================
