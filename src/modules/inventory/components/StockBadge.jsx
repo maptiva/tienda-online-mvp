@@ -48,37 +48,34 @@ const StockBadge = ({ productId, storeSlug = null, className = "" }) => {
     return "Disponible";
   };
 
-  const getStockColor = () => {
+  const getStockStyles = () => {
     const minAlert = inventory?.min_stock_alert || 5;
 
     if (quantity <= 0) {
-      return "text-red-600 font-semibold";
+      return "bg-red-50 text-red-600 border-red-100 font-black";
     }
 
     if (quantity <= minAlert) {
-      return "text-orange-500 font-medium";
+      return "bg-orange-50 text-orange-600 border-orange-100 font-bold";
     }
 
-    return "text-green-600";
+    return "bg-emerald-50 text-emerald-600 border-emerald-100 font-medium";
   };
 
   const getStockIcon = () => {
     const minAlert = inventory?.min_stock_alert || 5;
-
-    if (quantity <= 0) {
-      return "❌";
-    }
-
-    if (quantity <= minAlert) {
-      return "⚠️";
-    }
-
-    return "✅";
+    if (quantity <= 0) return "×";
+    if (quantity <= minAlert) return "⚠️";
+    return "●";
   };
 
   return (
-    <div className={`text-sm ${getStockColor()} ${className}`}>
-      <span className="mr-1">{getStockIcon()}</span>
+    <div className={`
+      inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[11px] transition-all font-bold
+      ${getStockStyles()} 
+      ${className}
+    `}>
+      <span className="text-[12px] leading-none">{getStockIcon()}</span>
       {getStockText()}
     </div>
   );
