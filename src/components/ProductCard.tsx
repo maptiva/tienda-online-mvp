@@ -195,9 +195,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
                   {/* Llamador de Descuento por Pago Dinámico */}
                   {bestDiscount > 0 && (
-                    <div className="mt-2 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 shadow-sm animate-fade-in">
-                      <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-tighter block text-center">
-                        ${incentivePrice.toFixed(2)} {discountLabel}
+                    <div className="mt-2 bg-stone-100 dark:bg-stone-200 px-3 py-1 rounded-lg border border-stone-200 dark:border-stone-300 shadow-sm animate-fade-in">
+                      <span className="text-[11px] uppercase tracking-tighter block text-center text-stone-700">
+                        <span className="font-black">${incentivePrice.toFixed(2)}</span>
+                        <span className="font-medium opacity-80 ml-1">{discountLabel}</span>
                       </span>
                     </div>
                   )}
