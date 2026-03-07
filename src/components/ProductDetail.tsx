@@ -393,11 +393,11 @@ const ProductDetail: React.FC = () => {
 
                 {/* Llamador de Descuento por Pago Dinámico */}
                 {bestDiscount > 0 && (
-                  <div className="mt-3 flex items-center gap-2 bg-emerald-50 self-start px-4 py-2 rounded-xl border border-emerald-100 shadow-sm">
-                    <span className="text-sm font-bold text-emerald-600">
-                      Págalo a ${incentivePrice.toFixed(2)} {discountLabel}
+                  <div className="mt-3 flex items-center gap-2 bg-stone-100 dark:bg-stone-200 self-start px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-300 shadow-sm">
+                    <span className="text-sm text-stone-700">
+                      Págalo a <span className="font-black">${incentivePrice.toFixed(2)}</span> <span className="font-medium opacity-80">{discountLabel}</span>
                     </span>
-                    <span className="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
+                    <span className="bg-stone-500 dark:bg-stone-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm">
                       -{bestDiscount}%
                     </span>
                   </div>
