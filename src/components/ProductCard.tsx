@@ -77,19 +77,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   // --- Lógica de Promoción (Catálogo) ---
   const isOffer = product.compare_at_price && product.compare_at_price > product.price;
-  const discountPercentage = isOffer 
+  const discountPercentage = isOffer
     ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
     : 0;
 
   // --- Lógica de Descuento por Pago (Global) ---
   const cashDisc = store?.discount_settings?.enabled ? (store.discount_settings.cash_discount || 0) : 0;
   const transferDisc = store?.discount_settings?.enabled ? (store.discount_settings.transfer_discount || 0) : 0;
-  
+
   const bestDiscount = Math.max(cashDisc, transferDisc);
   const incentivePrice = product.price * (1 - bestDiscount / 100);
-  
-  const discountLabel = cashDisc === transferDisc 
-    ? 'en efectivo / con transferencia' 
+
+  const discountLabel = cashDisc === transferDisc
+    ? 'en efectivo / con transferencia'
     : (cashDisc > transferDisc ? 'en efectivo' : 'con transferencia');
 
   return (
@@ -103,11 +103,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Badge de Oferta */}
       {isOffer && !product.price_on_request && (
         <div className="absolute top-3 left-3 z-10 animate-pulse">
-          <div 
+          <div
             className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg"
-            style={{ 
-                backgroundColor: 'var(--color-primary)', 
-                color: 'var(--color-primary-text)' 
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-primary-text)'
             }}
           >
             <FaTag size={10} />
@@ -149,8 +149,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           <div>
             {stockEnabled && (
-              <div className="mb-2 flex justify-center">
-                <StockBadge productId={product.id} storeSlug={storeName || ''} className="text-[10px]" />
+              <div className="mb-3 flex justify-center">
+                <StockBadge productId={product.id} storeSlug={storeName || ''} />
               </div>
             )}
 
@@ -177,7 +177,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {/* Visualización de Precios */}
                 <div className="flex flex-col items-center mb-4 min-h-[4.5rem] justify-center">
                   {isOffer && (
-                    <span 
+                    <span
                       className="text-xs font-medium line-through opacity-70 mb-0.5"
                       style={{ color: 'var(--color-text-light)' }}
                     >
@@ -196,9 +196,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   {/* Llamador de Descuento por Pago Dinámico */}
                   {bestDiscount > 0 && (
                     <div className="mt-2 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 shadow-sm animate-fade-in">
-                        <span className="text-[11px] font-black text-emerald-700 uppercase tracking-tighter block text-center">
-                            ${incentivePrice.toFixed(2)} {discountLabel}
-                        </span>
+                      <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-tighter block text-center">
+                        ${incentivePrice.toFixed(2)} {discountLabel}
+                      </span>
                     </div>
                   )}
                 </div>
