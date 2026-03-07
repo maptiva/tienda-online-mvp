@@ -17,6 +17,25 @@ import ProtectedRoute from './router/ProtectedRoute';
 import SuperAdminRoute from './router/SuperAdminRoute';
 import LandingPage from './pages/LandingPage';
 
+// Skeleton loaders para diferentes secciones
+const AdminSkeleton = () => (
+  <div className="flex h-screen bg-gray-50">
+    <div className="w-64 bg-white border-r animate-pulse" />
+    <div className="flex-1 p-8">
+      <div className="h-8 bg-gray-200 rounded w-1/4 mb-6 animate-pulse" />
+      <div className="h-64 bg-gray-200 rounded animate-pulse" />
+    </div>
+  </div>
+);
+
+const PageSkeleton = () => (
+  <div className="p-8 space-y-4">
+    <div className="h-8 bg-gray-200 rounded w-1/3 animate-pulse" />
+    <div className="h-32 bg-gray-200 rounded animate-pulse" />
+    <div className="h-32 bg-gray-200 rounded animate-pulse" />
+  </div>
+);
+
 // Lazy-loaded routes - loaded on demand
 const Login = lazy(() => import('./pages/Login'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
@@ -43,51 +62,134 @@ const Payments = lazy(() => import('./pages/admin/crm/Payments'));
 
 
 function App() {
-
-
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <ScrollToTop />
-        <Suspense fallback={<LazyLoadFallback />}>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/mapa" element={<ExploreMap />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+        <Routes>
+          {/* Rutas públicas - Suspense global para primera carga */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/mapa" element={
+            <Suspense fallback={<LazyLoadFallback />}>
+              <ExploreMap />
+            </Suspense>
+          } />
+          <Route path="/login" element={
+            <Suspense fallback={<LazyLoadFallback />}>
+              <Login />
+            </Suspense>
+          } />
+          <Route path="/forgot-password" element={
+            <Suspense fallback={<LazyLoadFallback />}>
+              <ForgotPassword />
+            </Suspense>
+          } />
+          <Route path="/reset-password" element={
+            <Suspense fallback={<LazyLoadFallback />}>
+              <ResetPassword />
+            </Suspense>
+          } />
 
-            <Route path="/:storeName" element={<PublicLayout />}>
-              <Route index element={<ProductList />} />
-              <Route path="product/:productId" element={<ProductDetail />} />
+          <Route path="/:storeName" element={<PublicLayout />}>
+            <Route index element={<ProductList />} />
+            <Route path="product/:productId" element={<ProductDetail />} />
+          </Route>
+
+          {/* Admin routes - Suspense específico para layout */}
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <Suspense fallback={<AdminSkeleton />}>
+                <AdminLayout />
+              </Suspense>
+            </ProtectedRoute>
+          }>
+            <Route index element={
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminDashboard />
+              </Suspense>
+            } />
+            <Route path="producto" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <AdminDashboard />
+              </Suspense>
+            } />
+            <Route path="categoria" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <CategoriaPage />
+              </Suspense>
+            } />
+            <Route path="settings" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <StoreSettings />
+              </Suspense>
+            } />
+            <Route path="new" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <ProductForm />
+              </Suspense>
+            } />
+            <Route path="edit/:productId" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <ProductForm />
+              </Suspense>
+            } />
+            <Route path="precios" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <BulkPriceUpdate />
+              </Suspense>
+            } />
+            <Route path="inventario" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <InventoryPage />
+              </Suspense>
+            } />
+            <Route path="orders" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <OrdersDashboard />
+              </Suspense>
+            } />
+            <Route path="discounts" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <DiscountSettingsPage />
+              </Suspense>
+            } />
+            <Route path="stats" element={
+              <Suspense fallback={<PageSkeleton />}>
+                <StatsPage />
+              </Suspense>
+            } />
+
+            {/* CRM Routes - PROTECTED BY SUPER ADMIN ROUTE */}
+            <Route path="crm" element={<SuperAdminRoute><Outlet /></SuperAdminRoute>}>
+              <Route index element={
+                <Suspense fallback={<PageSkeleton />}>
+                  <CRMDashboard />
+                </Suspense>
+              } />
+              <Route path="clients" element={
+                <Suspense fallback={<PageSkeleton />}>
+                  <Clients />
+                </Suspense>
+              } />
+              <Route path="leads" element={
+                <Suspense fallback={<PageSkeleton />}>
+                  <Leads />
+                </Suspense>
+              } />
+              <Route path="payments" element={
+                <Suspense fallback={<PageSkeleton />}>
+                  <Payments />
+                </Suspense>
+              } />
             </Route>
+          </Route>
 
-
-            <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="producto" element={<AdminDashboard />} />
-              <Route path="categoria" element={<CategoriaPage />} />
-              <Route path="settings" element={<StoreSettings />} />
-              <Route path="new" element={<ProductForm />} />
-              <Route path="edit/:productId" element={<ProductForm />} />
-              <Route path="precios" element={<BulkPriceUpdate />} />
-              <Route path="inventario" element={<InventoryPage />} />
-              <Route path="orders" element={<OrdersDashboard />} />
-              <Route path="discounts" element={<DiscountSettingsPage />} />
-              <Route path="stats" element={<StatsPage />} />
-
-              {/* CRM Routes - PROTECTED BY SUPER ADMIN ROUTE */}
-              <Route path="crm" element={<SuperAdminRoute><Outlet /></SuperAdminRoute>}>
-                <Route index element={<CRMDashboard />} />
-                <Route path="clients" element={<Clients />} />
-                <Route path="leads" element={<Leads />} />
-                <Route path="payments" element={<Payments />} />
-              </Route>
-            </Route>
-
-            <Route path='*' element={<Error404 />} />
-          </Routes>
-        </Suspense>
+          <Route path='*' element={
+            <Suspense fallback={<LazyLoadFallback />}>
+              <Error404 />
+            </Suspense>
+          } />
+        </Routes>
       </CartProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

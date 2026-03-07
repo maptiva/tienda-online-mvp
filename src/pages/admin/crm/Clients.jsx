@@ -10,7 +10,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Clients = () => {
-    const { clients, loading: clientsLoading, error, fetchClients, getRealStores, createClient, updateClient, archiveClient, reactivateClient } = useClients();
+    const { clients, loading: clientsLoading, error, fetchClients, getRealStores, createClient, updateClient, archiveClient, reactivateClient, pagination, nextPage, prevPage } = useClients();
     const { registerPayment, loading: paymentLoading } = usePayments();
     const { setImpersonatedUser, impersonatedUser, isMaster } = useAuth();
     const navigate = useNavigate();
@@ -190,7 +190,7 @@ const Clients = () => {
 
                 {clients && (
                     <p className='text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest'>
-                        {showArchived ? 'Archivo:' : 'Radar:'} <span className='text-gray-800'>{filteredClients.length}</span> de <span className='text-gray-800'>{clients.length}</span> Clientes
+                        {showArchived ? 'Archivo:' : 'Radar:'} <span className='text-gray-800'>{filteredClients.length}</span> de <span className='text-gray-800'>{pagination.totalItems}</span> Clientes
                     </p>
                 )}
             </div>
@@ -433,6 +433,31 @@ const Clients = () => {
                             })
                         )}
                     </div>
+
+                {/* Controles de Paginación */}
+                {pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+                        <button
+                            onClick={prevPage}
+                            disabled={!pagination.hasPrevPage || clientsLoading}
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-white border border-gray-200 shadow-sm hover:bg-gray-100 text-gray-600"
+                        >
+                            ← Anterior
+                        </button>
+
+                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                            Página <span className="text-gray-800">{pagination.page}</span> de <span className="text-gray-800">{pagination.totalPages}</span>
+                        </span>
+
+                        <button
+                            onClick={nextPage}
+                            disabled={!pagination.hasNextPage || clientsLoading}
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-white border border-gray-200 shadow-sm hover:bg-gray-100 text-gray-600"
+                        >
+                            Siguiente →
+                        </button>
+                    </div>
+                )}
                 </div>
 
                 {/* Modales */}
