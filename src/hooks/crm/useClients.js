@@ -1,16 +1,30 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '../../services/supabase';
 
+const ITEMS_PER_PAGE = 20; // Configurable: items por página
+
 export const useClients = () => {
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        totalPages: 1,
+        totalItems: 0,
+        hasNextPage: false,
+        hasPrevPage: false
+    });
 
-    const fetchClients = useCallback(async (showArchived = false) => {
+    const fetchClients = useCallback(async (showArchived = false, page = 1) => {
         setLoading(true);
         try {
-            // Primero traer los clientes (filtrando por estado)
-            let query = supabase.from('clients').select('*');
+            const from = (page - 1) * ITEMS_PER_PAGE;
+            const to = from + ITEMS_PER_PAGE - 1;
+
+            // Query con paginación y count exacto
+            let query = supabase
+                .from('clients')
+                .select('*', { count: 'exact' });
 
             if (!showArchived) {
                 query = query.eq('status', 'active');
@@ -18,14 +32,19 @@ export const useClients = () => {
                 query = query.eq('status', 'archived');
             }
 
-            const { data: clientsData, error: clientsError } = await query.order('created_at', { ascending: false });
+            const { data: clientsData, error: clientsError, count } = await query
+                .order('created_at', { ascending: false })
+                .range(from, to);
 
             if (clientsError) {
                 console.error('❌ Error trayendo clientes:', clientsError);
                 throw clientsError;
             }
 
-            // Luego traer todas las tiendas con sus suscripciones
+            // Solo traer tiendas y pagos para los clientes de esta página
+            const clientIds = clientsData.map(c => c.id);
+
+            // Traer tiendas relacionadas (optimizado con filtro IN)
             const { data: storesData, error: storesError } = await supabase
                 .from('stores')
                 .select(`
@@ -42,32 +61,45 @@ export const useClients = () => {
                         status,
                         amount
                     )
-                `);
+                `)
+                .in('client_id', clientIds);
 
             if (storesError) {
                 console.error('❌ Error trayendo tiendas:', storesError);
                 throw storesError;
             }
 
-            // Luego traer todos los pagos para calcular estados comerciales
+            // Traer pagos relacionados (optimizado con filtro IN y limit)
             const { data: paymentsData, error: paymentsError } = await supabase
                 .from('payments')
                 .select('client_id, created_at, notes, amount')
-                .order('created_at', { ascending: false });
+                .in('client_id', clientIds)
+                .order('created_at', { ascending: false })
+                .limit(100); // Limitar pagos por cliente
 
             if (paymentsError) {
                 console.error('❌ Error trayendo pagos:', paymentsError);
                 throw paymentsError;
             }
 
-            // Hacer el JOIN manualmente en JavaScript
+            // JOIN manual optimizado
             const clientsWithStores = clientsData.map(client => ({
                 ...client,
-                stores: storesData.filter(store => store.client_id === client.id),
-                payments: paymentsData.filter(p => p.client_id === client.id)
+                stores: storesData?.filter(store => store.client_id === client.id) || [],
+                payments: paymentsData?.filter(p => p.client_id === client.id) || []
             }));
 
             setClients(clientsWithStores);
+
+            // Actualizar paginación
+            const totalPages = Math.ceil((count || 0) / ITEMS_PER_PAGE);
+            setPagination({
+                page,
+                totalPages,
+                totalItems: count || 0,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            });
         } catch (err) {
             console.error('Error fetching clients:', err);
             setError(err.message);
@@ -220,11 +252,34 @@ export const useClients = () => {
         }
     };
 
+    // Funciones de navegación de paginación
+    const goToPage = useCallback((pageNum) => {
+        if (pageNum >= 1 && pageNum <= pagination.totalPages) {
+            fetchClients(false, pageNum);
+        }
+    }, [fetchClients, pagination.totalPages]);
+
+    const nextPage = useCallback(() => {
+        if (pagination.hasNextPage) {
+            fetchClients(false, pagination.page + 1);
+        }
+    }, [fetchClients, pagination.hasNextPage, pagination.page]);
+
+    const prevPage = useCallback(() => {
+        if (pagination.hasPrevPage) {
+            fetchClients(false, pagination.page - 1);
+        }
+    }, [fetchClients, pagination.hasPrevPage, pagination.page]);
+
     return {
         clients,
         loading,
         error,
+        pagination,
         fetchClients,
+        goToPage,
+        nextPage,
+        prevPage,
         getRealStores,
         createClient,
         updateClient,
