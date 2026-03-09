@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import styles from "./CategoriaList.module.css";
 import { supabase } from "../../services/supabase";
 import { useCategoryState } from "../../store/useCategoryStore";
@@ -15,8 +16,27 @@ interface CategoriaListProps {
 
 const CategoriaList: React.FC<CategoriaListProps> = ({ userId }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
   const { categoryActive, activeCategory, clearCategoryActive } = useCategoryState();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sincronizar estado inicial desde la URL (Hidratación)
+  useEffect(() => {
+    if (categories.length > 0) {
+      const categoryNameFromUrl = searchParams.get('categoria');
+      if (categoryNameFromUrl) {
+        const categoryToActivate = categories.find(
+          c => c.name.toLowerCase() === categoryNameFromUrl.toLowerCase()
+        );
+        if (categoryToActivate && (!categoryActive || categoryActive.id !== categoryToActivate.id)) {
+          activeCategory(categoryToActivate);
+        }
+      } else if (categoryActive) {
+        // Si no hay parámetro en la URL pero hay categoría activa (y no es por interacción fresca), 
+        // podríamos decidir qué hacer. Por ahora respetamos el estado o lo limpiamos.
+      }
+    }
+  }, [categories, searchParams]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -61,11 +81,17 @@ const CategoriaList: React.FC<CategoriaListProps> = ({ userId }) => {
     // Scroll al inicio de la página al cambiar de categoría
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    const newParams = new URLSearchParams(searchParams);
+
     if (category === null) {
       clearCategoryActive();
+      newParams.delete('categoria');
     } else {
       activeCategory(category);
+      newParams.set('categoria', category.name);
     }
+
+    setSearchParams(newParams, { replace: true });
   };
 
   return (

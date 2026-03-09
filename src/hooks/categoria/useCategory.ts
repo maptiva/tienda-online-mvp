@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+import { useSearchParams } from "react-router-dom";
 import { Categoria } from "../../interfaces/Categoria"
 import { supabase } from "../../services/supabase"
 import { useCategoryState } from "../../store/useCategoryStore";
@@ -6,20 +7,29 @@ import { useAuth } from "../../context/AuthContext";
 
 export const useCategory = () => {
     const { user, impersonatedUser } = useAuth();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { categories, categoryActive, getCategories, activeCategory, limpiarCategories, clearCategoryActive, addCategory, deleteCategory, updateCategory } = useCategoryState();
 
     // Determinar el ID objetivo (Usuario impersonado o logueado)
     const targetId = impersonatedUser?.id || user?.id;
 
     const limpiarCategoryActive = async () => {
-        clearCategoryActive()
+        clearCategoryActive();
+        // Limpiar el parámetro de la URL
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('categoria');
+        setSearchParams(newParams, { replace: true });
     };
 
     const startActiveCategory = async (id: number) => {
         const category = categories.find(elem => elem.id === id);
 
         if (category) {
-            activeCategory(category)
+            activeCategory(category);
+            // Actualizar el parámetro de la URL con el nombre de la categoría
+            const newParams = new URLSearchParams(searchParams);
+            newParams.set('categoria', category.name);
+            setSearchParams(newParams, { replace: true });
         }
     };
 
