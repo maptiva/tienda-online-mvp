@@ -211,8 +211,15 @@ const ExploreMap = () => {
             ...s,
             category: (s.category === 'Veterinaria' || s.category === 'Petshop') ? 'Pet Shop' : (s.category || 'Otros')
         })).filter(store => {
-            const matchesSearch = store.store_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                store.address?.toLowerCase().includes(searchTerm.toLowerCase());
+            const categoryLabel = categoryMetaMap[store.category]?.label || store.category || '';
+            const searchLower = searchTerm.toLowerCase();
+
+            const matchesSearch =
+                store.store_name.toLowerCase().includes(searchLower) ||
+                store.address?.toLowerCase().includes(searchLower) ||
+                store.city?.toLowerCase().includes(searchLower) ||
+                categoryLabel.toLowerCase().includes(searchLower);
+
             const matchesCategory = !selectedCategory || store.category === selectedCategory;
             const matchesCity = !selectedCity || store.city === selectedCity;
             return matchesSearch && matchesCategory && matchesCity;
