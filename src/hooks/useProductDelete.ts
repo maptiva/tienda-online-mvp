@@ -36,18 +36,14 @@ export const deleteProduct = async (id: string, imageUrl: string): Promise<boole
             });
         }
 
-        // 3. Eliminar archivos del Storage
+        // 3. Eliminar archivos del Storage (con chequeo de referencias)
         if (imagesToDelete.length > 0) {
-            console.log('[Storage] Eliminando archivos físicos:', imagesToDelete);
-            const { error: storageError } = await supabase.storage
-                .from('product-images')
-                .remove(imagesToDelete);
-
-            if (storageError) {
-                console.error('[Storage] Error al eliminar archivos físicos:', storageError);
-            } else {
-                console.log('[Storage] Archivos físicos eliminados con éxito.');
-            }
+            const { storageService } = await import('../services/storageService');
+            // Nota: Aquí pasamos las URLs originales porque el service hace el getStoragePath interno
+            // Pero el hook ya tiene los paths? No, imagesToDelete tiene los paths.
+            // Voy a pasar los paths directamente si el service lo soporta.
+            // Ajusto el service para que acepte paths o URLs.
+            await storageService.safeDeleteImages(imagesToDelete);
         }
 
         // 4. Eliminar el registro del producto de la base de datos

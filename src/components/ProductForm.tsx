@@ -1,11 +1,12 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { formConfig } from '../config/productFormConfig';
 import styles from './ProductForm.module.css';
 import { compressImage } from '../utils/imageCompression';
 import { getStoragePath } from '../utils/storageUtils';
+import { storageService } from '../services/storageService';
 import Swal from 'sweetalert2';
 
 interface Category {
@@ -30,6 +31,8 @@ interface ProductFormData {
 
 function ProductForm() {
   const { productId } = useParams<{ productId: string }>();
+  const [searchParams] = useSearchParams();
+  const duplicateId = searchParams.get('duplicateFrom');
   const navigate = useNavigate();
   const { user, impersonatedUser } = useAuth() as any;
   const [formData, setFormData] = useState<ProductFormData>({
@@ -64,10 +67,11 @@ function ProductForm() {
     };
     
     formConfig.forEach(field => {
-      if (field.name === 'price') {
-        initialData[field.name] = 0;
+      const fieldName = field.name as string;
+      if (fieldName === 'price') {
+        initialData[fieldName] = 0;
       } else {
-        initialData[field.name] = field.required ? '' : null;
+        initialData[fieldName] = field.required ? '' : null;
       }
     });
 
@@ -126,10 +130,53 @@ function ProductForm() {
         }
       };
       fetchProduct();
+    } else if (duplicateId) {
+      const fetchProductForDuplication = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', parseInt(duplicateId, 10))
+            .single();
+
+          if (error) throw error;
+          if (!data) throw new Error('Producto original no encontrado para duplicar');
+
+          // Limpiar campos únicos/identificadores
+          const { id, sku, display_id, created_at, user_id, ...duplicateData } = data;
+          
+          setFormData({
+            ...initialData,
+            ...duplicateData,
+            sku: '' // Siempre vacío según requerimiento
+          });
+          
+          setOriginalImageUrl(data.image_url);
+          if (data.gallery_images && Array.isArray(data.gallery_images)) {
+            setExistingGalleryImages(data.gallery_images);
+          }
+          
+          Swal.fire({
+            icon: 'info',
+            title: 'Modo Duplicación',
+            text: 'Se han cargado los datos del producto original. Por favor, revisa y asigna un nuevo SKU si es necesario.',
+            timer: 3000,
+            toast: true,
+            position: 'top-end'
+          });
+          
+        } catch (err: any) {
+          setError(`Error al duplicar producto: ${err.message}`);
+          console.error('Error fetching product for duplication:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProductForDuplication();
     } else {
       setLoading(false);
     }
-  }, [productId, user, targetId]);
+  }, [productId, duplicateId, user, targetId]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -278,20 +325,11 @@ function ProductForm() {
 
     try {
       if (productId && newImageUrl && originalImageUrl) {
-        const oldImagePath = getStoragePath(originalImageUrl, 'product-images');
-        if (oldImagePath) {
-          await supabase.storage.from('product-images').remove([oldImagePath]);
-        }
+        await storageService.safeDeleteImages([originalImageUrl]);
       }
 
       if (galleryImagesToDelete.length > 0) {
-        const pathsToDelete = galleryImagesToDelete
-          .map(url => getStoragePath(url, 'product-images'))
-          .filter((p): p is string => !!p);
-
-        if (pathsToDelete.length > 0) {
-          await supabase.storage.from('product-images').remove(pathsToDelete);
-        }
+        await storageService.safeDeleteImages(galleryImagesToDelete);
       }
     } catch (cleanupErr) {
       console.warn('[Storage] Error no crítico durante la limpieza:', cleanupErr);
@@ -342,14 +380,16 @@ function ProductForm() {
           {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 border border-red-100 font-medium text-center">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {formConfig.map((field) => (
-              <div key={field.name} className={styles.formGroup}>
-                <label htmlFor={field.name} className="block text-sm font-bold text-gray-700 mb-2">{field.label}</label>
+            {formConfig.map((field) => {
+            const fieldName = field.name as string;
+            return (
+              <div key={fieldName} className={styles.formGroup}>
+                <label htmlFor={fieldName} className="block text-sm font-bold text-gray-700 mb-2">{field.label}</label>
                 {field.type === 'textarea' ? (
                   <textarea
-                    id={field.name}
-                    name={field.name}
-                    value={formData[field.name] || ''}
+                    id={fieldName}
+                    name={fieldName}
+                    value={(formData[fieldName] as any) || ''}
                     onChange={handleChange}
                     required={field.required}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none transition-all min-h-[100px]"
@@ -415,9 +455,9 @@ function ProductForm() {
                 ) : field.type === 'select' ? (
                   <div className="relative">
                     <select
-                      id={field.name}
-                      name={field.name}
-                      value={formData[field.name] || ''}
+                      id={fieldName}
+                      name={fieldName}
+                      value={(formData[fieldName] as any) || ''}
                       onChange={handleChange}
                       required={field.required}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none appearance-none bg-white font-medium text-gray-700"
@@ -433,23 +473,23 @@ function ProductForm() {
                   </div>
                 ) : field.type === 'checkbox' ? (
                   <div className="flex items-start gap-3 mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => {       
-                    const checkbox = document.getElementById(field.name) as HTMLInputElement;
+                    const checkbox = document.getElementById(fieldName) as HTMLInputElement;
                     if (checkbox) checkbox.click();
                   }}>
                     <div className="flex items-center h-5">
                       <input
                         type="checkbox"
-                        id={field.name}
-                        name={field.name}
-                        checked={formData[field.name] || false}
+                        id={fieldName}
+                        name={fieldName}
+                        checked={(formData[fieldName] as any) || false}
                         onChange={handleChange}
                         onClick={(e) => e.stopPropagation()} 
                         className="w-5 h-5 text-[#5FAFB8] border-gray-300 rounded focus:ring-[#5FAFB8] cursor-pointer"
                       />
                     </div>
                     <div className="ml-2 text-sm">
-                      <label htmlFor={field.name} className="font-bold text-gray-700 cursor-pointer select-none">{field.label}</label>
-                      {field.name === 'price_on_request' && (
+                      <label htmlFor={fieldName} className="font-bold text-gray-700 cursor-pointer select-none">{field.label}</label>
+                      {fieldName === 'price_on_request' && (
                         <p className="text-gray-500 text-xs mt-0.5">
                           {formData.price_on_request
                             ? "✅ El precio se ocultará. El cliente verá un botón de 'Consultar Precio'."
@@ -461,21 +501,22 @@ function ProductForm() {
                 ) : (
                   <input
                     type={field.type}
-                    id={field.name}
-                    name={field.name}
-                    value={formData[field.name] ?? ''}
+                    id={fieldName}
+                    name={fieldName}
+                    value={(formData[fieldName] as any) ?? ''}
                     onChange={handleChange}
-                    required={field.name === 'price' && formData.price_on_request ? false : field.required}
-                    disabled={field.name === 'price' && formData.price_on_request}
-                    placeholder={field.name === 'price' && formData.price_on_request ? "Precio oculto (Consultar Precio activo)" : ""}
-                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none transition-all ${field.name === 'price' && formData.price_on_request
+                    required={fieldName === 'price' && formData.price_on_request ? false : field.required}
+                    disabled={fieldName === 'price' && formData.price_on_request}
+                    placeholder={fieldName === 'price' && formData.price_on_request ? "Precio oculto (Consultar Precio activo)" : ""}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none transition-all ${fieldName === 'price' && formData.price_on_request
                       ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed italic'
                       : 'border-gray-300 font-medium'
                       }`}
                   />
                 )}
               </div>
-            ))}
+            );
+          })}
 
             <div className="pt-4 border-t border-gray-100 mt-8">
               <button
