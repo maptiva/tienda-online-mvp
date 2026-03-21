@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Product } from '../../interfaces/Producto'
 import { useNavigate } from 'react-router-dom'
 import { RiPencilLine } from 'react-icons/ri';
-import { MdOutlineDelete } from 'react-icons/md';
+import { MdOutlineDelete, MdContentCopy } from 'react-icons/md';
 import { deleteProduct } from '../../hooks/useProductDelete';
 import Swal from 'sweetalert2';
 
@@ -59,6 +59,12 @@ export const ProductElement = ({ product }: Props) => {
             <td className='py-3 text-lg text-gray-500'>{categories?.name}</td>
             <td className='py-3'>
                 <div className='gap-4 flex items-center justify-center'>
+                    <button className='cursor-pointer text-gray-400 hover:text-green-600 transition-all duration-300 outline-none' 
+                        onClick={() => navigate(`/admin/new?duplicateFrom=${id}`)}
+                        title="Duplicar producto"
+                    >
+                        <MdContentCopy size={20} />
+                    </button>
                     <button className='cursor-pointer text-gray-500 hover:text-blue-600 transition-all duration-300 outline-none' onClick={(e) => navigate(`/admin/edit/${id}`)}>
                         <RiPencilLine size={22} />
                     </button>

@@ -696,36 +696,66 @@
         }
 
         async function fetchDbRefs(url, headers) {
+            // Función interna para paginar cualquier tabla
+            const fetchAll = async (table, select) => {
+                let allData = [];
+                let offset = 0;
+                const limit = 1000;
+                let hasMore = true;
+
+                while (hasMore) {
+                    log(`  Fetching ${table} (offset: ${offset})...`, 'info');
+                    const res = await fetch(`${url}/rest/v1/${table}?select=${select}&limit=${limit}&offset=${offset}`, { headers });
+                    if (!res.ok) {
+                        log(`⚠️ Error en ${table}: ${res.status}`, 'warn');
+                        break;
+                    }
+                    const data = await res.json();
+                    allData = allData.concat(data);
+                    if (data.length < limit) hasMore = false;
+                    else offset += limit;
+                }
+                return allData;
+            };
+
             try {
-                const res = await fetch(`${url}/rest/v1/products?select=image_url,gallery_images&limit=10000`, {
-                    headers: { ...headers, 'Prefer': 'count=exact' }
+                const products = await fetchAll('products', 'image_url,gallery_images');
+                log(`  📦 Total Productos: ${products.length}`, 'ok');
+                products.forEach(p => {
+                    if (p.image_url) dbReferences.add(decodeURIComponent(p.image_url));
+                    
+                    let gallery = p.gallery_images;
+                    if (typeof gallery === 'string' && gallery.startsWith('[')) {
+                        try { gallery = JSON.parse(gallery); } catch(e) {}
+                    }
+                    
+                    if (Array.isArray(gallery)) {
+                        gallery.forEach(u => u && dbReferences.add(decodeURIComponent(u)));
+                    }
                 });
-                if (res.ok) {
-                    const products = await res.json();
-                    log(`  📦 Productos en DB: ${products.length}`, 'ok');
-                    products.forEach(p => {
-                        if (p.image_url) dbReferences.add(p.image_url);
-                        if (Array.isArray(p.gallery_images)) p.gallery_images.forEach(u => u && dbReferences.add(u));
-                    });
-                    log(`  🔗 URLs referenciadas: ${dbReferences.size}`, 'ok');
-                } else log(`⚠️ No se pudieron obtener productos: ${res.status}`, 'warn');
             } catch (err) { log(`❌ Error productos: ${err.message}`, 'error'); }
 
             try {
-                const res = await fetch(`${url}/rest/v1/stores?select=logo_url&limit=1000`, { headers });
-                if (res.ok) {
-                    const stores = await res.json();
-                    log(`  🏪 Tiendas en DB: ${stores.length}`, 'ok');
-                    stores.forEach(s => s.logo_url && dbReferences.add(s.logo_url));
-                }
+                const stores = await fetchAll('stores', 'logo_url');
+                log(`  🏪 Total Tiendas: ${stores.length}`, 'ok');
+                stores.forEach(s => s.logo_url && dbReferences.add(decodeURIComponent(s.logo_url)));
             } catch (err) { log(`⚠️ Error tiendas: ${err.message}`, 'warn'); }
+
+            log(`  🔗 URLs únicas referenciadas: ${dbReferences.size}`, 'ok');
         }
 
         function detectOrphans() {
             orphanFiles = [];
             allFiles.forEach(file => {
                 if (isImg(file.name)) {
-                    const referenced = Array.from(dbReferences).some(ref => ref && ref.includes(file.path));
+                    // Normalización de path para comparación segura
+                    const filePath = decodeURIComponent(file.path);
+                    const referenced = Array.from(dbReferences).some(ref => {
+                        if (!ref) return false;
+                        const decodedRef = decodeURIComponent(ref);
+                        return decodedRef.includes(filePath) || decodedRef.includes(file.path);
+                    });
+                    
                     file.isOrphan = !referenced;
                     if (!referenced) {
                         orphanFiles.push(file);
