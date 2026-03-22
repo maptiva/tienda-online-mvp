@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../services/supabase';
+import { storeSchema } from '../schemas/store.schema';
+import { safeValidate } from '../utils/zodHelpers';
+import type { Store } from '../schemas/store.schema';
 
-export const useStoreByName = (storeName) => {
-    const [store, setStore] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+export const useStoreByName = (storeName: string | null | undefined) => {
+    const [store, setStore] = useState<Store | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchStore = async () => {
@@ -18,7 +21,7 @@ export const useStoreByName = (storeName) => {
                     return;
                 }
 
-                const { data, error } = await supabase
+                const { data: rawStore, error } = await supabase
                     .from('stores')
                     .select('*')
                     .eq('store_slug', storeName)
@@ -31,11 +34,18 @@ export const useStoreByName = (storeName) => {
                     } else {
                         throw error;
                     }
-                } else {
-                    setStore(data);
+                } else if (rawStore) {
+                    // Validar los datos con Zod
+                    const { data: validatedStore, error: validationError } = safeValidate(storeSchema, rawStore);
+                    if (validationError) {
+                        console.warn("Validation errors for store:", validationError.issues);
+                        setStore(null);
+                    } else if (validatedStore) {
+                        setStore(validatedStore);
+                    }
                 }
             } catch (err) {
-                setError(err.message);
+                setError(err instanceof Error ? err.message : String(err));
                 console.error('Error fetching store:', err);
             } finally {
                 setLoading(false);

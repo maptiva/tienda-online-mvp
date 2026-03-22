@@ -4,15 +4,15 @@ import { z } from 'zod';
  * Schema de validación para pagos del CRM
  */
 export const paymentSchema = z.object({
-  id: z.string().uuid(),
-  client_id: z.string().uuid(),
-  subscription_id: z.string().uuid().optional(),
+  id: z.union([z.string().uuid(), z.number()]),
+  client_id: z.union([z.string().uuid(), z.number()]),
+  subscription_id: z.union([z.string().uuid(), z.number()]).optional().nullable(),
   amount: z.number().positive('El monto debe ser mayor a 0'),
   payment_method: z.string().optional(),
   status: z.enum(['COMPLETED', 'PENDING', 'FAILED', 'REFUNDED']).default('COMPLETED'),
   notes: z.string().optional(),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional()
+  created_at: z.string().optional().nullable(),
+  updated_at: z.string().optional().nullable()
 });
 
 // Tipo inferido del schema para uso en TypeScript
