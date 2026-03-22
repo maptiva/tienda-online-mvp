@@ -2,20 +2,34 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaStore } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
+import { type Store } from '../schemas/store.schema';
 
-const StoreCard = ({ store }) => {
+interface StoreCardProps {
+    store: Store & {
+        short_description?: string;
+        is_open?: boolean;
+    };
+}
+
+const StoreCard: React.FC<StoreCardProps> = ({ store }) => {
     const { theme } = useTheme();
+    
+    // Componente wrapper dinámico
     const CardWrapper = store.coming_soon ? 'div' : Link;
-    const cardProps = store.coming_soon ? {} : { to: `/${store.store_slug}` };
+    
+    // Props dinámicos según el tipo de componente
+    const cardProps = store.coming_soon 
+        ? {} 
+        : { to: `/${store.store_slug || ''}` };
 
-    // Placeholder data if missing (for existing stores before migration/manual update)
-    const category = store.category || 'Maptiva Store';
+    // Datos por defecto si faltan
+    const categoryName = store.category || 'Maptiva Store';
     const description = store.short_description || 'Descubrí los mejores productos en nuestra tienda.';
     const isOpen = store.is_open !== undefined ? store.is_open : true;
 
     return (
         <CardWrapper
-            {...cardProps}
+            {...(cardProps as any)}
             className="flex-shrink-0 w-72 group rounded-3xl transition-all duration-500 hover:scale-[1.03] relative overflow-hidden flex flex-col"
             style={{
                 backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.95)' : 'white',
@@ -66,12 +80,12 @@ const StoreCard = ({ store }) => {
                 <div className="space-y-1 mb-4">
                     <h3
                         className="text-xl font-black tracking-tight leading-tight"
-                        style={{ color: '#475569' }} // Same dark gray as description
+                        style={{ color: '#475569' }}
                     >
                         {store.store_name}
                     </h3>
                     <div className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-widest opacity-60">
-                        <span style={{ color: '#475569' }}>{category}</span>
+                        <span style={{ color: '#475569' }}>{categoryName}</span>
                         <span className="w-1 h-1 rounded-full bg-gray-300" />
                         <span className={isOpen ? 'text-emerald-500' : 'text-rose-500'} title="Sincronización automática en desarrollo">
                             {isOpen ? '🟢 Abierto' : '🔴 Cerrado'} <span className="text-[8px] opacity-70">(Beta)</span>

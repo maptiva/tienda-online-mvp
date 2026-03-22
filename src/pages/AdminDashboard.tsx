@@ -7,9 +7,9 @@ import { ProductElement } from '../components/dashboard/ProductElement';
 import { ProductCard } from '../components/dashboard/ProductCard';
 import SearchBar from '../components/SearchBar';
 
-function AdminDashboard() {
+const AdminDashboard: React.FC = () => {
     const navigate = useNavigate();
-    const { products, loading, error } = useProducts();
+    const { products, loading } = useProducts();
     const [searchTerm, setSearchTerm] = useState('');
 
     // Filtrar productos por búsqueda
@@ -19,7 +19,6 @@ function AdminDashboard() {
 
         const searchLower = searchTerm.toLowerCase();
         return products.filter((product) => {
-            const searchLower = searchTerm.toLowerCase();
             const matchesName = product.name.toLowerCase().includes(searchLower);
             const matchesCategory = product.categories?.name?.toLowerCase().includes(searchLower) || false;
 
@@ -117,6 +116,6 @@ function AdminDashboard() {
             </div>
         </div>
     );
-}
+};
 
 export default AdminDashboard;

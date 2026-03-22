@@ -6,23 +6,23 @@ import styles from './Login.module.css';
 import logoClicando from '../assets/logo-clicando.png';
 import SEO from '../components/shared/SEO';
 
-function Login() {
+const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuth();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      const { error } = await signIn({ email, password });
-      if (error) {
-        setError(error.message === 'Invalid login credentials' ? 'Credenciales inválidas' : 'Error al iniciar sesión.');
+      const { error: signInError } = await signIn({ email, password });
+      if (signInError) {
+        setError(signInError.message === 'Invalid login credentials' ? 'Credenciales inválidas' : 'Error al iniciar sesión.');
       } else {
         navigate('/admin');
       }
@@ -131,6 +131,6 @@ function Login() {
       </div>
     </div>
   );
-}
+};
 
 export default Login;

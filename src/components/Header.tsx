@@ -9,11 +9,18 @@ import { useTheme } from '../context/ThemeContext';
 import SearchBar from './SearchBar';
 import { useSearchState } from '../store/useSearchStore';
 import AboutModal from './public/AboutModal';
+import { type Store } from '../schemas/store.schema';
 
-const Header = ({ storeData, onCartClick }) => {
+interface HeaderProps {
+  storeData?: Store & { about_text?: string };
+  onCartClick: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ storeData, onCartClick }) => {
   const { cart } = useCart();
-  const { storeName } = useParams();
+  const { storeName } = useParams<{ storeName: string }>();
   const { theme, toggleTheme } = useTheme();
+  // Corregido: useSearchStore suele devolver el store completo o las funciones
   const { searchTerm, setSearchTerm } = useSearchState();
   const [showAbout, setShowAbout] = useState(false);
 
@@ -27,7 +34,7 @@ const Header = ({ storeData, onCartClick }) => {
     <header
       className="sticky top-0 z-50 transition-colors duration-300"
       style={{
-        backgroundColor: 'var(--color-surface)', // Opaco, sin transparencia
+        backgroundColor: 'var(--color-surface)',
         borderBottom: `1px solid var(--color-border)`
       }}
     >
@@ -36,12 +43,11 @@ const Header = ({ storeData, onCartClick }) => {
 
           {/* Izquierda: Clicando Logo + Tienda Logo + Nombre */}
           <div className="flex items-center gap-3 flex-1 min-w-0 mr-4">
-            {/* Contenedor para el botón de Clicando en Desktop */}
             <div id="clicando-brand-button-container" className="hidden md:flex md:items-center"></div>
 
             {/* Link de la Tienda */}
             <Link
-              to={`/${storeName}`}
+              to={`/${storeName || ''}`}
               className="flex items-center gap-3"
               onClick={() => window.scrollTo(0, 0)}
             >
@@ -74,7 +80,7 @@ const Header = ({ storeData, onCartClick }) => {
             style={{ color: theme === 'dark' ? '#f1f5f9' : 'var(--color-text-light)' }}
           >
 
-            {/* Icono Info (Nosotros) - Visible en ambos desktop y móvil */}
+            {/* Icono Info (Nosotros) */}
             <button
               onClick={() => setShowAbout(true)}
               className="cursor-pointer hover:opacity-80 transition-opacity p-1"

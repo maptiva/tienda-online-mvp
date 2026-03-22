@@ -12,9 +12,9 @@ import { useStoreConfig } from '../modules/inventory/hooks/useStoreConfig';
 import SEO from './shared/SEO';
 import { statsService } from '../modules/stats/services/statsService';
 
-const PublicLayout = () => {
+const PublicLayout: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { storeName } = useParams();
+  const { storeName } = useParams<{ storeName: string }>();
   const location = useLocation();
   const queryClient = useQueryClient();
   const { store, loading, error } = useStoreByName(storeName);
@@ -23,12 +23,12 @@ const PublicLayout = () => {
   // Tracking de visitas
   useEffect(() => {
     if (store && !loading && !error) {
-      // Registrar visita una sola vez por sesiÃ³n/tienda
+      // Registrar visita una sola vez por sesión/tienda
       const sessionKey = `tracked_visit_${store.id}`;
       const alreadyTracked = sessionStorage.getItem(sessionKey);
       
       if (!alreadyTracked && store.id) {
-        statsService.trackEvent(store.id, 'visit');
+        statsService.trackEvent(store.id.toString(), 'visit');
         sessionStorage.setItem(sessionKey, 'true');
       }
     }
@@ -89,23 +89,23 @@ const PublicLayout = () => {
         siteName={store.store_name}
       />
       <Header storeData={store} onCartClick={() => setIsCartOpen(true)} />
-      {isProductListPage && <CategoriaList userId={store.user_id} />}
+      {isProductListPage && <CategoriaList userId={store.user_id as string} />}
       <main className="!mt-0 flex-grow">
         <Outlet context={{ store }} />
       </main>
       <Footer storeName={store.store_name} storeData={store} />
       <WhatsAppButton
         phoneNumber={store.whatsapp_number}
-        customMessage={store.whatsapp_message}
+        customMessage={store.whatsapp_message as string | undefined}
         storeId={store.id}
       />
       {isProductListPage && <ClicandoBrandButton />}
       <CartModal
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        whatsappNumber={store.whatsapp_number}
-        storeSlug={storeName}
-        stockEnabled={stockEnabled}
+        whatsappNumber={store.whatsapp_number as string}
+        storeSlug={storeName as string}
+        stockEnabled={stockEnabled as boolean}
       />
     </div>
   );

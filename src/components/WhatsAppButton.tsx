@@ -2,15 +2,21 @@ import React from 'react';
 import styles from './WhatsAppButton.module.css';
 import { statsService } from '../modules/stats/services/statsService';
 
-const WhatsAppButton = ({ phoneNumber, customMessage, storeId }) => {
-  // Si no hay nÃºmero de WhatsApp, no mostrar el botÃ³n
+interface WhatsAppButtonProps {
+  phoneNumber?: string | null;
+  customMessage?: string;
+  storeId?: string | number;
+}
+
+const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ phoneNumber, customMessage, storeId }) => {
+  // Si no hay número de WhatsApp, no mostrar el botón
   if (!phoneNumber) {
     return null;
   }
 
   const handleClick = () => {
     if (storeId) {
-      statsService.trackEvent(storeId, 'whatsapp_click');
+      statsService.trackEvent(storeId.toString(), 'whatsapp_click');
     }
   };
 

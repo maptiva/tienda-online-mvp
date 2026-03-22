@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { AsideBar } from './dashboard/AsideBar';
 import MasterModeBanner from './MasterModeBanner';
 import './AdminLayout.css';
 
-const AdminLayout = () => {
+const AdminLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   // Forzar tema claro en el panel de admin
   useEffect(() => {
@@ -19,10 +20,10 @@ const AdminLayout = () => {
     };
   }, []);
 
-  // Cerrar menú al cambiar de ruta (útil para móvil)
+  // Cerrar menú al cambiar de ruta
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [window.location.pathname]);
+  }, [location.pathname]);
 
   // Prevenir scroll cuando el menú móvil está abierto
   useEffect(() => {

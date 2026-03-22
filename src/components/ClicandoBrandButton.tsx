@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import styles from './ClicandoBrandButton.module.css';
@@ -6,7 +6,7 @@ import logo from '../assets/logo-clicando.png';
 import { FaChevronRight } from 'react-icons/fa';
 
 // --- Hooks ---
-const useMediaQuery = (query) => {
+const useMediaQuery = (query: string): boolean => {
   const [matches, setMatches] = useState(window.matchMedia(query).matches);
 
   useEffect(() => {
@@ -19,8 +19,8 @@ const useMediaQuery = (query) => {
   return matches;
 };
 
-const usePortalContainer = (isDesktop) => {
-  const [container, setContainer] = useState(null);
+const usePortalContainer = (isDesktop: boolean): HTMLElement | null => {
+  const [container, setContainer] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     if (isDesktop) {
@@ -35,13 +35,13 @@ const usePortalContainer = (isDesktop) => {
 };
 
 // --- Sub-components ---
-const MobileButton = () => {
+const MobileButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = React.useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -84,7 +84,7 @@ const MobileButton = () => {
   );
 };
 
-const DesktopButton = () => (
+const DesktopButton: React.FC = () => (
   <Link
     to="/"
     className={styles.desktopButton}
@@ -97,7 +97,7 @@ const DesktopButton = () => (
 
 
 // --- Main Component ---
-const ClicandoBrandButton = () => {
+const ClicandoBrandButton: React.FC = () => {
   const isDesktop = useMediaQuery('(min-width: 769px)');
   const portalContainer = usePortalContainer(isDesktop);
 

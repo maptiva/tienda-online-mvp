@@ -6,7 +6,7 @@
 const getSuperAdminEmails = () => {
     const envEmails = import.meta.env.VITE_SUPER_ADMIN_EMAILS;
     if (envEmails) {
-        return envEmails.split(',').map(email => email.trim());
+        return envEmails.split(',').map((email: string) => email.trim());
     }
     // Emails por defecto para desarrollo
     return [
