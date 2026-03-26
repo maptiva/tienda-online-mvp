@@ -46,7 +46,17 @@ export const deleteProduct = async (id: string, imageUrl: string): Promise<boole
             await storageService.safeDeleteImages(imagesToDelete);
         }
 
-        // 4. Eliminar el registro del producto de la base de datos
+        // 4. Limpiar logs de inventario antes de borrar (Evitar error de FK)
+        const { error: logError } = await supabase
+            .from('inventory_logs')
+            .delete()
+            .eq('product_id', id);
+
+        if (logError) {
+            console.warn('[Database] No se pudieron borrar los logs de inventario ( FK check):', logError);
+        }
+
+        // 5. Eliminar el registro del producto de la base de datos
         const { error: dbError } = await supabase
             .from('products')
             .delete()
