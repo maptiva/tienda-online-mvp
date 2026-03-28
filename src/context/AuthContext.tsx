@@ -8,6 +8,7 @@ import { isSuperAdmin } from '../utils/authRoles';
  */
 export interface AuthContextType {
     user: User | null;
+    loading: boolean;
     signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ data: any; error: AuthError | null }>;
     signIn: (credentials: SignInWithPasswordCredentials) => Promise<{ data: any; error: AuthError | null }>;
     signOut: () => Promise<{ error: AuthError | null }>;
@@ -66,6 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         signIn: (data) => supabase.auth.signInWithPassword(data),
         signOut: () => supabase.auth.signOut(),
         user,
+        loading,
         impersonatedUser,
         setImpersonatedUser,
         isMaster
