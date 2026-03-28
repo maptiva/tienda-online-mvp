@@ -63,7 +63,7 @@ export const orderService = {
         total: number,
         paymentMethod: string = 'whatsapp',
         discountApplied: number = 0
-    ): Promise<OrderResult<unknown>> {
+    ): Promise<OrderResult<string>> {
         try {
             const { data, error } = await supabase.rpc('create_public_order', {
                 p_store_slug: storeSlug,
@@ -75,7 +75,15 @@ export const orderService = {
             });
 
             if (error) throw error;
-            return { success: true, data };
+
+            // El RPC devuelve un objeto JSONB: { success: boolean, order_id: string, ... }
+            const response = data as { success: boolean, order_id: string, error?: string };
+            
+            if (response.success) {
+                return { success: true, data: String(response.order_id) };
+            } else {
+                return { success: false, error: response.error || 'Error en el servidor al crear pedido' };
+            }
         } catch (error) {
             console.error('Error al crear pedido público:', error);
             const errorMessage = error instanceof Error ? error.message : 'Error desconocido al crear pedido';
