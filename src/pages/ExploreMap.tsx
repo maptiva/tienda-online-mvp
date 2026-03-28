@@ -18,8 +18,27 @@ import logoClicandoPng from '../assets/logo-clicando.png';
 import * as FaIcons from 'react-icons/fa';
 import { useShopCategories } from '../hooks/useShopCategories';
 
+interface Store {
+    id: string | number;
+    store_name: string;
+    store_slug: string;
+    logo_url: string;
+    latitude: number;
+    longitude: number;
+    category?: string;
+    is_demo?: boolean;
+    coming_soon?: boolean;
+}
+
+interface StoreMarkerProps {
+    store: Store;
+    isSelected: boolean;
+    onSelect: () => void;
+    metaMap: boolean;
+}
+
 // Componente para manejar cada marcador individualmente con su popup
-const StoreMarker = ({ store, isSelected, onSelect, metaMap }) => {
+const StoreMarker: React.FC<StoreMarkerProps> = ({ store, isSelected, onSelect, metaMap }) => {
     const markerRef = useRef(null);
 
     useEffect(() => {
