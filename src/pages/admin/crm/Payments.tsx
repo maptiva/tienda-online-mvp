@@ -3,15 +3,26 @@ import { usePayments } from '../../../hooks/crm/usePayments';
 import SearchBar from '../../../components/SearchBar';
 import { FaHistory } from 'react-icons/fa';
 
-const Payments = () => {
-    const { payments, loading, fetchPayments } = usePayments();
+interface PaymentData {
+    id: string | number;
+    client_id: string | number;
+    amount: number;
+    status: string;
+    payment_method?: string;
+    notes?: string;
+    created_at?: string;
+    clients?: { name: string };
+}
+
+const Payments: React.FC = () => {
+    const { payments, loading, fetchPayments } = usePayments() as { payments: PaymentData[]; loading: boolean; fetchPayments: () => Promise<void> };
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         fetchPayments();
     }, [fetchPayments]);
 
-    const formatCurrency = (amount) => {
+    const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-AR', {
             style: 'currency',
             currency: 'ARS',
@@ -19,7 +30,8 @@ const Payments = () => {
         }).format(amount);
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string | null | undefined) => {
+        if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleDateString('es-AR', {
             day: '2-digit',
@@ -32,7 +44,7 @@ const Payments = () => {
         });
     };
 
-    const getPaymentType = (notes) => {
+    const getPaymentType = (notes: string | undefined) => {
         if (notes?.includes('ACTIVACION')) return { label: '🚀 Activación', color: 'emerald' };
         if (notes?.includes('MANTENIMIENTO')) return { label: '🛠️ Mantenimiento', color: 'blue' };
         return { label: '💰 Pago', color: 'gray' };

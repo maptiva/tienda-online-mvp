@@ -3,10 +3,26 @@ import { leadsService } from '../../../modules/crm/services/leadsService';
 import { supabase } from '../../../services/supabase';
 import Swal from 'sweetalert2';
 import { FiUserPlus, FiPhone, FiMail, FiCalendar, FiCheckCircle, FiXCircle, FiMoreVertical, FiSearch, FiFilter, FiUpload } from 'react-icons/fi';
-import { Loading } from '../../../components/dashboard/Loading'; // Reutilizando componente de carga
+import { Loading } from '../../../components/dashboard/Loading';
 
-const LeadStatusBadge = ({ status }) => {
-    const styles = {
+interface Lead {
+    id?: string | number;
+    business_name?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    source?: string;
+    notes?: string;
+    status?: string;
+    created_at?: string;
+}
+
+interface LeadStatusBadgeProps {
+    status?: string;
+}
+
+const LeadStatusBadge: React.FC<LeadStatusBadgeProps> = ({ status }) => {
+    const styles: Record<string, { bg: string; text: string; label: string }> = {
         NEW: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Nuevo' },
         CONTACTED: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Contactado' },
         INTERESTED: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'Interesado' },
@@ -14,7 +30,7 @@ const LeadStatusBadge = ({ status }) => {
         LOST: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Perdido' }
     };
 
-    const style = styles[status] || styles.NEW;
+    const style = styles[status || 'NEW'] || styles.NEW;
 
     return (
         <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${style.bg} ${style.text}`}>
@@ -23,16 +39,15 @@ const LeadStatusBadge = ({ status }) => {
     );
 };
 
-const Leads = () => {
-    const [leads, setLeads] = useState([]);
+const Leads: React.FC = () => {
+    const [leads, setLeads] = useState<Lead[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingLead, setEditingLead] = useState(null);
+    const [editingLead, setEditingLead] = useState<Lead | null>(null);
 
-    // Form State
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<Lead>({
         business_name: '',
         name: '',
         email: '',
