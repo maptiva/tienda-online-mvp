@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaWhatsapp } from 'react-icons/fa';
+import { FaShoppingCart, FaWhatsapp, FaCog, FaStore } from 'react-icons/fa';
 import { HiOutlineSun, HiOutlineMoon } from 'react-icons/hi';
 import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../services/supabase';
@@ -10,28 +10,28 @@ import catalogoIllustration from '../assets/illustrations/catalogo-completo.png'
 import whatsappIllustration from '../assets/illustrations/whatsapp-integrado.png';
 import personalizableIllustration from '../assets/illustrations/personalizable.png';
 import SEO from '../components/shared/SEO';
-import { motion, Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import StoreCard from '../components/StoreCard';
 
-interface FeaturedStore {
-    id: string;
+interface Store {
+    id: string | number;
     store_name: string;
     store_slug: string;
-    logo_url?: string | null;
-    is_demo?: boolean;
-    coming_soon?: boolean;
-    is_active?: boolean;
-    created_at?: string;
-    category?: string;
-    short_description?: string;
-    is_open?: boolean;
+    logo_url: string;
+    is_demo: boolean;
+    coming_soon: boolean;
+    is_active: boolean;
+    created_at: string;
+    category: string;
+    short_description: string;
+    is_open: boolean;
 }
 
 const LandingPage: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
-    const [featuredStores, setFeaturedStores] = useState<FeaturedStore[]>([]);
+    const [featuredStores, setFeaturedStores] = useState<Store[]>([]);
     const [showDirectory, setShowDirectory] = useState(false);
-    const carouselRef = useRef<HTMLDivElement>(null);
+    const carouselRef = React.useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchFeaturedStores = async () => {
@@ -47,7 +47,7 @@ const LandingPage: React.FC = () => {
 
             if (data) {
                 // Custom sorting logic - Active stores first
-                const getStoreRank = (store: FeaturedStore) => {
+                const getStoreRank = (store) => {
                     if (store.is_active && !store.is_demo && !store.coming_soon) {
                         return 1; // Active stores first
                     }
@@ -60,7 +60,7 @@ const LandingPage: React.FC = () => {
                     return 4; // Others
                 };
 
-                const sortedData = (data as FeaturedStore[])
+                const sortedData = (data || [])
                     .filter(s => s.is_active || s.coming_soon || s.is_demo)
                     .sort((a, b) => {
                         const rankA = getStoreRank(a);
@@ -72,7 +72,7 @@ const LandingPage: React.FC = () => {
 
                         // Secondary sort by creation date (newest first)
                         if (a.created_at && b.created_at) {
-                            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                            return new Date(b.created_at) - new Date(a.created_at);
                         }
                         return 0;
                     });
@@ -122,7 +122,7 @@ const LandingPage: React.FC = () => {
         }
     };
 
-    const itemVariants: Variants = {
+    const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: {
             y: 0,
@@ -191,6 +191,7 @@ const LandingPage: React.FC = () => {
                             alt="Clicando Logo"
                             className="w-44 h-44 mx-auto mb-6 drop-shadow-[0_10px_35px_rgba(0,0,0,0.15)]"
                         />
+                        {/* Glow effect */}
                         <div className="absolute inset-0 bg-blue-400/10 blur-3xl -z-10 rounded-full scale-125"></div>
                     </motion.div>
 
@@ -419,7 +420,7 @@ const LandingPage: React.FC = () => {
                     </section>
                 </motion.div>
 
-                {/* CTA Final */}
+                {/* CTA Final - Centrado vertical entre secciones */}
                 <motion.div variants={itemVariants} className="py-16 space-y-4">
                     <div className="relative inline-block group">
                         <Link
@@ -432,6 +433,7 @@ const LandingPage: React.FC = () => {
                         >
                             Acceder a mi Tienda
                         </Link>
+                        {/* Shadow decoration */}
                         <div className="absolute inset-0 bg-blue-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
                     </div>
 
@@ -439,6 +441,8 @@ const LandingPage: React.FC = () => {
                         ¿Eres cliente? Accede directamente con tu usuario.
                     </p>
 
+                    {/* CTA para nuevos clientes */}
+                    {/* CTA para nuevos clientes - UNIFICADO CON MAPA */}
                     <div
                         className="p-8 lg:p-12 rounded-[2rem] backdrop-blur-xl transition-all duration-500 shadow-2xl"
                         style={{
@@ -497,6 +501,6 @@ const LandingPage: React.FC = () => {
             />
         </div>
     );
-};
+}
 
 export default LandingPage;
