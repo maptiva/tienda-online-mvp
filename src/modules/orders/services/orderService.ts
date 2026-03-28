@@ -40,6 +40,7 @@ export interface Order {
     customer_info: CustomerInfo;
     items: OrderItem[];
     client_total: number;
+    total: number;
     payment_method: string;
     discount_applied: number;
     created_at: string;
