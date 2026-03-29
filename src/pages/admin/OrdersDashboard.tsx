@@ -130,7 +130,7 @@ const OrdersDashboard: React.FC = () => {
                                                 )}
                                             </td>
                                             <td className="p-4">
-                                                <div className="font-bold text-gray-800">${Number(order.client_total).toFixed(2)}</div>
+                                                <div className="font-bold text-gray-800">${Number(order.total || 0).toFixed(2)}</div>
                                             </td>
                                             <td className="p-4">
                                                 {renderStatus(order.status)}
