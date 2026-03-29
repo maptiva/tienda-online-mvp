@@ -566,7 +566,7 @@ function StoreSettings() {
             <QRKit
               storeName={storeData.store_name}
               logoUrl={storeData.logo_url}
-              storeSlug={storeData.store_slug || storeData.id}
+              storeSlug={storeData.store_slug || String(storeData.id || '')}
             />
           </div>
         )}

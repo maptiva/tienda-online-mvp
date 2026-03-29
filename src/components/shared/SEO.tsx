@@ -1,0 +1,69 @@
+import React from 'react';
+
+interface SEOProps {
+    title?: string;
+    description?: string;
+    name?: string;
+    type?: string;
+    image?: string | null;
+    url?: string;
+    schema?: any;
+    siteName?: string;
+}
+
+const SEO: React.FC<SEOProps> = ({
+    title,
+    description,
+    name,
+    type = 'website',
+    image,
+    url,
+    schema,
+    siteName = 'Clicando'
+}) => {
+    return (
+        <>
+            {/* Standard metadata tags */}
+            <title>{title}</title>
+            <meta name='description' content={description} />
+
+            {/* End standard metadata tags */}
+
+            {/* Facebook tags */}
+            <meta property="og:type" content={type} />
+            <meta property="og:title" content={title} />
+            <meta property="og:description" content={description} />
+            <meta property="og:site_name" content={siteName} />
+            <meta property="og:locale" content="es_AR" />
+            {image && (
+                <>
+                    <meta property="og:image" content={image} />
+                    <meta property="og:image:secure_url" content={image} />
+                    <meta property="og:image:type" content="image/png" />
+                    <meta property="og:image:width" content="1200" />
+                    <meta property="og:image:height" content="630" />
+                    <meta property="og:image:alt" content={`Logo de ${title}`} />
+                </>
+            )}
+            {url && <meta property="og:url" content={url} />}
+            {/* End Facebook tags */}
+
+            {/* Twitter tags */}
+            <meta name="twitter:creator" content={name} />
+            <meta name="twitter:card" content={type === 'article' ? 'summary_large_image' : 'summary'} />
+            <meta name="twitter:title" content={title} />
+            <meta name="twitter:description" content={description} />
+            {image && <meta name="twitter:image" content={image} />}
+            {/* End Twitter tags */}
+
+            {/* Schema.org for Google */}
+            {schema && (
+                <script type="application/ld+json">
+                    {JSON.stringify(schema)}
+                </script>
+            )}
+        </>
+    );
+};
+
+export default SEO;

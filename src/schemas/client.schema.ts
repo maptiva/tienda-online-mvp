@@ -4,7 +4,7 @@ import { z } from 'zod';
  * Schema de validación para clientes del CRM
  */
 export const clientSchema = z.object({
-  id: z.string().uuid(),
+  id: z.union([z.string().uuid(), z.number()]),
   name: z.string().min(1, 'El nombre del cliente es requerido'),
   contact_email: z.string().email('Email de contacto inválido').optional(),
   contact_phone: z.string().optional(),
@@ -12,8 +12,8 @@ export const clientSchema = z.object({
   notes: z.string().optional(),
   status: z.enum(['active', 'archived']).default('active'),
   enable_stock: z.boolean().optional(),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional()
+  created_at: z.string().optional().nullable(),
+  updated_at: z.string().optional().nullable()
 });
 
 // Tipo inferido del schema para uso en TypeScript

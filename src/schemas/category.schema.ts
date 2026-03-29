@@ -5,15 +5,20 @@ import { z } from 'zod';
  * Alineado con la interfaz Categoria de src/interfaces/Categoria.ts
  */
 export const categorySchema = z.object({
-  id: z.number().int().positive(),
-  name: z.string().min(1, 'El nombre de la categoría es requerido'),
-  description: z.string().optional(),
-  order: z.number().int().nonnegative().optional(),
-  user_id: z.string().uuid().optional(),
-  parent_id: z.number().int().positive().optional(),
-  is_active: z.boolean().optional(),
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional()
+  id: z.union([z.number(), z.string()]),
+  label: z.string().optional().nullable(), // Campo real usado en BD para shop_categories
+  name: z.string().optional().nullable(), // Mantener name por compatibilidad
+  description: z.string().optional().nullable(),
+  emoji: z.string().optional().nullable(),
+  icon_name: z.string().optional().nullable(), // Campo para iconos FaIcons
+  marker_color: z.string().optional().nullable(), // Color del marcador en el mapa
+  slug: z.string().optional().nullable(),
+  order: z.number().int().nonnegative().optional().nullable(),
+  user_id: z.string().optional().nullable(),
+  parent_id: z.union([z.number(), z.string()]).optional().nullable(),
+  is_active: z.boolean().optional().nullable(),
+  created_at: z.string().optional().nullable(),
+  updated_at: z.string().optional().nullable()
 });
 
 // Tipo inferido del schema para uso en TypeScript

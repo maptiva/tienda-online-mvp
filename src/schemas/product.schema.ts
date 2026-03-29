@@ -12,7 +12,7 @@ export const productSchema = z.object({
   price: z.number().nonnegative('El precio no puede ser negativo'),
   compare_at_price: z.number().nonnegative().optional().nullable(),
   category_id: z.number().int().positive(),
-  image_url: z.string().url('URL de imagen inválida').optional().or(z.literal('')).nullable(),
+  image_url: z.string().optional().or(z.literal('')).nullable(),
   categories: z.object({
     name: z.string()
   }).optional().nullable(),
