@@ -132,7 +132,7 @@ const CartModal: React.FC<CartModalProps> = ({
       );
 
       if (resOrder.success) {
-        orderId = resOrder.order_id;
+        orderId = resOrder.data as string;
         // Registrar evento de pedido en estadísticas
         const { data: stData } = await supabase.from('stores').select('id').eq('store_slug', storeSlug).single();
         if (stData) {

@@ -76,7 +76,14 @@ export const orderService = {
             });
 
             if (error) throw error;
-            return { success: true, data };
+            
+            const response = data as { success: boolean; order_id: string; error?: string };
+            
+            if (response.success) {
+                return { success: true, data: String(response.order_id) };
+            } else {
+                return { success: false, error: response.error || 'Error en el servidor al crear pedido' };
+            }
         } catch (error) {
             console.error('Error al crear pedido público:', error);
             const errorMessage = error instanceof Error ? error.message : 'Error desconocido al crear pedido';
