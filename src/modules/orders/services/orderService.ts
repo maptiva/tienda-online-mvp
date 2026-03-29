@@ -64,7 +64,7 @@ export const orderService = {
         total: number,
         paymentMethod: string = 'whatsapp',
         discountApplied: number = 0
-    ): Promise<OrderResult<unknown>> {
+    ): Promise<OrderResult<string>> {
         try {
             const { data, error } = await supabase.rpc('create_public_order', {
                 p_store_slug: storeSlug,
@@ -76,7 +76,8 @@ export const orderService = {
             });
 
             if (error) throw error;
-            
+
+            // El RPC devuelve un objeto JSONB: { success: boolean, order_id: string, ... }
             const response = data as { success: boolean; order_id: string; error?: string };
             
             if (response.success) {

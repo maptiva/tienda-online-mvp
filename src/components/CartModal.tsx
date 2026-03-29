@@ -191,9 +191,10 @@ const CartModal: React.FC<CartModalProps> = ({
     }
 
     function proceedToWhatsApp(finalOrderId: string | null) {
+      const displayId = finalOrderId ? String(finalOrderId).slice(-6).toUpperCase() : 'WEB';
       let message = `Hola, me gustaría hacer el siguiente pedido:
 
-*Pedido:* #${finalOrderId ? finalOrderId.slice(-6).toUpperCase() : 'WEB'}
+*Pedido:* #${displayId}
 *Nombre:* ${name}
 *Teléfono:* ${phone}`;
 
