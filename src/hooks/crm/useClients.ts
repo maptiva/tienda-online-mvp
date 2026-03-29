@@ -95,11 +95,24 @@ export const useClients = () => {
                 throw storesError;
             }
 
+            // Traer pagos relacionados (optimizado con filtro IN y limit)
+            const { data: paymentsData, error: paymentsError } = await supabase
+                .from('payments')
+                .select('client_id, created_at, notes, amount')
+                .in('client_id', clientIds)
+                .order('created_at', { ascending: false })
+                .limit(100);
+
+            if (paymentsError) {
+                console.error('❌ Error trayendo pagos:', paymentsError);
+                throw paymentsError;
+            }
+
             // JOIN manual optimizado
             const clientsWithStores = validatedClients.map(client => ({
                 ...client,
                 stores: rawStoresData?.filter(store => store.client_id === client.id) || [],
-                payments: [] // Se podría completar similarmente si es necesario
+                payments: paymentsData?.filter((p: any) => p.client_id === client.id) || []
             }));
 
             setClients(clientsWithStores);

@@ -21,7 +21,12 @@ export const storeSchema = z.object({
   is_demo: z.boolean().optional().nullable(),
   coming_soon: z.boolean().optional().nullable(),
   created_at: z.string().optional().nullable(),
-  updated_at: z.string().optional().nullable()
+  updated_at: z.string().optional().nullable(),
+  discount_settings: z.object({
+    enabled: z.boolean().optional(),
+    cash_discount: z.number().optional(),
+    transfer_discount: z.number().optional()
+  }).optional().nullable()
 });
 
 // Tipo inferido del schema para uso en TypeScript

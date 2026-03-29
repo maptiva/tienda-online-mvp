@@ -78,7 +78,7 @@ export const orderService = {
             if (error) throw error;
 
             // El RPC devuelve un objeto JSONB: { success: boolean, order_id: string, ... }
-            const response = data as { success: boolean, order_id: string, error?: string };
+            const response = data as { success: boolean; order_id: string; error?: string };
             
             if (response.success) {
                 return { success: true, data: String(response.order_id) };

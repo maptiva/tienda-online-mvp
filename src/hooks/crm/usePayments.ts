@@ -38,18 +38,23 @@ export const usePayments = () => {
             const { data: rawPayments, error: fetchError } = await query;
             if (fetchError) throw fetchError;
 
-            // Validar los datos de pagos con Zod
-            const validatedPayments: Payment[] = [];
+            // Validar los datos de pagos con Zod pero mantener las relaciones de Supabase
+            const validatedPayments: any[] = [];
             const paymentErrors: string[] = [];
 
-            (rawPayments || []).forEach((rawPayment) => {
+            (rawPayments || []).forEach((rawPayment: any) => {
                 const cleanData = preparePaymentForValidation(rawPayment);
                 const { data: validatedPayment, error: validationError } = safeValidate(paymentSchema, cleanData);
                 
                 if (validationError) {
-                    paymentErrors.push(...validationError.issues.map(e => e.message));
+                    paymentErrors.push(...validationError.issues.map((e: any) => e.message));
                 } else if (validatedPayment) {
-                    validatedPayments.push(validatedPayment);
+                    // Mantener las relaciones de Supabase (clients, subscriptions) para el componente
+                    validatedPayments.push({
+                        ...validatedPayment,
+                        clients: rawPayment.clients,
+                        subscriptions: rawPayment.subscriptions
+                    });
                 }
             });
 
