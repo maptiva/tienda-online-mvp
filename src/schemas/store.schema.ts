@@ -20,6 +20,9 @@ export const storeSchema = z.object({
   is_active: z.boolean().optional(),
   is_demo: z.boolean().optional().nullable(),
   coming_soon: z.boolean().optional().nullable(),
+  client_id: z.union([z.string(), z.number()]).optional().nullable(),
+  enable_stock: z.boolean().optional(),
+  payment_exempt: z.boolean().optional(),
   created_at: z.string().optional().nullable(),
   updated_at: z.string().optional().nullable(),
   discount_settings: z.object({
