@@ -57,7 +57,7 @@ export const useClients = () => {
             (rawClientsData || []).forEach((rawClient) => {
                 const { data: validatedClient, error: validationError } = safeValidate(clientSchema, rawClient);
                 if (validationError) {
-                    clientErrors.push(...validationError.issues.map(e => e.message));
+                    clientErrors.push(`[${rawClient.name || 'unknown'}]: ${validationError.issues.map(e => e.message).join(', ')}`);
                 } else if (validatedClient) {
                     validatedClients.push(validatedClient);
                 }
@@ -81,6 +81,7 @@ export const useClients = () => {
                     client_id,
                     user_id,
                     enable_stock,
+                    payment_exempt,
                     subscriptions (
                         id,
                         plan_type,
@@ -181,7 +182,8 @@ export const useClients = () => {
                     .from('stores')
                     .update({
                         client_id: newClient.id,
-                        enable_stock: validatedClientData.enable_stock === true
+                        enable_stock: validatedClientData.enable_stock === true,
+                        payment_exempt: validatedClientData.payment_exempt === true
                     })
                     .eq('id', storeIdNum);
             }
@@ -227,7 +229,8 @@ export const useClients = () => {
                     .from('stores')
                     .update({
                         client_id: id,
-                        enable_stock: validatedClientData.enable_stock === true
+                        enable_stock: validatedClientData.enable_stock === true,
+                        payment_exempt: validatedClientData.payment_exempt === true
                     })
                     .eq('id', storeIdNum);
             }
@@ -242,7 +245,7 @@ export const useClients = () => {
         }
     };
 
-    const reactivateClient = async (id: string) => {
+    const reactivateClient = async (id: string | number) => {
         setLoading(true);
         try {
             const { error } = await supabase.from('clients').update({ status: 'active' }).eq('id', id);
@@ -257,7 +260,7 @@ export const useClients = () => {
         }
     };
 
-    const archiveClient = async (id: string) => {
+    const archiveClient = async (id: string | number) => {
         setLoading(true);
         try {
             await supabase.from('stores').update({ client_id: null }).eq('client_id', id);

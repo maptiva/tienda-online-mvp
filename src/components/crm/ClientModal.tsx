@@ -8,6 +8,7 @@ interface ClientFormData {
     contact_phone: string;
     notes: string;
     enable_stock: boolean;
+    payment_exempt: boolean;
     billing_info: {
         cuit: string;
         address: string;
@@ -29,6 +30,7 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, onSubmit, ge
         contact_phone: '',
         notes: '',
         enable_stock: false,
+        payment_exempt: false,
         billing_info: { cuit: '', address: '' }
     });
     const [stores, setStores] = useState<Store[]>([]);
@@ -44,6 +46,7 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, onSubmit, ge
                 contact_phone: editingClient.contact_phone || '',
                 notes: editingClient.notes || '',
                 enable_stock: editingClient.stores?.[0]?.enable_stock || false,
+                payment_exempt: editingClient.stores?.[0]?.payment_exempt || false,
                 billing_info: (editingClient.billing_info as any) || { cuit: '', address: '' }
             });
             // Si tiene tienda, seleccionarla
@@ -60,6 +63,7 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, onSubmit, ge
                 contact_phone: '',
                 notes: '',
                 enable_stock: false,
+                payment_exempt: false,
                 billing_info: { cuit: '', address: '' }
             });
             setSelectedStoreId('');
@@ -203,6 +207,24 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, onSubmit, ge
                                     onChange={(e) => setFormData({ ...formData, enable_stock: e.target.checked })}
                                 />
                                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#5FAFB8]"></div>
+                            </label>
+                        </div>
+                        <div className="bg-amber-50/50 p-4 rounded-xl border border-amber-100 flex items-center justify-between mt-3">
+                            <div className="flex items-center gap-3">
+                                <span className="text-2xl">💎</span>
+                                <div>
+                                    <p className="text-sm font-black text-gray-800">Exención de Pago</p>
+                                    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tight">El cliente no requiere cobro mensual</p>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={formData.payment_exempt}
+                                    onChange={(e) => setFormData({ ...formData, payment_exempt: e.target.checked })}
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                             </label>
                         </div>
                     </div>

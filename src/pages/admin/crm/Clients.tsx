@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Client } from '../../../schemas/client.schema';
 
 interface ClientWithRelations extends Client {
-    stores?: { id: string; user_id: string; store_name: string }[];
+    stores?: { id: string; user_id: string; store_name: string; payment_exempt?: boolean }[];
     payments?: { created_at: string }[];
 }
 
@@ -102,7 +102,7 @@ const Clients: React.FC = () => {
         }
     };
 
-    const handleArchive = async (id: string) => {
+    const handleArchive = async (id: string | number) => {
         const confirm = await Swal.fire({
             title: '¿Dar de baja cliente?',
             text: "El cliente será archivado y su tienda quedará vacante, pero conservadorás su historial contable.",
@@ -124,7 +124,7 @@ const Clients: React.FC = () => {
         }
     };
 
-    const handleReactivate = async (id: string) => {
+    const handleReactivate = async (id: string | number) => {
         const confirm = await Swal.fire({
             title: '¿Reactivar cliente?',
             text: "El cliente volverá al radar de gestión activa.",
@@ -221,7 +221,7 @@ const Clients: React.FC = () => {
                             <tbody className="divide-y divide-gray-50">
                                 {filteredClients.length === 0 ? (
                                     <tr>
-                                        <td colSpan="4" className="px-8 py-20 text-center">
+                                        <td colSpan={4} className="px-8 py-20 text-center">
                                             <p className="text-gray-300 text-lg font-medium italic">
                                                 {searchTerm ? 'No hay resultados para esa búsqueda.' : 'No hay clientes en tu radar comercial todavía.'}
                                             </p>
@@ -260,6 +260,13 @@ const Clients: React.FC = () => {
                                             </td>
                                             <td className="px-8 py-4 text-center">
                                                 {(() => {
+                                                    const isExempt = client.stores?.some(s => s.payment_exempt);
+                                                    if (isExempt) return (
+                                                        <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter bg-amber-100 text-amber-700 border border-amber-200">
+                                                            ● Exento
+                                                        </span>
+                                                    );
+
                                                     const payments = client.payments || [];
                                                     if (payments.length === 0) return (
                                                         <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter bg-red-50 text-red-500 border border-red-100">
