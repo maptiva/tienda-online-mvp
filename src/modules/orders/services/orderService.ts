@@ -77,13 +77,14 @@ export const orderService = {
 
             if (error) throw error;
 
-            // El RPC devuelve un objeto JSONB: { success: boolean, order_id: string, ... }
-            const response = data as { success: boolean; order_id: string; error?: string };
+            // El RPC devuelve un objeto JSONB: { success: boolean, order_id: string, verified_total: number }
+            const response = data as { success: boolean, order_id: string, error?: string };
             
-            if (response.success) {
+            if (response && response.success) {
+                // Devolvemos el ID como string para que el componente pueda procesarlo
                 return { success: true, data: String(response.order_id) };
             } else {
-                return { success: false, error: response.error || 'Error en el servidor al crear pedido' };
+                return { success: false, error: response?.error || 'Error en el servidor al crear pedido' };
             }
         } catch (error) {
             console.error('Error al crear pedido público:', error);
