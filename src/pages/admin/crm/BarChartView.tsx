@@ -45,13 +45,14 @@ const BarChartView: React.FC<BarChartViewProps> = ({ monthlyData }) => {
                             const isCurrentMonth = index === currentMonth;
                             
                             return (
-                                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                                    <span className="text-[10px] font-bold text-gray-400">
+                                <div key={index} className="flex-1 h-full flex flex-col items-center justify-end gap-2 group">
+                                    <span className="text-[10px] font-bold text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
                                         {formatCurrency(month.total)}
                                     </span>
                                     <div 
-                                        className={`w-full rounded-t-lg transition-all hover:opacity-80 ${isCurrentMonth ? 'bg-[#10b981]' : 'bg-gray-300'}`}
+                                        className={`w-full max-w-[20px] rounded-t-sm transition-all hover:opacity-80 ${isCurrentMonth ? 'bg-[#10b981]' : 'bg-gray-300'}`}
                                         style={{ height: `${Math.max(percentage, 2)}%` }}
+                                        title={`${month.month}: ${formatCurrency(month.total)}`}
                                     />
                                     <span className={`text-[10px] font-black uppercase ${isCurrentMonth ? 'text-[#10b981]' : 'text-gray-400'}`}>
                                         {month.month}

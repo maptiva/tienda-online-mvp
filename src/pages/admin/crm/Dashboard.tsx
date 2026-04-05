@@ -41,36 +41,45 @@ const useMonthlyRevenue = ({ selectedYear }: { selectedYear: number }): UseMonth
             try {
                 console.log('🔍 Consultando pagos para año:', selectedYear);
 
+                const startDate = `${selectedYear}-01-01T00:00:00Z`;
+                const endDate = `${selectedYear}-12-31T23:59:59Z`;
+
                 const { data: allPayments, error: allError } = await supabase
                     .from('payments')
                     .select('amount, created_at')
-                    .order('created_at', { ascending: false })
-                    .limit(100);
+                    .gte('created_at', startDate)
+                    .lte('created_at', endDate)
+                    .order('created_at', { ascending: false });
 
                 console.log('📊 Total pagos encontrados:', allPayments?.length || 0);
-                if (allPayments && allPayments.length > 0) {
-                    console.log('📅 Primer pago:', allPayments[0]);
-                    console.log('📅 Último pago:', allPayments[allPayments.length - 1]);
-                }
 
                 if (allError) {
                     console.error('❌ Error en consulta:', allError);
                     throw allError;
                 }
 
-                const filteredPayments = (allPayments || []).filter(payment => {
-                    const paymentDate = new Date(payment.created_at);
-                    return paymentDate.getFullYear() === selectedYear;
-                });
+                const filteredPayments = allPayments || [];
 
                 console.log(`💰 Pagos del año ${selectedYear}:`, filteredPayments.length);
 
                 const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                 const monthlyTotals = Array(12).fill(0);
 
+                if (filteredPayments.length > 0) {
+                    console.log('💎 Estructura del primer pago:', {
+                        amount: filteredPayments[0].amount,
+                        type: typeof filteredPayments[0].amount,
+                        created_at: filteredPayments[0].created_at
+                    });
+                }
+
                 filteredPayments.forEach(payment => {
                     const month = new Date(payment.created_at).getMonth();
-                    monthlyTotals[month] += payment.amount || 0;
+                    // Forzamos conversión a número para evitar concatenación de strings o NaN
+                    const amount = Number(payment.amount || 0);
+                    if (!isNaN(amount)) {
+                        monthlyTotals[month] += amount;
+                    }
                 });
 
                 console.log('📊 Totales por mes:', monthlyTotals);
