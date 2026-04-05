@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useClients } from '../../../hooks/crm/useClients';
+import { useClients, type StoreWithMeta } from '../../../hooks/crm/useClients';
 import { usePayments } from '../../../hooks/crm/usePayments';
 import ClientModal from '../../../components/crm/ClientModal';
 import PaymentModal from '../../../components/crm/PaymentModal';
@@ -11,12 +11,12 @@ import { useNavigate } from 'react-router-dom';
 import type { Client } from '../../../schemas/client.schema';
 
 interface ClientWithRelations extends Client {
-    stores?: { id: string; user_id: string; store_name: string; payment_exempt?: boolean }[];
+    stores?: StoreWithMeta[];
     payments?: { created_at: string }[];
 }
 
 const Clients: React.FC = () => {
-    const { clients, loading: clientsLoading, fetchClients, getRealStores, createClient, updateClient, archiveClient, reactivateClient, pagination, nextPage, prevPage } = useClients();
+    const { clients, loading: clientsLoading, fetchClients, getRealStores, createClient, updateClient, archiveClient, reactivateClient, toggleStoreActive, pagination, nextPage, prevPage } = useClients();
     const { registerPayment, loading: paymentLoading } = usePayments();
     const { setImpersonatedUser, isMaster } = useAuth();
     const navigate = useNavigate();
@@ -26,6 +26,7 @@ const Clients: React.FC = () => {
     const [selectedClient, setSelectedClient] = useState<ClientWithRelations | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [showArchived, setShowArchived] = useState(false);
+    const [togglingStoreId, setTogglingStoreId] = useState<string | number | null>(null);
 
     const handleImpersonate = (userId: string, storeName: string) => {
         Swal.fire({
@@ -146,6 +147,40 @@ const Clients: React.FC = () => {
         }
     };
 
+    const handleToggleStoreActive = async (storeId: string | number, currentIsActive: boolean | null, storeName: string) => {
+        const newStatus = !currentIsActive;
+        const confirm = await Swal.fire({
+            title: newStatus ? '¿Activar tienda?' : '¿Desactivar tienda?',
+            text: newStatus 
+                ? `${storeName} estará visible en el carrusel y mapa público.`
+                : `${storeName} dejará de estar visible en el carrusel y mapa público.`,
+            icon: newStatus ? 'question' : 'warning',
+            showCancelButton: true,
+            confirmButtonColor: newStatus ? '#10b981' : '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: newStatus ? 'Sí, activar' : 'Sí, desactivar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (confirm.isConfirmed) {
+            setTogglingStoreId(storeId);
+            const result = await toggleStoreActive(storeId, currentIsActive);
+            setTogglingStoreId(null);
+            
+            if (result.success) {
+                Swal.fire({
+                    title: newStatus ? '¡Tienda Activada!' : '¡Tienda Desactivada!',
+                    text: `${storeName} ha sido ${newStatus ? 'activada' : 'desactivada'} correctamente.`,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire('Error', result.error || 'No se pudo cambiar el estado.', 'error');
+            }
+        }
+    };
+
     const filteredClients = (clients as ClientWithRelations[]).filter(client => {
         const searchLower = searchTerm.toLowerCase();
         return (
@@ -237,19 +272,35 @@ const Clients: React.FC = () => {
                                                     <span className="text-xs text-blue-400 font-bold">{client.contact_phone || ''}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex flex-wrap gap-2">
+                                            <td className="px-8 py-4">
+                                                <div className="flex flex-col gap-3">
                                                     {client.stores && client.stores.length > 0 ? (
                                                         client.stores.map(store => (
-                                                            <button
-                                                                key={store.id}
-                                                                onClick={() => isMaster && handleImpersonate(store.user_id, store.store_name)}
-                                                                className={`flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-1 rounded-full shadow-sm transition-all ${isMaster ? 'hover:bg-blue-600 hover:text-white hover:border-blue-600 cursor-pointer group/store' : ''}`}
-                                                                title={isMaster ? 'Gestionar esta tienda' : ''}
-                                                            >
-                                                                <span className={`w-2 h-2 rounded-full ${isMaster ? 'bg-blue-500 group-hover/store:bg-white' : 'bg-blue-500'}`}></span>
-                                                                <span className="text-xs font-bold text-gray-700 group-hover/store:text-white">{store.store_name}</span>
-                                                            </button>
+                                                            <div key={store.id} className="flex items-center justify-between gap-3 bg-white border border-gray-200 px-3 py-2 rounded-xl shadow-sm hover:border-gray-300 transition-all">
+                                                                <div className="flex items-center gap-2 min-w-0">
+                                                                    <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${store.is_active ? 'bg-emerald-500' : 'bg-gray-300'}`}></span>
+                                                                    <button
+                                                                        onClick={() => isMaster && handleImpersonate(store.user_id, store.store_name)}
+                                                                        className={`text-xs font-bold truncate ${isMaster ? 'text-blue-600 hover:text-blue-800 cursor-pointer' : 'text-gray-700'}`}
+                                                                        title={isMaster ? `Gestionar ${store.store_name}` : store.store_name}
+                                                                    >
+                                                                        {store.store_name}
+                                                                    </button>
+                                                                    {store.is_demo && (
+                                                                        <span className="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-black uppercase flex-shrink-0">DEMO</span>
+                                                                    )}
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => isMaster && handleToggleStoreActive(store.id, store.is_active, store.store_name)}
+                                                                    disabled={togglingStoreId === store.id}
+                                                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex-shrink-0 ${store.is_active ? 'bg-emerald-500' : 'bg-gray-300'} ${togglingStoreId === store.id ? 'opacity-50 cursor-not-allowed' : ''} ${isMaster ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                                                                    title={isMaster ? (store.is_active ? 'Desactivar tienda' : 'Activar tienda') : ''}
+                                                                >
+                                                                    <span
+                                                                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${store.is_active ? 'translate-x-6' : 'translate-x-1'}`}
+                                                                    />
+                                                                </button>
+                                                            </div>
                                                         ))
                                                     ) : (
                                                         <span className="text-xs text-gray-300 italic font-medium">

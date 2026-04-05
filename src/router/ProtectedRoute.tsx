@@ -2,18 +2,19 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-interface ProtectedRouteProps {
+export interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiredRole?: 'admin' | 'superadmin';
 }
 
-function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { user, isMaster } = useAuth();
 
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  return children;
-}
+  return <>{children}</>;
+};
 
 export default ProtectedRoute;

@@ -398,8 +398,8 @@ function ProductForm() {
                   <>
                     <input
                       type="file"
-                      id={field.name}
-                      name={field.name}
+                      id={String(field.name)}
+                      name={String(field.name)}
                       onChange={handleChange}
                       accept="image/*"
                       className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-bold file:bg-[#5FAFB8] file:text-white hover:file:bg-[#4A9BA4] transition-all cursor-pointer"

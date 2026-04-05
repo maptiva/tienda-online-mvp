@@ -121,7 +121,7 @@ const Payments: React.FC = () => {
                             <tbody className="divide-y divide-gray-50">
                                 {filteredPayments.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="px-8 py-20 text-center text-gray-400 italic">
+                                        <td colSpan={6} className="px-8 py-20 text-center text-gray-400 italic">
                                             No hay registros que coincidan con tu búsqueda.
                                         </td>
                                     </tr>

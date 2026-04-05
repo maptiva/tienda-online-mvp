@@ -2,12 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaStore } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
-import { type Store } from '../schemas/store.schema';
 
 interface StoreCardProps {
-    store: Store & {
-        short_description?: string;
-        is_open?: boolean;
+    store: {
+        id: string | number;
+        store_name: string;
+        store_slug: string | null | undefined;
+        logo_url: string | null | undefined;
+        category: string | null | undefined;
+        short_description?: string | null | undefined;
+        is_demo?: boolean | null | undefined;
+        coming_soon?: boolean | null | undefined;
+        is_open?: boolean | null | undefined;
+        is_active?: boolean | null | undefined;
     };
 }
 

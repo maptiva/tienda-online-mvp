@@ -1,5 +1,5 @@
 import { supabase } from '../../../services/supabase';
-import { type Lead } from './leads.schema';
+import { type Lead } from '../../../schemas/lead.schema';
 
 /**
  * Datos para crear un lead

@@ -13,23 +13,25 @@ import SEO from '../components/shared/SEO';
 import { motion } from 'framer-motion';
 import StoreCard from '../components/StoreCard';
 
-interface Store {
+interface PublicStore {
     id: string | number;
     store_name: string;
-    store_slug: string;
-    logo_url: string;
-    is_demo: boolean;
-    coming_soon: boolean;
-    is_active: boolean;
-    created_at: string;
-    category: string;
-    short_description: string;
-    is_open: boolean;
+    store_slug: string | null;
+    logo_url: string | null;
+    is_demo: boolean | null;
+    coming_soon: boolean | null;
+    is_active: boolean | null;
+    is_open: boolean | null;
+    created_at: string | null;
+    category: string | null;
+    short_description: string | null;
+    user_id: string;
+    show_map: boolean | null;
 }
 
 const LandingPage: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
-    const [featuredStores, setFeaturedStores] = useState<Store[]>([]);
+    const [featuredStores, setFeaturedStores] = useState<PublicStore[]>([]);
     const [showDirectory, setShowDirectory] = useState(false);
     const carouselRef = React.useRef<HTMLDivElement>(null);
 
@@ -37,7 +39,7 @@ const LandingPage: React.FC = () => {
         const fetchFeaturedStores = async () => {
             const { data, error } = await supabase
                 .from('stores')
-                .select('id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, created_at, category, short_description, is_open')
+                .select('id, user_id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, is_open, created_at, category, short_description, show_map')
                 .limit(20);
 
             if (error) {
@@ -46,22 +48,21 @@ const LandingPage: React.FC = () => {
             }
 
             if (data) {
-                // Custom sorting logic - Active stores first
-                const getStoreRank = (store) => {
+                const getStoreRank = (store: PublicStore): number => {
                     if (store.is_active && !store.is_demo && !store.coming_soon) {
-                        return 1; // Active stores first
+                        return 1;
                     }
                     if (store.is_demo) {
-                        return 2; // Demo second
+                        return 2;
                     }
                     if (store.coming_soon) {
-                        return 3; // Coming soon third
+                        return 3;
                     }
-                    return 4; // Others
+                    return 4;
                 };
 
-                const sortedData = (data || [])
-                    .filter(s => s.is_active || s.coming_soon || s.is_demo)
+                const sortedData: PublicStore[] = (data || [])
+                    .filter((s): s is PublicStore => s.is_active || s.coming_soon || s.is_demo)
                     .sort((a, b) => {
                         const rankA = getStoreRank(a);
                         const rankB = getStoreRank(b);
@@ -70,9 +71,8 @@ const LandingPage: React.FC = () => {
                             return rankA - rankB;
                         }
 
-                        // Secondary sort by creation date (newest first)
                         if (a.created_at && b.created_at) {
-                            return new Date(b.created_at) - new Date(a.created_at);
+                            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                         }
                         return 0;
                     });
@@ -127,7 +127,7 @@ const LandingPage: React.FC = () => {
         visible: {
             y: 0,
             opacity: 1,
-            transition: { duration: 0.6, ease: "easeOut" }
+            transition: { duration: 0.6, ease: "easeOut" as const }
         }
     };
 
@@ -182,7 +182,7 @@ const LandingPage: React.FC = () => {
                         transition={{
                             duration: 5,
                             repeat: Infinity,
-                            ease: "easeInOut"
+                            ease: "easeInOut" as const
                         }}
                         className="relative inline-block"
                     >
@@ -229,7 +229,7 @@ const LandingPage: React.FC = () => {
                     >
                         <motion.div
                             animate={{ y: [0, -4, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as const }}
                             className="bg-emerald-500/10 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
                         >
                             <img
@@ -256,7 +256,7 @@ const LandingPage: React.FC = () => {
                     >
                         <motion.div
                             animate={{ y: [0, -4, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as const, delay: 0.5 }}
                             className="bg-emerald-500/10 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
                         >
                             <img
@@ -283,7 +283,7 @@ const LandingPage: React.FC = () => {
                     >
                         <motion.div
                             animate={{ y: [0, -4, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" as const, delay: 1 }}
                             className="bg-emerald-500/10 w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
                         >
                             <img

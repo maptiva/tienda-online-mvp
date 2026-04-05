@@ -88,12 +88,33 @@ const PublicLayout: React.FC = () => {
         schema={jsonLd}
         siteName={store.store_name}
       />
-      <Header storeData={store} onCartClick={() => setIsCartOpen(true)} />
+      <Header 
+        storeData={{
+          ...store,
+          about_text: store.about_text ?? undefined
+        }} 
+        onCartClick={() => setIsCartOpen(true)} 
+      />
       {isProductListPage && <CategoriaList userId={store.user_id as string} />}
       <main className="!mt-0 flex-grow">
         <Outlet context={{ store }} />
       </main>
-      <Footer storeName={store.store_name} storeData={store} />
+      <Footer 
+        storeName={store.store_name} 
+        storeData={{
+          address: store.address ?? undefined,
+          contact_phone: store.contact_phone ?? undefined,
+          business_hours: store.business_hours ?? undefined,
+          instagram_url: store.instagram_url ?? undefined,
+          facebook_url: store.facebook_url ?? undefined,
+          tiktok_url: store.tiktok_url ?? undefined,
+          latitude: store.latitude ?? undefined,
+          longitude: store.longitude ?? undefined,
+          show_map: store.show_map ?? undefined,
+          city: store.city ?? undefined,
+          category: store.category ?? undefined
+        }} 
+      />
       <WhatsAppButton
         phoneNumber={store.whatsapp_number}
         customMessage={store.whatsapp_message as string | undefined}

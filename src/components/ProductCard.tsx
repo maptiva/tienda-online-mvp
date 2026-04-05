@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState<string | number>(1);
   const { stockEnabled } = useStoreConfig() as any;
-  const { inventory } = useStock(stockEnabled ? product.id : null, storeName || '') as any;
+  const { inventory } = useStock(stockEnabled ? String(product.id) : null, storeName || '') as any;
   const { store } = useStoreByName(storeName || '') as any;
 
   if (!product) {
@@ -150,7 +150,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div>
             {stockEnabled && (
               <div className="mb-3 flex justify-center">
-                <StockBadge productId={product.id} storeSlug={storeName || ''} />
+                <StockBadge productId={String(product.id)} storeSlug={storeName || ''} />
               </div>
             )}
 
