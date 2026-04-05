@@ -1,6 +1,11 @@
 # Tienda Online MVP - SaaS Multi-tenant 🚀✨
 
-Bienvenido a la consola maestra de **Tienda Online MVP**. Este proyecto es una plataforma de comercio electrónico modular y escalable diseñada para múltiples tiendas en una sola base de datos (Multi-tenant).
+> [!IMPORTANT]
+> ### 🤖 Guía Master para Agentes (Contexto Rápido)
+> Si acabas de entrar a este proyecto, lee los siguientes documentos en orden para entender la arquitectura actual:
+> 1. **[Arquitectura y Patrones](./docs/architecture/PATTERNS.md):** Seguridad RLS, UUIDs y manejo de datos.
+> 2. **[Hoja de Ruta (Roadmap)](./docs/roadmaps/ROADMAP.md):** Próximos pasos del producto.
+> 3. **[Informe Final de Migración TS](./docs/TS_MIGRATION_FINAL.md):** Detalles sobre la transición a TypeScript.
 
 ## 🛡️ Estado Actual: Nivel Oro (Gold Standard)
 El proyecto ha sido recientemente saneado y optimizado siguiendo los más altos estándares técnicos:
