@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { type Client } from '../../schemas/client.schema';
 import { type StoreWithMeta } from '../../hooks/crm/useClients';
 
-interface ClientFormData {
+export interface ClientFormData {
     name: string;
     contact_email: string;
     contact_phone: string;

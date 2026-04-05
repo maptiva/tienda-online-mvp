@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
 import { type Client } from '../../schemas/client.schema';
+import { type StoreWithMeta } from '../../hooks/crm/useClients';
 
-interface PaymentFormData {
+export interface PaymentFormData {
     amount: number;
     payment_type: 'ACTIVACION' | 'MANTENIMIENTO';
     payment_method: string;
     notes: string;
 }
 
+export interface FinalPaymentData extends PaymentFormData {
+    client_id: string | number;
+    subscription_id: string | number | null;
+}
+
 interface PaymentModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: any) => void;
-    client: (Client & { stores?: any[] }) | null;
+    onSubmit: (data: FinalPaymentData) => void;
+    client: (Client & { stores?: StoreWithMeta[] }) | null;
 }
 
 const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onSubmit, client }) => {
