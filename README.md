@@ -1,87 +1,33 @@
-# Tienda Online SaaS - Multi-Tenant
+# Tienda Online MVP - SaaS Multi-tenant 🚀✨
 
-Plataforma SaaS multi-tenant para tiendas online con personalización completa por cliente.
+Bienvenido a la consola maestra de **Tienda Online MVP**. Este proyecto es una plataforma de comercio electrónico modular y escalable diseñada para múltiples tiendas en una sola base de datos (Multi-tenant).
 
-## 🚀 Características
+## 🛡️ Estado Actual: Nivel Oro (Gold Standard)
+El proyecto ha sido recientemente saneado y optimizado siguiendo los más altos estándares técnicos:
 
-- **Multi-tenant:** Múltiples tiendas independientes en una sola plataforma
-- **Personalización completa:** Logo, colores, información de contacto por tienda
-- **WhatsApp integrado:** Botón flotante y carrito con envío directo
-- **Gestión de productos:** CRUD completo con imágenes
-- **Categorías:** Filtrado dinámico de productos
-- **Responsive:** Diseño adaptable a móviles y tablets
+- **TypeScript (100%):** Todo el código fuente está tipado y validado (`npx tsc --noEmit` -> 0 errores).
+- **Seguridad RLS:** Row Level Security activo en Supabase usando UUIDs inmutables para aislamiento total de datos.
+- **TanStack Query:** Gestión de estado del servidor optimizada con caching e invalidación automática.
+- **Root Clean:** El repositorio mantiene una raíz limpia y profesional.
 
-## 🛠️ Tecnologías
+## 📖 Base de Conocimiento (Knowledge Base)
+Para entrar en contexto rápidamente, consulta la carpeta **[`/docs`](./docs)**:
 
-- **Frontend:** React + Vite
-- **Base de Datos:** Supabase (PostgreSQL)
-- **Hosting:** GitHub Pages
-- **Autenticación:** Supabase Auth
-- **Storage:** Supabase Storage
+1. **[Arquitectura y Patrones](./docs/architecture/PATTERNS.md):** Manual sobre seguridad RLS, UUIDs y manejo de datos con TanStack Query.
+2. **[Hoja de Ruta (Roadmap)](./docs/roadmaps/ROADMAP.md):** Lista de mejoras pendientes y visión del producto.
+3. **[Informe de Migración TS](./docs/TS_MIGRATION_FINAL.md):** Resumen de cómo se alcanzó el estado 100% TypeScript.
 
-## 📦 Instalación
-
+## 🚀 Inicio Rápido
 ```bash
-# Clonar repositorio
-git clone https://github.com/maptiva/tienda-online-mvp.git
-
 # Instalar dependencias
 npm install
 
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus credenciales de Supabase
-
-# Ejecutar scripts SQL en Supabase (en orden)
-# Ver carpeta /sql/
-
-# Iniciar servidor de desarrollo
+# Iniciar entorno de desarrollo
 npm run dev
+
+# Validar integridad de tipos (Obligatorio antes de deploy)
+npx tsc --noEmit
 ```
 
-## 🌐 Deploy
-
-```bash
-# Build para producción
-npm run build
-
-# Deploy a GitHub Pages
-npm run deploy
-```
-
-## 📁 Estructura del Proyecto
-
-```
-/src
-  /components     # Componentes reutilizables
-  /pages          # Páginas principales
-  /hooks          # Custom hooks
-  /context        # Context API
-  /services       # Servicios (Supabase)
-  /store          # Estado global (Zustand)
-/sql              # Scripts de base de datos
-/public           # Archivos estáticos
-```
-
-## 🔐 Configuración de Base de Datos
-
-Ejecutar los scripts SQL en orden (01 a 10) en el SQL Editor de Supabase:
-
-1. `01_create_base_tables.sql` - Tablas base
-2. `02_create_stores_multitenant.sql` - Multi-tenant
-3. `03_implement_rls.sql` - Seguridad RLS
-4. `04_configure_storage.sql` - Storage para logos
-5. `05_configure_product_images_storage.sql` - Storage para productos
-6. `06_public_read_policies.sql` - Políticas públicas
-7. `07_add_whatsapp_message.sql` - WhatsApp personalizado
-8. `08_update_whatsapp_messages.sql` - Actualizar mensajes
-9. `09_add_address_hours.sql` - Domicilio y horarios
-10. `10_add_store_slug.sql` - URLs amigables
-
-## 📝 Licencia
-
-Proyecto privado - Todos los derechos reservados
-
-## 👨‍💻 Desarrollado por
-
-[Maptiva](https://maptiva.github.io/maptiva/)
+---
+*Mantenido por Alejandro - Inteligencia Comercial y Gestión de Relevamientos.* 🏁🕵️‍♂️🔧
