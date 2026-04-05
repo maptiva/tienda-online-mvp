@@ -4,10 +4,34 @@ import { clientSchema, createClientSchema, updateClientSchema } from '../../sche
 import { safeValidate } from '../../utils/zodHelpers';
 import type { Client } from '../../schemas/client.schema';
 
-const ITEMS_PER_PAGE = 20; // Configurable: items por página
+const ITEMS_PER_PAGE = 20;
+
+export interface StoreWithMeta {
+    id: string | number;
+    store_name: string;
+    store_slug: string | null;
+    is_demo: boolean | null;
+    is_active: boolean | null;
+    is_open: boolean | null;
+    client_id: string | null;
+    user_id: string;
+    enable_stock: boolean | null;
+    payment_exempt: boolean | null;
+    subscriptions?: {
+        id: string;
+        plan_type: string | null;
+        status: string | null;
+        amount: number;
+    }[];
+}
+
+export interface ClientWithStores extends Client {
+    stores?: StoreWithMeta[];
+    payments?: { client_id: string; created_at: string; notes: string | null; amount: number }[];
+}
 
 export const useClients = () => {
-    const [clients, setClients] = useState<Client[]>([]);
+    const [clients, setClients] = useState<ClientWithStores[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [pagination, setPagination] = useState<{
@@ -78,6 +102,8 @@ export const useClients = () => {
                     store_name,
                     store_slug,
                     is_demo,
+                    is_active,
+                    is_open,
                     client_id,
                     user_id,
                     enable_stock,
@@ -110,10 +136,10 @@ export const useClients = () => {
             }
 
             // JOIN manual optimizado
-            const clientsWithStores = validatedClients.map(client => ({
+            const clientsWithStores: ClientWithStores[] = validatedClients.map(client => ({
                 ...client,
-                stores: rawStoresData?.filter(store => store.client_id === client.id) || [],
-                payments: paymentsData?.filter((p: any) => p.client_id === client.id) || []
+                stores: (rawStoresData || []).filter(store => store.client_id === client.id) as StoreWithMeta[],
+                payments: (paymentsData || []).filter(p => p.client_id === client.id)
             }));
 
             setClients(clientsWithStores);
@@ -135,15 +161,15 @@ export const useClients = () => {
         }
     }, []);
 
-    const getRealStores = async () => {
+    const getRealStores = async (): Promise<StoreWithMeta[]> => {
         try {
             const { data: rawStores, error: storeError } = await supabase
                 .from('stores')
-                .select('id, store_name, user_id, client_id, enable_stock')
+                .select('id, store_name, user_id, client_id, enable_stock, is_active, is_open')
                 .eq('is_demo', false);
 
             if (storeError) throw storeError;
-            return rawStores || [];
+            return (rawStores || []) as StoreWithMeta[];
         } catch (err) {
             console.error('Error fetching real stores:', err);
             return [];
@@ -276,6 +302,35 @@ export const useClients = () => {
         }
     };
 
+    const toggleStoreActive = async (storeId: string | number, currentIsActive: boolean | null) => {
+        setLoading(true);
+        try {
+            const newIsActive = !currentIsActive;
+            const { error } = await supabase
+                .from('stores')
+                .update({ is_active: newIsActive })
+                .eq('id', storeId);
+            
+            if (error) throw error;
+            
+            setClients(prevClients => prevClients.map(client => ({
+                ...client,
+                stores: client.stores?.map(store => 
+                    store.id === storeId 
+                        ? { ...store, is_active: newIsActive }
+                        : store
+                )
+            })));
+            
+            return { success: true, newIsActive };
+        } catch (err) {
+            console.error('Error toggling store active:', err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const goToPage = useCallback((pageNum: number) => {
         if (pageNum >= 1 && pageNum <= pagination.totalPages) {
             fetchClients(false, pageNum);
@@ -303,6 +358,7 @@ export const useClients = () => {
         createClient,
         updateClient,
         archiveClient,
-        reactivateClient
+        reactivateClient,
+        toggleStoreActive
     };
 };

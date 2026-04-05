@@ -38,11 +38,11 @@ const Login = lazy(() => import('./pages/Login'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const ExploreMap = lazy(() => import('./pages/ExploreMap'));
-const Error404 = lazy(() => import('./pages/Error404'));
+const Error404 = lazy(() => import('./pages/Error404').then(m => ({ default: m.Error404 })));
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const ProductForm = lazy(() => import('./components/ProductForm'));
-const CategoriaPage = lazy(() => import('./pages/dashboard/CategoriaPage.tsx'));
+const CategoriaPage = lazy(() => import('./pages/dashboard/CategoriaPage'));
 const StoreSettings = lazy(() => import('./pages/StoreSettings'));
 const BulkPriceUpdate = lazy(() => import('./pages/admin/BulkPriceUpdate'));
 const InventoryPage = lazy(() => import('./modules/inventory/pages/InventoryPage'));

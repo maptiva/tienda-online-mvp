@@ -128,7 +128,7 @@ export const usePayments = () => {
                     .eq('id', validatedPaymentData.subscription_id);
             }
 
-            await fetchPayments(validatedPaymentData.client_id);
+            await fetchPayments(String(validatedPaymentData.client_id));
             return { success: true, data: validatedNewPayment || rawNewPayment };
         } catch (err) {
             console.error('Error registering payment:', err);

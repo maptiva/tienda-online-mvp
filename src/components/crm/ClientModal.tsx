@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { type Client } from '../../schemas/client.schema';
-import { type Store } from '../../schemas/store.schema';
+import { type StoreWithMeta } from '../../hooks/crm/useClients';
 
 interface ClientFormData {
     name: string;
@@ -19,8 +19,8 @@ interface ClientModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (formData: ClientFormData, storeId: string | number, clientId?: string | number) => void;
-    getRealStores: () => Promise<Store[]>;
-    editingClient?: (Client & { stores?: Store[] }) | null;
+    getRealStores: () => Promise<StoreWithMeta[]>;
+    editingClient?: (Client & { stores?: StoreWithMeta[] }) | null;
 }
 
 const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, onSubmit, getRealStores, editingClient = null }) => {
@@ -33,7 +33,7 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, onSubmit, ge
         payment_exempt: false,
         billing_info: { cuit: '', address: '' }
     });
-    const [stores, setStores] = useState<Store[]>([]);
+    const [stores, setStores] = useState<StoreWithMeta[]>([]);
     const [selectedStoreId, setSelectedStoreId] = useState<string | number>('');
     const [loadingStores, setLoadingStores] = useState(false);
 

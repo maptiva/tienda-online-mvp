@@ -19,6 +19,8 @@ export interface OrderItem {
     name: string;
     quantity: number;
     price: number;
+    sku?: string | null;
+    display_id?: number | null;
 }
 
 /**

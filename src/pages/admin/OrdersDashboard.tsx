@@ -154,7 +154,7 @@ const OrdersDashboard: React.FC = () => {
                 {isDetailOpen && selectedOrder && (
                     <OrderDetailModal
                         isOpen={isDetailOpen}
-                        order={selectedOrder}
+                        order={selectedOrder as Order}
                         onClose={() => setIsDetailOpen(false)}
                         onStatusUpdate={fetchOrders}
                     />

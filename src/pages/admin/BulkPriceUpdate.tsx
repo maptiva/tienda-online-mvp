@@ -148,14 +148,14 @@ const BulkPriceUpdate: React.FC = () => {
             const productsToUpdate = filteredProducts.filter((p: Product) => selectedProducts.has(p.id));
 
             // Guardar backup para "Deshacer"
-            const backup = productsToUpdate.map(p => ({ 
+            const backup = productsToUpdate.map((p: Product) => ({ 
                 id: p.id, 
                 price: p.price, 
                 compare_at_price: p.compare_at_price 
             }));
             setLastActionBackup(backup);
 
-            const updates = productsToUpdate.map(p => {
+            const updates = productsToUpdate.map((p: Product) => {
                 const { newPrice, newComparePrice } = calculateNewValues(p);
                 return {
                     id: p.id,
@@ -166,7 +166,7 @@ const BulkPriceUpdate: React.FC = () => {
             });
 
             const results = await Promise.all(
-                updates.map(u =>
+                updates.map((u: { id: number; price: number; compare_at_price: number | null; updated_at: string }) =>
                     supabase
                         .from('products')
                         .update({ 
@@ -226,11 +226,11 @@ const BulkPriceUpdate: React.FC = () => {
         setIsUpdating(true);
         try {
             const productsToUpdate = filteredProducts.filter((p: Product) => selectedProducts.has(p.id));
-            const backup = productsToUpdate.map(p => ({ id: p.id, price_on_request: p.price_on_request }));
+            const backup = productsToUpdate.map((p: Product) => ({ id: p.id, price_on_request: p.price_on_request }));
             setLastActionBackup(backup);
 
             await Promise.all(
-                productsToUpdate.map(p =>
+                productsToUpdate.map((p: Product) =>
                     supabase
                         .from('products')
                         .update({ 

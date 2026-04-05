@@ -74,19 +74,31 @@ const Leads: React.FC = () => {
         }
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             if (editingLead) {
-                await leadsService.updateLead(editingLead.id, formData);
+                await leadsService.updateLead(String(editingLead.id), {
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    source: formData.source,
+                    status: formData.status as 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CONVERTED' | 'LOST',
+                    notes: formData.notes
+                });
                 Swal.fire('Actualizado', 'Lead actualizado correctamente', 'success');
             } else {
-                await leadsService.createLead(formData);
+                await leadsService.createLead({
+                    name: formData.name || '',
+                    email: formData.email,
+                    phone: formData.phone,
+                    source: formData.source
+                });
                 Swal.fire('Creado', 'Lead creado correctamente', 'success');
             }
             setIsModalOpen(false);
@@ -111,7 +123,7 @@ const Leads: React.FC = () => {
         setEditingLead(null);
     };
 
-    const openModal = (lead = null) => {
+    const openModal = (lead: Lead | null = null) => {
         if (lead) {
             setEditingLead(lead);
             setFormData({
@@ -129,15 +141,15 @@ const Leads: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    const fileInputRef = useRef(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = async (event) => {
-            const text = event.target.result;
+        reader.onload = async (event: ProgressEvent<FileReader>) => {
+            const text = event.target?.result as string;
             const rows = text.split('\n');
             const leadsToImport = [];
 
@@ -161,7 +173,7 @@ const Leads: React.FC = () => {
                         if (words.length > 1) {
                             const firstName = words[0];
                             // Normalize for comparison without accents
-                            const normalizeString = (str) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+                            const normalizeString = (str: string) => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
                             // Common business words that should NOT be treated as contact names
                             const businessWords = ['tienda', 'libreria', 'distribuidora', 'heladeria', 'jugueteria', 'veterinaria', 'pintureria', 'papeleria'];
@@ -213,7 +225,7 @@ const Leads: React.FC = () => {
         reader.readAsText(file);
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id: string | number) => {
         const result = await Swal.fire({
             title: '¿Estás seguro?',
             text: "No podrás revertir esto.",
@@ -227,7 +239,7 @@ const Leads: React.FC = () => {
 
         if (result.isConfirmed) {
             try {
-                await leadsService.deleteLead(id);
+                await leadsService.deleteLead(String(id));
                 Swal.fire('Eliminado', 'El lead ha sido eliminado.', 'success');
                 fetchLeads();
             } catch (error) {
@@ -236,7 +248,7 @@ const Leads: React.FC = () => {
         }
     };
 
-    const handleConvertToClient = async (lead) => {
+    const handleConvertToClient = async (lead: Lead) => {
         const result = await Swal.fire({
             title: '¡Convertir a Cliente!',
             text: `Se creará un nuevo cliente basado en ${lead.name}.`,
@@ -249,12 +261,12 @@ const Leads: React.FC = () => {
         if (result.isConfirmed) {
             try {
                 const clientData = {
-                    name: lead.name,
+                    name: lead.name || 'Sin nombre',
                     contact_email: lead.email,
                     contact_phone: lead.phone,
                     notes: `Convertido desde Lead. Origen: ${lead.source}. Notas previas: ${lead.notes}`
                 };
-                await leadsService.convertToClient(lead.id, clientData);
+                await leadsService.convertToClient(String(lead.id), clientData);
                 Swal.fire('¡Felicidades!', 'Nuevo cliente creado y lead actualizado.', 'success');
                 fetchLeads();
             } catch (error) {
@@ -272,7 +284,7 @@ const Leads: React.FC = () => {
         return matchesSearch && matchesStatus;
     });
 
-    function transform(str) {
+    function transform(str: string | undefined) {
         return (str || '').toLowerCase();
     }
 
@@ -310,7 +322,7 @@ const Leads: React.FC = () => {
                         <FiUserPlus className="text-lg" /> + Nuevo Lead
                     </button>
                     <button
-                        onClick={() => fileInputRef.current.click()}
+                        onClick={() => fileInputRef.current?.click()}
                         className="bg-blue-500 text-white p-2 px-6 rounded-xl font-bold shadow-lg shadow-blue-100 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-sm uppercase tracking-wider h-fit"
                     >
                         <FiUpload className="text-lg" /> Importar CSV
@@ -365,7 +377,7 @@ const Leads: React.FC = () => {
                                 <button onClick={() => openModal(lead)} className="p-1.5 text-gray-400 hover:text-blue-500 bg-gray-50 rounded-lg">
                                     <span className="text-xs">✏️</span>
                                 </button>
-                                <button onClick={() => handleDelete(lead.id)} className="p-1.5 text-gray-400 hover:text-red-500 bg-gray-50 rounded-lg">
+                                <button onClick={() => handleDelete(lead.id || '')} className="p-1.5 text-gray-400 hover:text-red-500 bg-gray-50 rounded-lg">
                                     <span className="text-xs">🗑️</span>
                                 </button>
                             </div>
@@ -390,7 +402,7 @@ const Leads: React.FC = () => {
                                 </div>
                             )}
                             <div className="flex items-center gap-2 text-xs text-gray-500 italic mt-2">
-                                <FiCalendar className="text-gray-400" /> Creado: {new Date(lead.created_at).toLocaleDateString()}
+                                <FiCalendar className="text-gray-400" /> Creado: {lead.created_at ? new Date(lead.created_at).toLocaleDateString() : 'N/A'}
                             </div>
                         </div>
 
@@ -512,7 +524,7 @@ const Leads: React.FC = () => {
                                 <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Notas</label>
                                 <textarea
                                     name="notes"
-                                    rows="3"
+                                    rows={3}
                                     className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#5FAFB8]"
                                     value={formData.notes}
                                     onChange={handleInputChange}

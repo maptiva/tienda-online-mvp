@@ -300,7 +300,7 @@ const InventoryPage: React.FC = () => {
                 </div>
 
                 <StockAdjustment
-                  productId={selectedProduct.id}
+                  productId={String(selectedProduct.id)}
                   onSuccess={() => {
                     loadInventory();
                   }}

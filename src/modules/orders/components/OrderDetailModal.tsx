@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { orderService } from '../services/orderService';
+import { orderService, type Order, type OrderItem } from '../services/orderService';
 import { 
     FaTimes, FaUser, FaPhone, FaMapMarkerAlt, 
     FaMoneyBillWave, FaUniversity, FaCalendarAlt, 
@@ -8,33 +8,10 @@ import {
 import Swal from 'sweetalert2';
 import { supabase } from '../../../services/supabase';
 
-// --- Interfaces de Datos ---
-
 interface CustomerInfo {
     name: string;
     phone: string;
     address?: string;
-}
-
-interface OrderItem {
-    product_id: number;
-    display_id?: number;
-    sku?: string | null;
-    name: string;
-    quantity: number;
-    price: number;
-}
-
-interface Order {
-    id: string | number;
-    created_at: string;
-    status: 'pending' | 'completed' | 'cancelled' | string;
-    customer_info: CustomerInfo;
-    items: OrderItem[];
-    total: number;
-    payment_method?: string;
-    discount_applied?: number;
-    store_id?: number | string;
 }
 
 interface OrderDetailModalProps {

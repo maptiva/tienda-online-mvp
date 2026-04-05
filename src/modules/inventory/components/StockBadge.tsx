@@ -8,7 +8,7 @@ interface StockBadgeProps {
 }
 
 const StockBadge: React.FC<StockBadgeProps> = ({ productId, storeSlug = null, className = "" }) => {
-    const { inventory, loading, error } = useStock(productId, storeSlug);
+    const { inventory, loading, error } = useStock(productId, storeSlug ?? undefined);
 
     if (loading) {
         return (

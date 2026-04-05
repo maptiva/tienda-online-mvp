@@ -1,4 +1,4 @@
-import { Product } from './product.schema';
+import { Product } from '../schemas/product.schema';
 
 /**
  * Configuración de campos para el formulario de productos
