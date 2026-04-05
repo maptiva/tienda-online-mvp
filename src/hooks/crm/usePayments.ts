@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '../../services/supabase';
-import { paymentSchema, registerPaymentSchema } from '../../schemas/payment.schema';
+import { paymentSchema, registerPaymentSchema, type Payment } from '../../schemas/payment.schema';
 import { safeValidate } from '../../utils/zodHelpers';
-import type { Payment } from '../../schemas/payment.schema';
+import { z } from 'zod';
+
+type RegisterPaymentData = z.infer<typeof registerPaymentSchema>;
 
 export const usePayments = () => {
     const [payments, setPayments] = useState<Payment[]>([]);
@@ -12,12 +14,12 @@ export const usePayments = () => {
     /**
      * Helper para limpiar datos antes de validar (extrae joins de Supabase)
      */
-    const preparePaymentForValidation = (raw: any) => {
+    const preparePaymentForValidation = useCallback((raw: any) => {
         if (!raw) return null;
         // El schema espera los campos de la tabla payments, no los objetos anidados de joins
         const { clients, subscriptions, ...paymentData } = raw;
         return paymentData;
-    };
+    }, []);
 
     const fetchPayments = useCallback(async (clientId: string | null = null) => {
         setLoading(true);
@@ -69,22 +71,16 @@ export const usePayments = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [preparePaymentForValidation]);
 
     /**
      * Registra un pago y opcionalmente actualiza/crea una suscripción.
      */
-    const registerPayment = async (paymentData: Omit<Payment, 'id' | 'created_at' | 'updated_at'>) => {
+    const registerPayment = async (paymentData: RegisterPaymentData) => {
         setLoading(true);
         try {
-            // Asegurarse de que amount sea número antes de validar si viene de un form JS
-            const dataToValidate = {
-                ...paymentData,
-                amount: typeof paymentData.amount === 'string' ? parseFloat(paymentData.amount) : paymentData.amount
-            };
-
-            // Validar datos de entrada con registerPaymentSchema (que no requiere ID)
-            const { data: validatedPaymentData, error: validationError } = safeValidate(registerPaymentSchema, dataToValidate);
+            // Validar datos de entrada con Zod
+            const { data: validatedPaymentData, error: validationError } = safeValidate(registerPaymentSchema, paymentData);
             
             if (validationError || !validatedPaymentData) {
                 throw new Error(`Datos de pago inválidos: ${validationError?.issues.map(e => e.message).join(', ') || 'Error desconocido'}`);

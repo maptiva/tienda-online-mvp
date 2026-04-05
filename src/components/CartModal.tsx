@@ -9,6 +9,13 @@ import { orderService } from '../modules/orders/services/orderService';
 import PaymentMethodSelector from '../modules/discounts/components/PaymentMethodSelector';
 import { supabase } from '../services/supabase';
 import { statsService } from '../modules/stats/services/statsService';
+import type { CartItem } from '../context/CartContext';
+
+interface DiscountSettings {
+  enabled: boolean;
+  cash_discount: number;
+  transfer_discount: number;
+}
 
 interface CartModalProps {
   isOpen: boolean;
@@ -25,15 +32,15 @@ const CartModal: React.FC<CartModalProps> = ({
   storeSlug,
   stockEnabled
 }) => {
-  const { cart, removeFromCart, clearCart } = useCart() as any;
-  const { theme } = useTheme() as any;
+  const { cart, removeFromCart, clearCart } = useCart();
+  const { theme } = useTheme();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Estados para descuentos
-  const [discountSettings, setDiscountSettings] = useState<any>(null);
+  const [discountSettings, setDiscountSettings] = useState<DiscountSettings | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('whatsapp');
 
   // Cargar configuración y datos persistidos al abrir el modal
@@ -55,8 +62,13 @@ const CartModal: React.FC<CartModalProps> = ({
               .single();
 
             if (data?.discount_settings) {
-              setDiscountSettings(data.discount_settings);
-              if (data.discount_settings.enabled) {
+              const settings = data.discount_settings as any;
+              setDiscountSettings({
+                enabled: settings.enabled || false,
+                cash_discount: Number(settings.cash_discount || 0),
+                transfer_discount: Number(settings.transfer_discount || 0)
+              });
+              if (settings.enabled) {
                 setPaymentMethod('cash');
               }
             }
@@ -72,7 +84,7 @@ const CartModal: React.FC<CartModalProps> = ({
   if (!isOpen) return null;
 
   // Cálculos de totales y descuentos
-  const subtotal = cart.reduce((sum: number, item: any) => sum + item.product.price * item.quantity, 0);
+  const subtotal = cart.reduce((sum: number, item: CartItem) => sum + (Number(item.product.price) * Number(item.quantity)), 0);
 
   const getDiscountPercentage = () => {
     if (!discountSettings || !discountSettings.enabled) return 0;
@@ -109,8 +121,8 @@ const CartModal: React.FC<CartModalProps> = ({
     // 1. Guardar el pedido en la Base de Datos
     try {
       const orderData = { name, phone, address };
-      const itemsForOrder = cart.map((item: any) => ({
-        product_id: Number(item.product.id), // ID real para integridad referencial
+      const itemsForOrder = cart.map((item: CartItem) => ({
+        product_id: String(item.product.id), // ID real como string para integridad
         display_id: item.product.display_id,  // ID corto (#1, #2...)
         sku: item.product.sku,                // SKU personalizado
         name: item.product.name,
@@ -158,16 +170,16 @@ const CartModal: React.FC<CartModalProps> = ({
 
     if (stockEnabled && storeSlug) {
       try {
-        const itemsToProcess = cart.map((item: any) => ({
-          product_id: item.product.id,
+        const itemsToProcess = cart.map((item: CartItem) => ({
+          product_id: String(item.product.id),
           quantity: item.quantity
         }));
 
-        const result = await (inventoryService as any).processPublicCartSale(
+        const result = await inventoryService.processPublicCartSale(
           storeSlug,
           itemsToProcess,
           `Pedido #${orderId || 'WEB'} - ${name}`
-        );
+        ) as { success: boolean, error?: string };
 
         if (!result.success) {
           const swalRes = await Swal.fire({
@@ -208,11 +220,11 @@ const CartModal: React.FC<CartModalProps> = ({
       message += `
 
 *Productos:*`;
-      cart.forEach((item: any) => {
+      cart.forEach((item: CartItem) => {
         // Implementación de REF: #ID o SKU como en baseline
         const productRef = item.product.sku ? item.product.sku : `#${item.product.display_id || item.product.id}`;
         message += `
-- ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(item.product.price * item.quantity).toFixed(2)}`;
+- ${item.quantity}x ${item.product.name} (REF: ${productRef}) - $${(Number(item.product.price) * Number(item.quantity)).toFixed(2)}`;
       });
 
       if (discountAmount > 0) {
@@ -282,12 +294,12 @@ const CartModal: React.FC<CartModalProps> = ({
 
         {cart.length > 0 ? (
           <div className={styles.cartItems}>
-            {cart.map((item: any) => (
+            {cart.map((item: CartItem) => (
               <div key={item.product.id} className={styles.productItem}>
-                <img src={item.product.image_url} alt={item.product.name} className={styles.productImage} />
+                <img src={item.product.image_url || ''} alt={item.product.name} className={styles.productImage} />
                 <div className={styles.productDetails}>
                   <span>{item.quantity}x {item.product.name}</span>
-                  <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+                  <span>${(Number(item.product.price) * Number(item.quantity)).toFixed(2)}</span>
                 </div>
                 <button onClick={() => removeFromCart(item.product.id)} className={styles.deleteButton}>
                   <MdOutlineDelete className='text-red-500' size={25} />

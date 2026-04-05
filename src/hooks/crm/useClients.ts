@@ -1,8 +1,13 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '../../services/supabase';
-import { clientSchema, createClientSchema, updateClientSchema } from '../../schemas/client.schema';
+import { clientSchema, createClientSchema, updateClientSchema, type Client } from '../../schemas/client.schema';
+import { registerPaymentSchema } from '../../schemas/payment.schema';
 import { safeValidate } from '../../utils/zodHelpers';
-import type { Client } from '../../schemas/client.schema';
+import { z } from 'zod';
+
+type CreateClientData = z.infer<typeof createClientSchema>;
+type UpdateClientData = z.infer<typeof updateClientSchema>;
+type RegisterPaymentData = z.infer<typeof registerPaymentSchema>;
 
 const ITEMS_PER_PAGE = 20;
 
@@ -176,7 +181,7 @@ export const useClients = () => {
         }
     };
 
-    const createClient = async (clientData: Omit<Client, 'id' | 'created_at' | 'updated_at'>, storeId: string | null = null) => {
+    const createClient = async (clientData: CreateClientData, storeId: string | number | null = null) => {
         setLoading(true);
         try {
             // Validar datos de entrada con Zod
@@ -202,8 +207,6 @@ export const useClients = () => {
 
             // 2. Si se seleccionó una tienda, vincularla
             if (storeId && newClient) {
-                const storeIdNum = parseInt(storeId, 10);
-
                 await supabase
                     .from('stores')
                     .update({
@@ -211,7 +214,7 @@ export const useClients = () => {
                         enable_stock: validatedClientData.enable_stock === true,
                         payment_exempt: validatedClientData.payment_exempt === true
                     })
-                    .eq('id', storeIdNum);
+                    .eq('id', storeId);
             }
 
             await fetchClients();
@@ -224,7 +227,7 @@ export const useClients = () => {
         }
     };
 
-    const updateClient = async (id: string, clientData: Partial<Omit<Client, 'id' | 'created_at' | 'updated_at'>>, storeId: string | null = null) => {
+    const updateClient = async (id: string | number, clientData: UpdateClientData, storeId: string | number | null = null) => {
         setLoading(true);
         try {
             // Validar datos de entrada con Zod
@@ -249,8 +252,6 @@ export const useClients = () => {
 
             // 2. Gestionar vinculación de tienda
             if (storeId) {
-                const storeIdNum = parseInt(storeId, 10);
-
                 await supabase
                     .from('stores')
                     .update({
@@ -258,7 +259,7 @@ export const useClients = () => {
                         enable_stock: validatedClientData.enable_stock === true,
                         payment_exempt: validatedClientData.payment_exempt === true
                     })
-                    .eq('id', storeIdNum);
+                    .eq('id', storeId);
             }
 
             await fetchClients();

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useClients, type StoreWithMeta } from '../../../hooks/crm/useClients';
 import { usePayments } from '../../../hooks/crm/usePayments';
-import ClientModal from '../../../components/crm/ClientModal';
-import PaymentModal from '../../../components/crm/PaymentModal';
+import ClientModal, { type ClientFormData } from '../../../components/crm/ClientModal';
+import PaymentModal, { type FinalPaymentData } from '../../../components/crm/PaymentModal';
 import Swal from 'sweetalert2';
 import { FaUserPlus } from 'react-icons/fa';
 import SearchBar from '../../../components/SearchBar';
@@ -58,8 +58,7 @@ const Clients: React.FC = () => {
         setIsPaymentModalOpen(true);
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleSubmitClient = async (formData: any, storeId: any, clientId?: any) => {
+    const handleSubmitClient = async (formData: ClientFormData, storeId: string | number, clientId?: string | number) => {
         let result;
         if (clientId) {
             result = await updateClient(clientId, formData, storeId);
@@ -84,8 +83,7 @@ const Clients: React.FC = () => {
         }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleRegisterPayment = async (paymentData: any) => {
+    const handleRegisterPayment = async (paymentData: FinalPaymentData) => {
         const result = await registerPayment(paymentData);
         if (result.success) {
             setIsPaymentModalOpen(false);

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { supabase } from '../services/supabase';
-import { User, AuthError, SignInWithPasswordCredentials, SignUpWithPasswordCredentials } from '@supabase/supabase-js';
+import { User, AuthError, SignInWithPasswordCredentials, SignUpWithPasswordCredentials, AuthResponse } from '@supabase/supabase-js';
 import { isSuperAdmin } from '../utils/authRoles';
 
 /**
@@ -9,8 +9,8 @@ import { isSuperAdmin } from '../utils/authRoles';
 export interface AuthContextType {
     user: User | null;
     loading: boolean;
-    signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ data: any; error: AuthError | null }>;
-    signIn: (credentials: SignInWithPasswordCredentials) => Promise<{ data: any; error: AuthError | null }>;
+    signUp: (credentials: SignUpWithPasswordCredentials) => Promise<AuthResponse>;
+    signIn: (credentials: SignInWithPasswordCredentials) => Promise<AuthResponse>;
     signOut: () => Promise<{ error: AuthError | null }>;
     impersonatedUser: { id: string; storeName: string } | null;
     setImpersonatedUser: (user: { id: string; storeName: string } | null) => void;
