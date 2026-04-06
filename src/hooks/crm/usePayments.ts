@@ -14,11 +14,11 @@ export const usePayments = () => {
     /**
      * Helper para limpiar datos antes de validar (extrae joins de Supabase)
      */
-    const preparePaymentForValidation = useCallback((raw: any) => {
+    const preparePaymentForValidation = useCallback((raw: Record<string, unknown> | null) => {
         if (!raw) return null;
         // El schema espera los campos de la tabla payments, no los objetos anidados de joins
         const { clients, subscriptions, ...paymentData } = raw;
-        return paymentData;
+        return paymentData as Record<string, unknown>;
     }, []);
 
     const fetchPayments = useCallback(async (clientId: string | null = null) => {
@@ -41,21 +41,25 @@ export const usePayments = () => {
             if (fetchError) throw fetchError;
 
             // Validar los datos de pagos con Zod pero mantener las relaciones de Supabase
-            const validatedPayments: any[] = [];
+            type PaymentWithDetails = Payment & {
+                clients?: { name?: string } | null;
+                subscriptions?: { plan_type?: string } | null;
+            };
+            const validatedPayments: PaymentWithDetails[] = [];
             const paymentErrors: string[] = [];
 
-            (rawPayments || []).forEach((rawPayment: any) => {
+            (rawPayments || []).forEach((rawPayment: Record<string, unknown>) => {
                 const cleanData = preparePaymentForValidation(rawPayment);
                 const { data: validatedPayment, error: validationError } = safeValidate(paymentSchema, cleanData);
-                
+
                 if (validationError) {
-                    paymentErrors.push(...validationError.issues.map((e: any) => e.message));
+                    paymentErrors.push(...validationError.issues.map(e => e.message));
                 } else if (validatedPayment) {
                     // Mantener las relaciones de Supabase (clients, subscriptions) para el componente
                     validatedPayments.push({
                         ...validatedPayment,
-                        clients: rawPayment.clients,
-                        subscriptions: rawPayment.subscriptions
+                        clients: rawPayment.clients as { name?: string } | null,
+                        subscriptions: rawPayment.subscriptions as { plan_type?: string } | null
                     });
                 }
             });
@@ -64,7 +68,7 @@ export const usePayments = () => {
                 console.warn("Validation errors for payments:", paymentErrors);
             }
 
-            setPayments(validatedPayments);
+            setPayments(validatedPayments as Payment[]); // Cast down for context usage
         } catch (err) {
             console.error('Error fetching payments:', err);
             setError(err instanceof Error ? err.message : String(err));

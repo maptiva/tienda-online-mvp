@@ -41,11 +41,11 @@ const ForgotPassword: React.FC = () => {
             });
 
             setEmail('');
-        } catch (error: any) {
+        } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: error.message || 'Error al enviar el email'
+                text: error instanceof Error ? error.message : 'Error al enviar el email'
             });
         } finally {
             setLoading(false);

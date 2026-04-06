@@ -8,32 +8,20 @@ import { supabase } from '../../services/supabase';
 import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
 
-interface Product {
-    id: number;
-    display_id?: number;
-    sku?: string;
-    name: string;
-    description?: string;
-    price: number;
-    compare_at_price?: number | null;
-    price_on_request?: boolean;
-    category_id?: number;
-    image_url?: string;
-    categories?: { name: string };
-}
+import { Product } from '../../schemas/product.schema';
 
 type OperationType = 'increase' | 'decrease' | 'visibility' | 'promo' | 'clear_promo';
 type ValueType = 'percentage' | 'fixed';
 
 const BulkPriceUpdate: React.FC = () => {
     const queryClient = useQueryClient();
-    const { products, loading: productsLoading } = useProducts() as any;
-    const { categories, loading: categoriesLoading } = useCategories() as any;
-    const { user, impersonatedUser } = useAuth() as any;
+    const { products, loading: productsLoading } = useProducts();
+    const { categories, loading: categoriesLoading } = useCategories();
+    const { user, impersonatedUser } = useAuth();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    const [selectedProducts, setSelectedProducts] = useState<Set<number>>(new Set());
+    const [selectedProducts, setSelectedProducts] = useState<Set<string | number>>(new Set());
 
     // Configuración de la operación
     const [operation, setOperation] = useState<OperationType>('increase');
@@ -44,7 +32,12 @@ const BulkPriceUpdate: React.FC = () => {
 
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateMessage, setUpdateMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-    const [lastActionBackup, setLastActionBackup] = useState<any[] | null>(null);
+    const [lastActionBackup, setLastActionBackup] = useState<{ 
+        id: string | number; 
+        price?: number; 
+        compare_at_price?: number | null;
+        price_on_request?: boolean | null;
+    }[] | null>(null);
     const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
     // Lógica de redondeo
@@ -126,7 +119,7 @@ const BulkPriceUpdate: React.FC = () => {
         }
     };
 
-    const toggleProduct = (id: number) => {
+    const toggleProduct = (id: string | number) => {
         const next = new Set(selectedProducts);
         if (next.has(id)) next.delete(id);
         else next.add(id);
@@ -151,7 +144,7 @@ const BulkPriceUpdate: React.FC = () => {
             const backup = productsToUpdate.map((p: Product) => ({ 
                 id: p.id, 
                 price: p.price, 
-                compare_at_price: p.compare_at_price 
+                compare_at_price: p.compare_at_price ?? null 
             }));
             setLastActionBackup(backup);
 
@@ -166,7 +159,7 @@ const BulkPriceUpdate: React.FC = () => {
             });
 
             const results = await Promise.all(
-                updates.map((u: { id: number; price: number; compare_at_price: number | null; updated_at: string }) =>
+                updates.map((u: { id: string | number; price: number; compare_at_price: number | null; updated_at: string }) =>
                     supabase
                         .from('products')
                         .update({ 
@@ -183,8 +176,8 @@ const BulkPriceUpdate: React.FC = () => {
             setUpdateMessage({ type: 'success', text: `¡Actualización exitosa!` });
             setTimeout(() => setUpdateMessage(null), 5000);
             queryClient.invalidateQueries({ queryKey: ['products'] });
-        } catch (err: any) {
-            setUpdateMessage({ type: 'error', text: 'Error: ' + err.message });
+        } catch (err) {
+            setUpdateMessage({ type: 'error', text: `Error: ${err instanceof Error ? err.message : String(err)}` });
         } finally {
             setIsUpdating(false);
         }
@@ -212,8 +205,8 @@ const BulkPriceUpdate: React.FC = () => {
             setUpdateMessage({ type: 'success', text: `¡Cambios revertidos!` });
             setLastActionBackup(null);
             queryClient.invalidateQueries({ queryKey: ['products'] });
-        } catch (err: any) {
-            setUpdateMessage({ type: 'error', text: 'Error al deshacer: ' + err.message });
+        } catch (err) {
+            setUpdateMessage({ type: 'error', text: `Error al deshacer: ${err instanceof Error ? err.message : String(err)}` });
         } finally {
             setIsUpdating(false);
         }
@@ -243,8 +236,8 @@ const BulkPriceUpdate: React.FC = () => {
 
             setUpdateMessage({ type: 'success', text: `Visibilidad actualizada` });
             queryClient.invalidateQueries({ queryKey: ['products'] });
-        } catch (err: any) {
-            setUpdateMessage({ type: 'error', text: 'Error: ' + err.message });
+        } catch (err) {
+            setUpdateMessage({ type: 'error', text: `Error: ${err instanceof Error ? err.message : String(err)}` });
         } finally {
             setIsUpdating(false);
         }
@@ -284,7 +277,7 @@ const BulkPriceUpdate: React.FC = () => {
                             onChange={(e) => setSelectedCategory(e.target.value)}
                         >
                             <option value="all">Todas las Categorías</option>
-                            {categories?.map((c: any) => (
+                            {categories?.map((c) => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
                             ))}
                         </select>

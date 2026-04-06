@@ -29,9 +29,9 @@ export const useStoreId = () => {
 
                 if (dbError) throw dbError;
                 if (data) setStoreId(data.id);
-            } catch (err: any) {
+            } catch (err) {
                 console.error('[useStoreId] Error fetching store ID:', err);
-                setError(err.message);
+                setError(err instanceof Error ? err.message : String(err));
             } finally {
                 setLoading(false);
             }

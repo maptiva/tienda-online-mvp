@@ -47,7 +47,7 @@ const ClientModal: React.FC<ClientModalProps> = ({ isOpen, onClose, onSubmit, ge
                 notes: editingClient.notes || '',
                 enable_stock: editingClient.stores?.[0]?.enable_stock || false,
                 payment_exempt: editingClient.stores?.[0]?.payment_exempt || false,
-                billing_info: (editingClient.billing_info as any) || { cuit: '', address: '' }
+                billing_info: (editingClient.billing_info as { cuit: string; address: string } | null) || { cuit: '', address: '' }
             });
             // Si tiene tienda, seleccionarla
             if (editingClient.stores && editingClient.stores.length > 0) {

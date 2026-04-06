@@ -62,7 +62,7 @@ const CartModal: React.FC<CartModalProps> = ({
               .single();
 
             if (data?.discount_settings) {
-              const settings = data.discount_settings as any;
+              const settings = data.discount_settings as { enabled?: boolean; cash_discount?: number; transfer_discount?: number };
               setDiscountSettings({
                 enabled: settings.enabled || false,
                 cash_discount: Number(settings.cash_discount || 0),

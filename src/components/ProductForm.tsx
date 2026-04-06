@@ -16,17 +16,16 @@ interface Category {
 
 interface ProductFormData {
   id?: string | number;
-  sku?: string;
+  sku?: string | null;
   name: string;
   description?: string | null;
   price: number;
   compare_at_price?: number | null;
   price_on_request?: boolean;
-  category_id: number | string;
+  category_id?: number | string | null;
   image_url?: string | null;
-  gallery_images?: string[];
+  gallery_images?: string[] | null;
   backup_price?: number | null;
-  [key: string]: any;
 }
 
 function ProductForm() {
@@ -34,7 +33,7 @@ function ProductForm() {
   const [searchParams] = useSearchParams();
   const duplicateId = searchParams.get('duplicateFrom');
   const navigate = useNavigate();
-  const { user, impersonatedUser } = useAuth() as any;
+  const { user, impersonatedUser } = useAuth();
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     price: 0,
@@ -67,11 +66,11 @@ function ProductForm() {
     };
     
     formConfig.forEach(field => {
-      const fieldName = field.name as string;
+      const fieldName = field.name as keyof ProductFormData;
       if (fieldName === 'price') {
-        initialData[fieldName] = 0;
+        initialData[fieldName] = 0 as unknown as ProductFormData[typeof fieldName];
       } else {
-        initialData[fieldName] = field.required ? '' : null;
+        (initialData as any)[fieldName] = field.required ? '' : null;
       }
     });
 
@@ -97,8 +96,8 @@ function ProductForm() {
         const { data, error } = await query;
         if (error) throw error;
         setCategories(data || []);
-      } catch (err: any) {
-        setError(`Error al cargar categorías: ${err.message}`);
+      } catch (err) {
+        setError(`Error al cargar categorías: ${err instanceof Error ? err.message : String(err)}`);
         console.error('Error fetching categories:', err);
       }
     };
@@ -122,8 +121,8 @@ function ProductForm() {
           if (data.gallery_images && Array.isArray(data.gallery_images)) {
             setExistingGalleryImages(data.gallery_images);
           }
-        } catch (err: any) {
-          setError(`Error al cargar el producto: ${err.message}`);
+        } catch (err) {
+          setError(`Error al cargar el producto: ${err instanceof Error ? err.message : String(err)}`);
           console.error('Error fetching product:', err);
         } finally {
           setLoading(false);
@@ -164,9 +163,9 @@ function ProductForm() {
             toast: true,
             position: 'top-end'
           });
-          
-        } catch (err: any) {
-          setError(`Error al duplicar producto: ${err.message}`);
+
+        } catch (err) {
+          setError(`Error al duplicar producto: ${err instanceof Error ? err.message : String(err)}`);
           console.error('Error fetching product for duplication:', err);
         } finally {
           setLoading(false);
@@ -204,14 +203,14 @@ function ProductForm() {
     } else {
       const type = e.target.type;
       const checked = (e.target as HTMLInputElement).checked;
-      let val: any = type === 'checkbox' ? checked : value;
+      let val: string | number | boolean | null = type === 'checkbox' ? checked : value;
 
       // Conversión numérica para campos de precio
       if (type === 'number') {
         val = value === '' ? 0 : parseFloat(value);
       }
 
-      let newData = { ...formData, [name]: val };
+      const newData = { ...formData, [name]: val } as ProductFormData;
 
       if (name === 'price_on_request') {
         if (checked) {
@@ -224,7 +223,7 @@ function ProductForm() {
         }
       }
 
-      setFormData(newData);
+      setFormData(newData as unknown as ProductFormData);
       if (!productId) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
       }
@@ -283,8 +282,8 @@ function ProductForm() {
 
         newImageUrl = publicUrlData.publicUrl;
         finalFormData.image_url = newImageUrl;
-      } catch (err: any) {
-        setError(`Error al subir imagen principal: ${err.message}`);
+      } catch (err) {
+        setError(`Error al subir imagen principal: ${err instanceof Error ? err.message : String(err)}`);
         setLoading(false);
         return;
       }
@@ -314,8 +313,8 @@ function ProductForm() {
         const uploadedUrls = await Promise.all(uploadPromises);
         newGalleryUrls = [...newGalleryUrls, ...uploadedUrls];
 
-      } catch (err: any) {
-        setError(`Error al subir galería: ${err.message}`);
+      } catch (err) {
+        setError(`Error al subir galería: ${err instanceof Error ? err.message : String(err)}`);
         setLoading(false);
         return;
       }
@@ -360,8 +359,8 @@ function ProductForm() {
       });
 
       navigate('/admin');
-    } catch (err: any) {
-      setError(`Error al guardar: ${err.message}`);
+    } catch (err) {
+      setError(`Error al guardar: ${err instanceof Error ? err.message : String(err)}`);
       console.error('Database error:', err);
     } finally {
       setLoading(false);
@@ -389,7 +388,7 @@ function ProductForm() {
                   <textarea
                     id={fieldName}
                     name={fieldName}
-                    value={(formData[fieldName] as any) || ''}
+                    value={String(formData[fieldName as keyof ProductFormData] || '')}
                     onChange={handleChange}
                     required={field.required}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none transition-all min-h-[100px]"
@@ -457,7 +456,7 @@ function ProductForm() {
                     <select
                       id={fieldName}
                       name={fieldName}
-                      value={(formData[fieldName] as any) || ''}
+                      value={String(formData[fieldName as keyof ProductFormData] || '')}
                       onChange={handleChange}
                       required={field.required}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5FAFB8] outline-none appearance-none bg-white font-medium text-gray-700"
@@ -472,7 +471,7 @@ function ProductForm() {
                     </div>
                   </div>
                 ) : field.type === 'checkbox' ? (
-                  <div className="flex items-start gap-3 mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => {       
+                  <div className="flex items-start gap-3 mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors cursor-pointer" onClick={() => {
                     const checkbox = document.getElementById(fieldName) as HTMLInputElement;
                     if (checkbox) checkbox.click();
                   }}>
@@ -481,9 +480,9 @@ function ProductForm() {
                         type="checkbox"
                         id={fieldName}
                         name={fieldName}
-                        checked={(formData[fieldName] as any) || false}
+                        checked={Boolean(formData[fieldName as keyof ProductFormData])}
                         onChange={handleChange}
-                        onClick={(e) => e.stopPropagation()} 
+                        onClick={(e) => e.stopPropagation()}
                         className="w-5 h-5 text-[#5FAFB8] border-gray-300 rounded focus:ring-[#5FAFB8] cursor-pointer"
                       />
                     </div>
@@ -503,7 +502,7 @@ function ProductForm() {
                     type={field.type}
                     id={fieldName}
                     name={fieldName}
-                    value={(formData[fieldName] as any) ?? ''}
+                    value={String(formData[fieldName as keyof ProductFormData] ?? '')}
                     onChange={handleChange}
                     required={fieldName === 'price' && formData.price_on_request ? false : field.required}
                     disabled={fieldName === 'price' && formData.price_on_request}

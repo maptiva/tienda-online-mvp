@@ -83,7 +83,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
     const handleSaveStatus = async () => {
         setIsSaving(true);
         try {
-            const result = await (orderService as any).updateOrderStatus(order.id, status);
+            const result = await orderService.updateOrderStatus(order.id, status);
             if (result.success) {
                 Swal.fire({
                     icon: 'success',

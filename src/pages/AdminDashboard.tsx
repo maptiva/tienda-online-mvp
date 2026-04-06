@@ -85,7 +85,7 @@ const AdminDashboard: React.FC = () => {
                             <tbody>
                                 {filteredProducts.length > 0 ? (
                                     filteredProducts.map((product) => (
-                                        <ProductElement key={product.id} product={product as any} />
+                                        <ProductElement key={product.id} product={product} />
                                     ))
                                 ) : (
                                     <tr>
@@ -104,7 +104,7 @@ const AdminDashboard: React.FC = () => {
                     <div className='flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3'>
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map((product) => (
-                                <ProductCard key={product.id} product={product as any} />
+                                <ProductCard key={product.id} product={product} />
                             ))
                         ) : (
                             <div className='text-center py-8 text-gray-500'>

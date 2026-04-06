@@ -12,25 +12,24 @@ import StockBadge from '../modules/inventory/components/StockBadge';
 import { useStock } from '../modules/inventory/hooks/useStock';
 import Swal from 'sweetalert2';
 
-interface Product {
-  id: number;
-  name: string;
-  description?: string;
-  price: number;
-  compare_at_price?: number | null;
-  image_url?: string;
-  gallery_images?: string[];
-  price_on_request?: boolean;
-  store_whatsapp?: string;
-  sku?: string;
-  display_id?: number;
+import { Product } from '../schemas/product.schema';
+
+interface OutletContext {
+  store?: {
+    whatsapp_number?: string;
+    discount_settings?: {
+      enabled: boolean;
+      cash_discount: number;
+      transfer_discount: number;
+    };
+  };
 }
 
 const ProductDetail: React.FC = () => {
-  const { store } = useOutletContext() as any;
+  const { store } = useOutletContext<OutletContext>();
   const { productId, storeName } = useParams<{ productId: string; storeName: string }>();
   const navigate = useNavigate();
-  const { product, loading, error } = useProductById(productId || '') as any;
+  const { product, loading, error } = useProductById(productId || '');
   const { addToCart } = useCart();
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState<string | number>(1);
@@ -46,8 +45,8 @@ const ProductDetail: React.FC = () => {
   const [dynamicScale, setDynamicScale] = useState(1.8);
   const [lastTap, setLastTap] = useState(0);
 
-  const { stockEnabled } = useStoreConfig() as any;
-  const { inventory } = useStock(product?.id, storeName || '') as any;
+  const { stockEnabled } = useStoreConfig();
+  const { inventory } = useStock(product?.id ? String(product.id) : null, storeName || '');
 
   // Bloquear scroll y manejar teclado
   useEffect(() => {
@@ -182,7 +181,7 @@ const ProductDetail: React.FC = () => {
         setOffset({ x: 0, y: 0 });
       } else {
         // Si no está ampliado, ampliamos
-        toggleZoom({ stopPropagation: () => { } } as any);
+        toggleZoom({ stopPropagation: () => { } } as unknown as React.MouseEvent);
       }
       setLastTap(0);
       return;
@@ -221,11 +220,12 @@ const ProductDetail: React.FC = () => {
     }
     // Verificar stock si está habilitado
     if (stockEnabled && inventory) {
-      if (inventory.quantity < numQuantity) {
+      const currentQty = inventory.quantity ?? 0;
+      if (currentQty < numQuantity) {
         Swal.fire({
           icon: 'error',
           title: 'Stock insuficiente',
-          text: `Solo hay ${inventory.quantity} unidades disponibles.`,
+          text: `Solo hay ${currentQty} unidades disponibles.`,
           confirmButtonColor: 'var(--color-primary)'
         });
         return;
@@ -279,8 +279,8 @@ const ProductDetail: React.FC = () => {
         <SEO
           title={product.name}
           name={product.name}
-          description={product.description}
-          image={imageUrl}
+          description={product.description || undefined}
+          image={imageUrl || undefined}
           type="product"
           url={window.location.href}
           schema={jsonLd}
@@ -348,19 +348,19 @@ const ProductDetail: React.FC = () => {
           <h1 style={{ color: 'var(--color-text-main)' }}>{product.name}</h1>
 
           <p className="text-sm font-bold uppercase tracking-widest opacity-60 mb-4" style={{ color: 'var(--color-text-light)' }}>
-            {product.sku ? `COD: ${product.sku}` : `REF: #${product.display_id || product.id}`}
+            {String(product.sku ? `COD: ${product.sku}` : `REF: #${String(product.display_id || product.id)}`)}
           </p>
 
           {stockEnabled && (
             <div className="mb-6 flex justify-start">
-              <StockBadge productId={product.id} storeSlug={storeName || null} className="text-sm scale-110 origin-left" />
+              <StockBadge productId={String(product.id)} storeSlug={storeName || null} className="text-sm scale-110 origin-left" />
             </div>
           )}
 
           {product.price_on_request ? (
             <a
               href={`https://wa.me/${store?.whatsapp_number}?text=${encodeURIComponent(
-                `Hola! Me interesa el producto "${product.name}" (REF: ${product.sku ? product.sku : '#' + (product.display_id || product.id)}) y quisiera consultar el precio.`
+                `Hola! Me interesa el producto "${product.name}" (REF: ${String(product.sku ? product.sku : '#' + String(product.display_id || product.id))}) y quisiera consultar el precio.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -432,15 +432,15 @@ const ProductDetail: React.FC = () => {
                 />
                 <button
                   onClick={handleAddToCart}
-                  disabled={stockEnabled && inventory?.quantity <= 0}
+                  disabled={stockEnabled && (inventory?.quantity ?? 0) <= 0}
                   className='font-bold py-2 px-6 rounded-lg transition-all duration-300'
                   style={{
-                    backgroundColor: (stockEnabled && inventory?.quantity <= 0) ? '#9ca3af' : 'var(--color-primary)',
-                    color: (stockEnabled && inventory?.quantity <= 0) ? '#6b7280' : 'var(--color-primary-text)',
-                    cursor: (stockEnabled && inventory?.quantity <= 0) ? 'not-allowed' : 'pointer'
+                    backgroundColor: (stockEnabled && (inventory?.quantity ?? 0) <= 0) ? '#9ca3af' : 'var(--color-primary)',
+                    color: (stockEnabled && (inventory?.quantity ?? 0) <= 0) ? '#6b7280' : 'var(--color-primary-text)',
+                    cursor: (stockEnabled && (inventory?.quantity ?? 0) <= 0) ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {stockEnabled && inventory?.quantity <= 0 ? 'Agotado' : 'Agregar al Pedido'}
+                  {stockEnabled && (inventory?.quantity ?? 0) <= 0 ? 'Agotado' : 'Agregar al Pedido'}
                 </button>
               </div>
             </div>

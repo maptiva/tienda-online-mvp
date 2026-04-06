@@ -1,16 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../services/supabase';
 
-interface Product {
-    id: string;
-    name: string;
-    description?: string;
-    price: number;
-    image_url?: string;
-    category_id?: string;
-    user_id: string;
-    [key: string]: unknown;
-}
+import { Product } from '../schemas/product.schema';
 
 /**
  * Hook para obtener un producto por ID usando TanStack Query

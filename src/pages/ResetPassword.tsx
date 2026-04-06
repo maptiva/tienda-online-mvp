@@ -77,11 +77,11 @@ const ResetPassword: React.FC = () => {
             });
 
             navigate('/login');
-        } catch (error: any) {
+        } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: error.message || 'Error al actualizar la contraseña'
+                text: error instanceof Error ? error.message : 'Error al actualizar la contraseña'
             });
         } finally {
             setLoading(false);
