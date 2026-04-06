@@ -14,17 +14,13 @@ interface InternalStoreCardProps {
 const InternalStoreCard: React.FC<InternalStoreCardProps> = ({ store }) => {
     const { theme } = useTheme();
 
-    const CardWrapper = store.coming_soon ? 'div' : Link;
-    const cardProps = store.coming_soon
-        ? {}
-        : { to: `/${store.store_slug}` };
+    const commonProps = {
+        className: `${styles.card} ${theme === 'dark' ? styles.darkCard : ''
+            } ${store.coming_soon ? styles.comingSoonCard : ''}`
+    };
 
-    return (
-        <CardWrapper
-            {...(cardProps as any)}
-            className={`${styles.card} ${theme === 'dark' ? styles.darkCard : ''
-                } ${store.coming_soon ? styles.comingSoonCard : ''}`}
-        >
+    const innerContent = (
+        <>
             <div className={styles.cardHeader}>
                 {store.logo_url ? (
                     <img
@@ -55,8 +51,14 @@ const InternalStoreCard: React.FC<InternalStoreCardProps> = ({ store }) => {
                     <span className={styles.visitLink}>Visitar Tienda →</span>
                 )}
             </div>
-        </CardWrapper>
+        </>
     );
+
+    if (store.coming_soon) {
+        return <div {...commonProps}>{innerContent}</div>;
+    }
+
+    return <Link to={`/${store.store_slug || ''}`} {...commonProps}>{innerContent}</Link>;
 };
 
 interface StoreDirectoryProps {
@@ -88,7 +90,7 @@ const StoreDirectory: React.FC<StoreDirectoryProps> = ({ isOpen, onClose }) => {
             if (error) throw error;
 
             // Custom sorting logic
-            const getStoreRank = (store: any) => {
+            const getStoreRank = (store: Partial<Store>) => {
                 if (store.is_active && !store.is_demo && !store.coming_soon) {
                     return 1;
                 }

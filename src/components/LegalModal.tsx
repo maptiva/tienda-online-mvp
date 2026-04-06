@@ -14,25 +14,25 @@ const LegalModal: React.FC<LegalModalProps> = ({ isOpen, onClose, title, content
 
     // Memoizar componentes para evitar re-renders innecesarios
     const markdownComponents = React.useMemo(() => ({
-        h2: ({ children }: any) => (
+        h2: ({ children }: { children?: React.ReactNode }) => (
             <h2 className={`text-xl font-semibold mt-6 mb-3 ${theme === 'light' ? 'text-gray-900' : '!text-gray-300'
                 }`}>
                 {children}
             </h2>
         ),
-        p: ({ children }: any) => (
+        p: ({ children }: { children?: React.ReactNode }) => (
             <p className={`mb-4 leading-relaxed ${theme === 'light' ? 'text-gray-700' : '!text-gray-300'
                 }`}>
                 {children}
             </p>
         ),
-        ul: ({ children }: any) => (
+        ul: ({ children }: { children?: React.ReactNode }) => (
             <ul className={`list-disc list-inside mb-4 space-y-2 ${theme === 'light' ? 'text-gray-700' : '!text-gray-300'
                 }`}>
                 {children}
             </ul>
         ),
-        strong: ({ children }: any) => (
+        strong: ({ children }: { children?: React.ReactNode }) => (
             <strong className={`font-semibold ${theme === 'light' ? 'text-gray-900' : '!text-gray-300'
                 }`}>
                 {children}

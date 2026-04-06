@@ -31,9 +31,9 @@ interface StoreData {
 }
 
 function StoreSettings() {
-  const { user, impersonatedUser } = useAuth() as any;
+  const { user, impersonatedUser } = useAuth();
   const targetId = impersonatedUser?.id || user?.id;
-  const { categories: shopCategories, loading: categoriesLoading } = useShopCategories() as any;
+  const { categories: shopCategories, loading: categoriesLoading } = useShopCategories();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [storeData, setStoreData] = useState<StoreData>({
@@ -200,8 +200,8 @@ function StoreSettings() {
         .getPublicUrl(fileName);
 
       return publicUrl;
-    } catch (compressionError: any) {
-      throw new Error(`Error al procesar el logo: ${compressionError.message}`);
+    } catch (compressionError) {
+      throw new Error(`Error al procesar el logo: ${compressionError instanceof Error ? compressionError.message : String(compressionError)}`);
     }
   };
 
@@ -243,11 +243,11 @@ function StoreSettings() {
         timer: 2000
       });
 
-    } catch (error: any) {
+    } catch (error) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: error.message || 'No se pudo guardar la configuración'
+        text: error instanceof Error ? error.message : 'No se pudo guardar la configuración'
       });
     } finally {
       setSaving(false);
@@ -389,7 +389,7 @@ function StoreSettings() {
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
             >
               <option value="">{categoriesLoading ? 'Cargando rubros...' : 'Selecciona una categoría'}</option>
-              {shopCategories.map((cat: any) => (
+              {shopCategories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.label}
                 </option>
@@ -422,7 +422,7 @@ function StoreSettings() {
                     storeName={storeData.store_name}
                     address={storeData.address}
                     draggable={true}
-                    onPositionChange={(newPos: any) => {
+                    onPositionChange={(newPos: { lat: number; lng: number }) => {
                       setStoreData(prev => ({
                         ...prev,
                         latitude: newPos.lat,

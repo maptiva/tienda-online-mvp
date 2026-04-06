@@ -4,8 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L, { LatLng, LeafletMouseEvent } from 'leaflet';
 
 // Fix for default marker icon in react-leaflet
-// @ts-ignore
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: () => string })._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -98,7 +97,7 @@ const StoreMap: React.FC<StoreMapProps> = ({ latitude, longitude, storeName, add
                 center={[lat, lng]}
                 zoom={15}
                 minZoom={!draggable ? 13 : 1}
-                maxBounds={!draggable ? bounds as any : null}
+                maxBounds={!draggable ? bounds : undefined}
                 maxBoundsViscosity={1.0}
                 scrollWheelZoom={draggable}
                 dragging={true}

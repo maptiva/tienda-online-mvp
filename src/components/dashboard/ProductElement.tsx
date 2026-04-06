@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Product } from '../../interfaces/Producto'
+import { Product as ZodProduct } from '../../schemas/product.schema'
 import { useNavigate } from 'react-router-dom'
 import { RiPencilLine } from 'react-icons/ri';
 import { MdOutlineDelete, MdContentCopy } from 'react-icons/md';
@@ -7,7 +7,7 @@ import { deleteProduct } from '../../hooks/useProductDelete';
 import Swal from 'sweetalert2';
 
 interface Props {
-    product: Product
+    product: ZodProduct
 }
 
 export const ProductElement = ({ product }: Props) => {
@@ -25,7 +25,7 @@ export const ProductElement = ({ product }: Props) => {
         });
 
         if (isConfirmed) {
-            const eliminado = await deleteProduct(id, image_url)
+            const eliminado = await deleteProduct(String(id), image_url || '');
 
             if (eliminado) {
                 setEstado(false);

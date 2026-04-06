@@ -21,31 +21,24 @@ interface StoreCardProps {
 const StoreCard: React.FC<StoreCardProps> = ({ store }) => {
     const { theme } = useTheme();
     
-    // Componente wrapper dinámico
-    const CardWrapper = store.coming_soon ? 'div' : Link;
-    
-    // Props dinámicos según el tipo de componente
-    const cardProps = store.coming_soon 
-        ? {} 
-        : { to: `/${store.store_slug || ''}` };
-
     // Datos por defecto si faltan
     const categoryName = store.category || 'Maptiva Store';
     const description = store.short_description || 'Descubrí los mejores productos en nuestra tienda.';
     const isOpen = store.is_open !== undefined ? store.is_open : true;
 
-    return (
-        <CardWrapper
-            {...(cardProps as any)}
-            className="flex-shrink-0 w-72 group rounded-3xl transition-all duration-500 hover:scale-[1.03] relative overflow-hidden flex flex-col"
-            style={{
-                backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.95)' : 'white',
-                border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0,0,0,0.05)'}`,
-                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.04)',
-                cursor: store.coming_soon ? 'default' : 'pointer',
-                opacity: store.coming_soon ? 0.8 : 1
-            }}
-        >
+    const commonProps = {
+        className: "flex-shrink-0 w-72 group rounded-3xl transition-all duration-500 hover:scale-[1.03] relative overflow-hidden flex flex-col",
+        style: {
+            backgroundColor: theme === 'dark' ? 'rgba(248, 250, 252, 0.95)' : 'white',
+            border: `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0,0,0,0.05)'}`,
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.04)',
+            cursor: store.coming_soon ? 'default' : 'pointer',
+            opacity: store.coming_soon ? 0.8 : 1
+        }
+    };
+
+    const innerContent = (
+        <>
             {/* Soft Gradient Overlay on Hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#5FAFB8]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -115,8 +108,14 @@ const StoreCard: React.FC<StoreCardProps> = ({ store }) => {
                     </div>
                 )}
             </div>
-        </CardWrapper>
+        </>
     );
+
+    if (store.coming_soon) {
+        return <div {...commonProps}>{innerContent}</div>;
+    }
+
+    return <Link to={`/${store.store_slug || ''}`} {...commonProps}>{innerContent}</Link>;
 };
 
 export default StoreCard;

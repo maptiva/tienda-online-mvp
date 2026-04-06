@@ -32,9 +32,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { storeName } = useParams<{ storeName: string }>();
   const { theme } = useTheme();
   const [quantity, setQuantity] = useState<string | number>(1);
-  const { stockEnabled } = useStoreConfig() as any;
-  const { inventory } = useStock(stockEnabled ? String(product.id) : null, storeName || '') as any;
-  const { store } = useStoreByName(storeName || '') as any;
+  const { stockEnabled } = useStoreConfig();
+  const { inventory } = useStock(stockEnabled ? String(product.id) : null, storeName || '');
+  const { store } = useStoreByName(storeName || '');
 
   if (!product) {
     return null;

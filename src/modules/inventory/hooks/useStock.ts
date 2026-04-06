@@ -42,8 +42,7 @@ export const useStock = (productId: string | null, storeSlug?: string) => {
         refetch
     } = useQuery({
         queryKey: ['inventory', productId, storeSlug, targetId],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        queryFn: () => inventoryService.fetchInventory(productId!, targetId as any, storeSlug as any),
+        queryFn: () => inventoryService.fetchInventory(productId!, targetId!, storeSlug),
         enabled: !!productId,
         staleTime: 10 * 1000,  // 10 segundos - datos frescos
         gcTime: 5 * 60 * 1000, // 5 minutos - mantener en cache
