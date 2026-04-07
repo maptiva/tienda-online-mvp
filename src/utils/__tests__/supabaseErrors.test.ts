@@ -11,7 +11,7 @@ import type { SupabaseError } from '../supabaseErrors';
 describe('handleSupabaseError', () => {
   it('retorna string vacío si no hay error', () => {
     expect(handleSupabaseError(null)).toBe('');
-    expect(handleSupabaseError(undefined as any)).toBe('');
+    expect(handleSupabaseError(undefined as unknown as { message: string, code: string, details: string, hint: string })).toBe('');
   });
 
   it('detecta errores de red', () => {
