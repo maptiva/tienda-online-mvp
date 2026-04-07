@@ -70,7 +70,7 @@ function ProductForm() {
       if (fieldName === 'price') {
         initialData[fieldName] = 0 as unknown as ProductFormData[typeof fieldName];
       } else {
-        (initialData as any)[fieldName] = field.required ? '' : null;
+        ((initialData as unknown) as Record<string, unknown>)[fieldName] = field.required ? '' : null;
       }
     });
 

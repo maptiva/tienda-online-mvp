@@ -58,7 +58,7 @@ describe('useStores hook', () => {
     // Mock de error para este test específico
     // Usamos un Error real para que err.message funcione en el catch
     const databaseError = new Error('Database error');
-    (supabase.from as any).mockImplementationOnce(() => ({
+    (supabase.from as unknown as { mockImplementationOnce: Function }).mockImplementationOnce(() => ({
       select: vi.fn(() => ({
         not: vi.fn(() => ({
           not: vi.fn(() => Promise.resolve({

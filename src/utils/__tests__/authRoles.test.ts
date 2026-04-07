@@ -24,10 +24,10 @@ describe('isSuperAdmin', () => {
 
   it('retorna false si el usuario no tiene email', () => {
     expect(isSuperAdmin({} as User)).toBe(false);
-    expect(isSuperAdmin({ name: 'Test' } as any)).toBe(false);
+    expect(isSuperAdmin({ name: 'Test' } as unknown as User)).toBe(false);
   });
 
   it('retorna false si el email es null', () => {
-    expect(isSuperAdmin({ email: null } as any)).toBe(false);
+    expect(isSuperAdmin({ email: null } as unknown as User)).toBe(false);
   });
 });
