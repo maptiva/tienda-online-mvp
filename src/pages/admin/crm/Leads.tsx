@@ -85,6 +85,7 @@ const Leads: React.FC = () => {
             if (editingLead) {
                 await leadsService.updateLead(String(editingLead.id), {
                     name: formData.name,
+                    business_name: formData.business_name,
                     email: formData.email,
                     phone: formData.phone,
                     source: formData.source,
@@ -95,6 +96,7 @@ const Leads: React.FC = () => {
             } else {
                 await leadsService.createLead({
                     name: formData.name || '',
+                    business_name: formData.business_name,
                     email: formData.email,
                     phone: formData.phone,
                     source: formData.source
