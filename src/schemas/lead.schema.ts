@@ -9,6 +9,7 @@ export const leadSchema = z.object({
   email: z.string().email('Email inválido').optional(),
   phone: z.string().optional(),
   source: z.string().optional(),
+  business_name: z.string().optional(),
   status: z.enum(['NEW', 'CONTACTED', 'QUALIFIED', 'CONVERTED', 'LOST']).default('NEW'),
   notes: z.string().optional(),
   store_id: z.string().uuid().optional(),
@@ -23,6 +24,7 @@ export type Lead = z.infer<typeof leadSchema>;
 // Schema para crear lead
 export const createLeadSchema = leadSchema.pick({
   name: true,
+  business_name: true,
   email: true,
   phone: true,
   source: true,

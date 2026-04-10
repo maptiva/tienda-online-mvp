@@ -6,6 +6,7 @@ import { type Lead } from '../../../schemas/lead.schema';
  */
 export interface CreateLeadData {
     name: string;
+    business_name?: string;
     email?: string;
     phone?: string;
     source?: string;
