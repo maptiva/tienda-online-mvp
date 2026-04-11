@@ -40,7 +40,9 @@ const LandingPage: React.FC = () => {
             const { data, error } = await supabase
                 .from('stores')
                 .select('id, user_id, store_name, store_slug, logo_url, is_demo, coming_soon, is_active, is_open, created_at, category, short_description, show_map')
-                .limit(20);
+                .or('is_active.eq.true,coming_soon.eq.true')
+                .order('created_at', { ascending: false })
+                .limit(30);
 
             if (error) {
                 console.error("Error cargando tiendas destacadas:", error);
@@ -48,36 +50,25 @@ const LandingPage: React.FC = () => {
             }
 
             if (data) {
-                const getStoreRank = (store: PublicStore): number => {
-                    if (store.is_active && !store.is_demo && !store.coming_soon) {
-                        return 1;
-                    }
-                    if (store.is_demo) {
-                        return 2;
-                    }
-                    if (store.coming_soon) {
-                        return 3;
-                    }
-                    return 4;
-                };
-
-                const sortedData: PublicStore[] = (data || [])
-                    .filter((s): s is PublicStore => s.is_active || s.coming_soon || s.is_demo)
+                const activeStores = (data || [])
+                    .filter((s): s is PublicStore => s.is_active && !s.is_demo && !s.coming_soon)
                     .sort((a, b) => {
-                        const rankA = getStoreRank(a);
-                        const rankB = getStoreRank(b);
+                        const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+                        const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+                        return bDate - aDate;
+                    })
+                    .slice(0, 15);
 
-                        if (rankA !== rankB) {
-                            return rankA - rankB;
-                        }
+                const comingSoonStores = (data || [])
+                    .filter((s): s is PublicStore => s.coming_soon)
+                    .sort((a, b) => {
+                        const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+                        const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+                        return bDate - aDate;
+                    })
+                    .slice(0, 5);
 
-                        if (a.created_at && b.created_at) {
-                            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-                        }
-                        return 0;
-                    });
-
-                setFeaturedStores(sortedData.slice(0, 20));
+                setFeaturedStores([...activeStores, ...comingSoonStores]);
             }
         };
         fetchFeaturedStores();
