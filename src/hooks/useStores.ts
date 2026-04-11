@@ -19,6 +19,7 @@ export interface PublicStore {
   is_active: boolean | null;
   is_open: boolean | null;
   user_id: string;
+  created_at: string | null;
 }
 
 export const useStores = () => {
@@ -36,7 +37,7 @@ export const useStores = () => {
         let rawStores: Record<string, unknown>[] | null = null;
         let { data, error } = await supabase
           .from('stores')
-          .select('id, store_name, logo_url, latitude, longitude, address, city, category, store_slug, is_demo, coming_soon, is_active, is_open, user_id')
+          .select('id, store_name, logo_url, latitude, longitude, address, city, category, store_slug, is_demo, coming_soon, is_active, is_open, user_id, created_at')
           .not('latitude', 'is', null)
           .not('longitude', 'is', null);
  
@@ -48,7 +49,7 @@ export const useStores = () => {
           // Reintento: Carga de emergencia sin las columnas nuevas
           const { data: fallbackStores, error: fallbackError } = await supabase
             .from('stores')
-            .select('id, store_name, logo_url, latitude, longitude, address, city, category, store_slug, is_demo, coming_soon, user_id')
+            .select('id, store_name, logo_url, latitude, longitude, address, city, category, store_slug, is_demo, coming_soon, user_id, created_at')
             .not('latitude', 'is', null)
             .not('longitude', 'is', null);
             
@@ -78,7 +79,8 @@ export const useStores = () => {
               coming_soon: typeof rawStore.coming_soon === 'boolean' ? rawStore.coming_soon : null,
               is_active: typeof rawStore.is_active === 'boolean' ? rawStore.is_active : null,
               is_open: typeof rawStore.is_open === 'boolean' ? rawStore.is_open : null,
-              user_id: String(rawStore.user_id || '')
+              user_id: String(rawStore.user_id || ''),
+              created_at: rawStore.created_at ? String(rawStore.created_at) : null
             });
           }
         });
