@@ -247,12 +247,18 @@ const ExploreMap = () => {
             
             return matchesSearch && matchesCategory && matchesCity && isActive;
         }).sort((a, b) => {
-            const getWeight = (s: typeof a): number => {
-                if (s.coming_soon) return 3;
+            const getRank = (s: typeof a): number => {
+                if (s.is_active && !s.is_demo && !s.coming_soon) return 1;
                 if (s.is_demo) return 2;
-                return 1;
+                if (s.coming_soon) return 3;
+                return 4;
             };
-            return getWeight(a) - getWeight(b);
+            const rankA = getRank(a);
+            const rankB = getRank(b);
+            if (rankA !== rankB) return rankA - rankB;
+            const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return dateB - dateA;
         });
     }, [stores, searchTerm, selectedCategory, selectedCity]);
 
