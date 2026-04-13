@@ -19,7 +19,6 @@ const ProductList: React.FC = () => {
   const { products, loading, error } = useProducts(store?.user_id as string);
   const { searchTerm, setSearchTerm } = useSearchState();
   const prevUserId = useRef<string | null>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Guardar scroll en sessionStorage al hacer scroll
   useEffect(() => {
