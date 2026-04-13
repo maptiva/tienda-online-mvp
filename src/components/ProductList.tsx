@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { useProducts } from '../hooks/useProducts';
@@ -6,7 +6,6 @@ import SearchBar from './SearchBar';
 import styles from './ProductList.module.css';
 import { MdErrorOutline } from 'react-icons/md';
 import { useCategory } from '../hooks/categoria/useCategory';
-// import { useTheme } from '../context/ThemeContext'; // Importado pero no usado en el JSX original
 import { useSearchState } from '../store/useSearchStore';
 import { type Store } from '../schemas/store.schema';
 
@@ -17,16 +16,49 @@ interface OutletContext {
 const ProductList: React.FC = () => {
   const { store } = useOutletContext<OutletContext>();
   const { categoryActive, limpiarCategoryActive } = useCategory();
-  // const { theme } = useTheme(); // No se usa en el componente original
   const { products, loading, error } = useProducts(store?.user_id as string);
   const { searchTerm, setSearchTerm } = useSearchState();
+  const prevUserId = useRef<string | null>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // Resetear filtros al cambiar de tienda
+  // Guardar scroll en sessionStorage al hacer scroll
   useEffect(() => {
-    if (store?.user_id) {
+    const handleScroll = () => {
+      const key = `scroll_state_${window.location.pathname}`;
+      const current = JSON.parse(sessionStorage.getItem(key) || '{"scrollX":0,"scrollY":0}');
+      if (window.scrollY > 0 && window.scrollY !== current.scrollY) {
+        sessionStorage.setItem(key, JSON.stringify({ scrollX: window.scrollX, scrollY: window.scrollY }));
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Restaurar scroll al montar el componente
+  useEffect(() => {
+    const key = `scroll_state_${window.location.pathname}`;
+    const saved = JSON.parse(sessionStorage.getItem(key) || '{"scrollX":0,"scrollY":0}');
+    
+    if (saved.scrollY > 0) {
+      // Usar requestAnimationFrame para evitar saltos
+      requestAnimationFrame(() => {
+        window.scrollTo(saved.scrollX, saved.scrollY);
+      });
+    }
+  }, []);
+
+  // Resetear filtros solo cuando cambia el user_id (no al volver atrás)
+  useEffect(() => {
+    const currentUserId = store?.user_id;
+    
+    // Solo limpiar si es un cambio real de tienda (no vuelve atrás)
+    if (prevUserId.current !== null && prevUserId.current !== currentUserId) {
       if (categoryActive) limpiarCategoryActive();
       if (searchTerm) setSearchTerm('');
     }
+    
+    prevUserId.current = currentUserId || null;
   }, [store?.user_id]);
 
   // Filtrado de productos
