@@ -34,16 +34,18 @@ const ProductList: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Restaurar scroll al montar el componente
+  // Restaurar scroll al montar el componente (solo si no viene de click en logo)
   useEffect(() => {
+    const isLogoNavigate = sessionStorage.getItem('logo_navigate') === 'true';
     const key = `scroll_state_${window.location.pathname}`;
     const saved = JSON.parse(sessionStorage.getItem(key) || '{"scrollX":0,"scrollY":0}');
     
-    if (saved.scrollY > 0) {
-      // Usar requestAnimationFrame para evitar saltos
+    if (saved.scrollY > 0 && !isLogoNavigate) {
       requestAnimationFrame(() => {
         window.scrollTo(saved.scrollX, saved.scrollY);
       });
+    } else if (isLogoNavigate) {
+      sessionStorage.removeItem(key);
     }
   }, []);
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import logoTitle from '../assets/titulo1.png';
 import { useCart } from '../context/CartContext';
 import { MdOutlineShoppingCart } from 'react-icons/md';
@@ -8,6 +8,7 @@ import { FiInfo } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 import SearchBar from './SearchBar';
 import { useSearchState } from '../store/useSearchStore';
+import { useCategory } from '../hooks/categoria/useCategory';
 import AboutModal from './public/AboutModal';
 import { type Store } from '../schemas/store.schema';
 
@@ -19,16 +20,30 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ storeData, onCartClick }) => {
   const { cart } = useCart();
   const { storeName } = useParams<{ storeName: string }>();
+  const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  // Corregido: useSearchStore suele devolver el store completo o las funciones
   const { searchTerm, setSearchTerm } = useSearchState();
+  const { limpiarCategoryActive } = useCategory();
   const [showAbout, setShowAbout] = useState(false);
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // Usar datos de la tienda si existen, sino valores por defecto
   const displayLogo = storeData?.logo_url || logoTitle;
   const displayStoreName = storeData?.store_name || 'Tienda Online';
+
+  const handleLogoClick = async () => {
+    const targetPath = `/${storeName}`;
+    setSearchTerm('');
+    await limpiarCategoryActive();
+    sessionStorage.removeItem(`scroll_state_${window.location.pathname}`);
+    sessionStorage.removeItem(`scroll_state_${targetPath}`);
+    sessionStorage.setItem('logo_navigate', 'true');
+    await navigate(targetPath, { replace: true });
+    setTimeout(() => window.scrollTo(0, 0), 100);
+    setTimeout(() => window.scrollTo(0, 0), 300);
+    setTimeout(() => window.scrollTo(0, 0), 500);
+    setTimeout(() => sessionStorage.removeItem('logo_navigate'), 1000);
+  };
 
   return (
     <header
@@ -46,10 +61,9 @@ const Header: React.FC<HeaderProps> = ({ storeData, onCartClick }) => {
             <div id="clicando-brand-button-container" className="hidden md:flex md:items-center"></div>
 
             {/* Link de la Tienda */}
-            <Link
-              to={`/${storeName || ''}`}
-              className="flex items-center gap-3"
-              onClick={() => window.scrollTo(0, 0)}
+            <button
+              onClick={handleLogoClick}
+              className="flex items-center gap-3 bg-transparent border-none cursor-pointer"
             >
               <img
                 src={displayLogo}
@@ -62,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({ storeData, onCartClick }) => {
               >
                 {displayStoreName}
               </span>
-            </Link>
+            </button>
           </div>
 
           {/* Centro: SearchBar (solo desktop) */}
