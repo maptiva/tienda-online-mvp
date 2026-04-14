@@ -48,6 +48,11 @@ const ProductDetail: React.FC = () => {
   const { stockEnabled } = useStoreConfig();
   const { inventory } = useStock(product?.id ? String(product.id) : null, storeName || '');
 
+  // Scroll al top al montar el componente
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Bloquear scroll y manejar teclado
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
