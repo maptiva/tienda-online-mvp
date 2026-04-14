@@ -7,7 +7,6 @@ import './App.css';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
 import { CartProvider } from './context/CartContext';
-import ScrollToTop from './components/ScrollToTop';
 import LazyLoadFallback from './components/LazyLoadFallback';
 
 import PublicLayout from './components/PublicLayout';
@@ -59,7 +58,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        <ScrollToTop />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/mapa" element={
