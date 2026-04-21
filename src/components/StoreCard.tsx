@@ -66,6 +66,8 @@ const StoreCard: React.FC<StoreCardProps> = ({ store }) => {
                             <img
                                 src={store.logo_url}
                                 alt={store.store_name}
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full rounded-full object-contain"
                             />
                         ) : (
