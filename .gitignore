@@ -54,6 +54,16 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# 8b. Herramientas de IA y Editores (PRIVADO)
+.claude/
+.opencode/
+
+# 8c. Python cache (nunca subir)
+*.pyc
+*.pyo
+__pycache__/
+*.pyd
+
 # 9. Skills de IA (PERMITIDOS)
 # Esto es el "cerebro" para que los agentes trabajen correctamente
 !.agent/skills/
@@ -66,3 +76,8 @@ supabase/.temp/
 # Archivos de resumen y debug de sesiones
 resumen_*.txt
 debug-*.js
+
+# 11. Scripts Operacionales One-Shot (PRIVADOS, no son del producto)
+# Scripts de inyección de tiendas específicas, análisis puntuales y debugging
+scripts/one-off/
+scratch/

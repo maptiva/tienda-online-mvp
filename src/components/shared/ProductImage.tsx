@@ -58,6 +58,8 @@ const ProductImage: React.FC<ProductImageProps> = ({
         <img
             src={src}
             alt={alt}
+            loading="lazy"
+            decoding="async"
             className={`
                 ${variantClasses[variant]} 
                 ${showHoverEffect ? 'group-hover:scale-110 transition-transform duration-300' : ''}
