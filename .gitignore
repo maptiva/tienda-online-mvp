@@ -81,3 +81,4 @@ debug-*.js
 # Scripts de inyección de tiendas específicas, análisis puntuales y debugging
 scripts/one-off/
 scratch/
+.aider*

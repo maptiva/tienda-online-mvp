@@ -74,7 +74,13 @@ const PublicLayout: React.FC = () => {
     "name": store.store_name,
     "image": absoluteLogoUrl,
     "telephone": store.whatsapp_number,
-    "url": window.location.href
+    "url": window.location.href,
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": store.address || "",
+      "addressLocality": store.city || "",
+      "addressCountry": "AR"
+    }
   };
 
   return (
