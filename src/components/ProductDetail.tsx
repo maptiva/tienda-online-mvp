@@ -16,6 +16,9 @@ import { Product } from '../schemas/product.schema';
 
 interface OutletContext {
   store?: {
+    store_name?: string;
+    address?: string;
+    city?: string;
     whatsapp_number?: string;
     discount_settings?: {
       enabled: boolean;
@@ -268,13 +271,49 @@ const ProductDetail: React.FC = () => {
     "name": product.name,
     "image": imageUrl,
     "description": product.description,
+    "sku": product.sku || `REF-${product.display_id || product.id}`,
+    "brand": {
+      "@type": "Brand",
+      "name": store?.store_name || "Clicando"
+    },
     "offers": {
       "@type": "Offer",
       "priceCurrency": "ARS",
       "price": product.price || 0,
       "priceValidUntil": priceValidUntil,
       "availability": "https://schema.org/InStock",
-      "url": window.location.href
+      "url": window.location.href,
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": 0,
+          "currency": "ARS"
+        },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 0,
+            "maxValue": 1,
+            "unitCode": "DAY"
+          },
+          "transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 5,
+            "unitCode": "DAY"
+          }
+        }
+      },
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "AR",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnPeriod",
+        "merchantReturnDays": 30,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/FreeReturn"
+      }
     }
   };
 
