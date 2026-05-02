@@ -128,7 +128,7 @@ const getCategoryIcon = (category: string | null | undefined, metaMap: Record<st
     const meta = (metaMap && category && metaMap[category]) || defaultMeta;
 
     const iconHtml = `<div style="
-        background-color: ${meta.marker === 'blue' ? '#3b82f6' : meta.marker === 'green' ? '#10b981' : meta.marker === 'red' ? '#ef4444' : meta.marker === 'orange' ? '#f97316' : meta.marker === 'yellow' ? '#eab308' : meta.marker === 'violet' ? '#8b5cf6' : meta.marker === 'grey' ? '#6b7280' : meta.marker === 'cyan' ? '#38bdf8' : '#3b82f6'};
+        background-color: ${meta.marker === 'blue' ? '#3b82f6' : meta.marker === 'green' ? '#10b981' : meta.marker === 'red' ? '#ef4444' : meta.marker === 'orange' ? '#f97316' : meta.marker === 'yellow' ? '#eab308' : meta.marker === 'violet' ? '#8b5cf6' : meta.marker === 'grey' ? '#6b7280' : meta.marker === 'cyan' ? '#38bdf8' : meta.marker === 'pink' ? '#fbcfe8' : '#3b82f6'};
         border: 2px solid white;
         border-radius: 50%;
         width: 32px;
@@ -200,9 +200,10 @@ const ExploreMap = () => {
         FaPaintBrush: '🏺',
         FaPalette: '🏺',
         FaHandPaper: '🏺',
-        FaMagic: '🏺',
+        FaMagic: '💄',
         FaGem: '🏺',
         FaPencilRuler: '📚',
+        FaMirror: '🪞',
     };
 
     const categoryMetaMap = useMemo(() => {
