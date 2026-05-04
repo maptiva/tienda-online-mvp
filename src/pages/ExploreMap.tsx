@@ -74,11 +74,28 @@ const StoreMarker: React.FC<StoreMarkerProps> = ({ store, isSelected, onSelect, 
             <Popup>
                 <div className="text-center p-1">
                     <img src={store.logo_url || ''} className="h-10 mx-auto mb-2" alt="" />
-                    <p className="font-bold">{store.store_name}</p>
+                    <p className="font-bold mb-1">{store.store_name}</p>
 
-                    {store.is_demo && (
-                        <span className="text-[10px] bg-yellow-400 text-black px-2 mt-1 rounded font-bold inline-block">DEMO</span>
-                    )}
+                    <div className="flex flex-col items-center gap-1 mb-2">
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border flex items-center gap-1 uppercase tracking-tighter"
+                            style={{ 
+                                backgroundColor: 'var(--color-surface)', 
+                                color: 'var(--color-text-light)', 
+                                borderColor: 'var(--color-border)' 
+                            }}>
+                            {store.category && metaMap[store.category] ? (
+                                <>
+                                    {metaMap[store.category].emoji} {metaMap[store.category].label}
+                                </>
+                            ) : (
+                                <>🏷️ {store.category || 'Tienda'}</>
+                            )}
+                        </span>
+                        
+                        {store.is_demo && (
+                            <span className="text-[10px] bg-yellow-400 text-black px-2 rounded font-bold inline-block">DEMO</span>
+                        )}
+                    </div>
 
                     {store.coming_soon ? (
                         <div className="text-gray-400 text-xs font-bold mt-2 py-1 px-3 bg-gray-100 rounded-lg border border-gray-200">
@@ -127,8 +144,10 @@ const getCategoryIcon = (category: string | null | undefined, metaMap: Record<st
     const defaultMeta = { marker: 'blue', emoji: '🏪' };
     const meta = (metaMap && category && metaMap[category]) || defaultMeta;
 
+    const isFarmacia = category === 'Farmacia';
+    
     const iconHtml = `<div style="
-        background-color: ${meta.marker === 'blue' ? '#3b82f6' : meta.marker === 'green' ? '#10b981' : meta.marker === 'red' ? '#ef4444' : meta.marker === 'orange' ? '#f97316' : meta.marker === 'yellow' ? '#eab308' : meta.marker === 'violet' ? '#8b5cf6' : meta.marker === 'grey' ? '#6b7280' : meta.marker === 'cyan' ? '#38bdf8' : meta.marker === 'pink' ? '#fbcfe8' : '#3b82f6'};
+        background-color: ${meta.marker === 'blue' ? '#3b82f6' : meta.marker === 'green' ? '#10b981' : meta.marker === 'red' ? '#ef4444' : meta.marker === 'orange' ? '#f97316' : meta.marker === 'yellow' ? '#eab308' : meta.marker === 'violet' ? '#8b5cf6' : meta.marker === 'grey' ? '#6b7280' : meta.marker === 'cyan' ? '#38bdf8' : meta.marker === 'pink' ? '#fbcfe8' : meta.marker === 'fuchsia' ? '#d946ef' : '#3b82f6'};
         border: 2px solid white;
         border-radius: 50%;
         width: 32px;
@@ -140,7 +159,7 @@ const getCategoryIcon = (category: string | null | undefined, metaMap: Record<st
         font-size: 16px;
         font-weight: bold;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    ">${meta.emoji}</div>`;
+    ">${isFarmacia ? '<span style="color: white; font-weight: 900; font-size: 20px; line-height: 1;">+</span>' : meta.emoji}</div>`;
 
     return L.divIcon({
         html: iconHtml,
@@ -212,7 +231,8 @@ const ExploreMap = () => {
             const iconName = cat.icon_name || '';
             let emoji = iconToEmoji[iconName] || '🏷️';
 
-            if (cat.id === 'Farmacia') emoji = '🧴';
+            if (cat.id === 'Farmacia') emoji = '➕';
+            if (cat.id === 'Perfumeria') emoji = '🧴';
             if (cat.id === 'Artesanías') emoji = '🏺';
             if (cat.id === 'Diseño' || cat.label === 'Diseño') emoji = '🎨';
 

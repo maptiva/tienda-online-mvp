@@ -12,6 +12,7 @@ import personalizableIllustration from '../assets/illustrations/personalizable.p
 import SEO from '../components/shared/SEO';
 import { motion } from 'framer-motion';
 import StoreCard from '../components/StoreCard';
+import { useShopCategories } from '../hooks/useShopCategories';
 
 interface PublicStore {
     id: string | number;
@@ -31,6 +32,7 @@ interface PublicStore {
 
 const LandingPage: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
+    const { categories: shopCategories } = useShopCategories();
     const [featuredStores, setFeaturedStores] = useState<PublicStore[]>([]);
     const [showDirectory, setShowDirectory] = useState(false);
     const carouselRef = React.useRef<HTMLDivElement>(null);
@@ -358,9 +360,18 @@ const LandingPage: React.FC = () => {
                                     WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)'
                                 }}
                             >
-                                {featuredStores.map(store => (
-                                    <StoreCard key={store.id} store={store} />
-                                ))}
+                                {featuredStores.map(store => {
+                                    const catMeta = shopCategories.find(c => c.id === store.category || c.label === store.category);
+                                    return (
+                                        <StoreCard 
+                                            key={store.id} 
+                                            store={{
+                                                ...store,
+                                                category: catMeta?.label || store.category
+                                            }} 
+                                        />
+                                    );
+                                })}
                             </div>
                         </div>
 

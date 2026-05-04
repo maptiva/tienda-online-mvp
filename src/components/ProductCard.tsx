@@ -21,6 +21,7 @@ interface Product {
   store_whatsapp?: string;
   sku?: string;
   display_id?: number;
+  gallery_images?: string[] | null;
 }
 
 interface ProductCardProps {
@@ -40,7 +41,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return null;
   }
 
-  const imageUrl = product.image_url;
+  // Lógica de fallback: si no hay imagen principal, usar la primera de la galería
+  const imageUrl = product.image_url || (product.gallery_images && product.gallery_images.length > 0 ? product.gallery_images[0] : undefined);
 
   const handleAddToCart = () => {
     const numQuantity = typeof quantity === 'string' ? parseInt(quantity, 10) : (quantity as number);
