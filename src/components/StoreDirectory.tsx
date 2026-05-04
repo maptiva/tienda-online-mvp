@@ -5,6 +5,7 @@ import { FaStore, FaTimes, FaSearch } from 'react-icons/fa';
 import { useTheme } from '../context/ThemeContext';
 import styles from './StoreDirectory.module.css';
 import { type Store } from '../schemas/store.schema';
+import { useShopCategories } from '../hooks/useShopCategories';
 
 // Componente individual de tarjeta de tienda (interno al directorio)
 interface InternalStoreCardProps {
@@ -71,6 +72,7 @@ const StoreDirectory: React.FC<StoreDirectoryProps> = ({ isOpen, onClose }) => {
     const [stores, setStores] = useState<Store[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState<string>('');
+    const { categories: shopCategories } = useShopCategories();
     const { theme } = useTheme();
 
     useEffect(() => {
@@ -168,9 +170,18 @@ const StoreDirectory: React.FC<StoreDirectoryProps> = ({ isOpen, onClose }) => {
                         <div className={styles.loading}>Cargando tiendas...</div>
                     ) : filteredStores.length > 0 ? (
                         <div className={styles.grid}>
-                            {filteredStores.map(store => (
-                                <InternalStoreCard key={store.id} store={store} />
-                            ))}
+                             {filteredStores.map(store => {
+                                const catMeta = shopCategories.find(c => c.id === store.category || c.label === store.category);
+                                return (
+                                    <InternalStoreCard 
+                                        key={store.id} 
+                                        store={{
+                                            ...store,
+                                            category: catMeta?.label || store.category
+                                        }} 
+                                    />
+                                );
+                            })}
                         </div>
                     ) : (
                         <div className={styles.empty}>
