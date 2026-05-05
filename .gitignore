@@ -82,3 +82,7 @@ debug-*.js
 scripts/one-off/
 scratch/
 .aider*
+
+# 12. Scraping Data (PRIVADO)
+Scrapping/
+scraping_data/

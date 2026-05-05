@@ -47,6 +47,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
 const BUCKET_NAME = 'product-images';
 const SIZE_LIMIT_MB = 0.375; // 375KB
 const DRY_RUN = process.argv.includes('--dry-run'); // Usar --dry-run para simular sin hacer cambios
+const USER_ID_ARG = process.argv.find(arg => arg.startsWith('--user_id='))?.split('=')[1];
+
 
 // Opciones de compresión (las mismas que el frontend)
 const compressionOptions = {
@@ -138,12 +140,18 @@ async function processImage(productId, imageUrl, isGallery = false) {
     // Verificar si necesita compresión
     const sizeLimitBytes = SIZE_LIMIT_MB * 1024 * 1024;
 
-    if (file.size <= sizeLimitBytes) {
-        console.log(`   ✅ Ya está dentro del límite (${SIZE_LIMIT_MB * 1024}KB), se omite`);
+    const isWebP = imageUrl.toLowerCase().includes('.webp');
+
+    if (file.size <= sizeLimitBytes && isWebP) {
+        console.log(`   ✅ Ya está dentro del límite (${SIZE_LIMIT_MB * 1024}KB) y es WebP, se omite`);
         return { success: true, skipped: true };
     }
 
-    console.log(`   ⚠️  Supera el límite (${SIZE_LIMIT_MB * 1024}KB), comprimiendo...`);
+    if (!isWebP) {
+        console.log(`   ⚠️  No es formato WebP, forzando conversión...`);
+    } else {
+        console.log(`   ⚠️  Supera el límite (${SIZE_LIMIT_MB * 1024}KB), comprimiendo...`);
+    }
 
     try {
         // Comprimir imagen
@@ -166,10 +174,17 @@ async function processImage(productId, imageUrl, isGallery = false) {
             };
         }
 
-        const newUrl = await uploadImage(compressedFile, storagePath);
+        // El nuevo path será el mismo pero con extensión .webp si no la tenía
+        const newStoragePath = storagePath.replace(/\.[^/.]+$/, "") + ".webp";
+        const newUrl = await uploadImage(compressedFile, newStoragePath);
 
         if (!newUrl) {
             return { success: false, reason: 'Error al subir' };
+        }
+
+        // Si el nombre cambió, eliminar el archivo original (solo si no es dry-run)
+        if (!DRY_RUN && newStoragePath !== storagePath) {
+            await supabase.storage.from(BUCKET_NAME).remove([storagePath]);
         }
 
         console.log(`   ✅ Nueva URL: ${newUrl.substring(0, 80)}...`);
@@ -203,9 +218,16 @@ async function main() {
     // 1. Obtener todos los productos
     console.log('📋 Obteniendo productos de la base de datos...');
 
-    const { data: products, error } = await supabase
+    let query = supabase
         .from('products')
         .select('id, image_url, gallery_images');
+    
+    if (USER_ID_ARG) {
+        console.log(`   Filtrando por User ID: ${USER_ID_ARG}`);
+        query = query.eq('user_id', USER_ID_ARG);
+    }
+
+    const { data: products, error } = await query;
 
     if (error) {
         console.error('❌ Error al obtener productos:', error.message);
