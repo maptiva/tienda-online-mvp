@@ -51,12 +51,13 @@ export interface InventoryResult<T> {
 export const inventoryService = {
     // Obtener inventario de un producto
     async fetchInventory(productId: string, userId: string | null, storeSlug: string | null = null): Promise<InventoryItem | null> {
-        // Vista pública: usar RPC pública si no hay usuario pero hay slug
-        if (!userId && storeSlug) {
+        // Vista pública: usar siempre RPC pública si hay slug de tienda
+        // Esto evita conflictos cuando un admin visita tiendas públicas de otros usuarios
+        if (storeSlug) {
             return await this.fetchPublicInventory(storeSlug, productId);
         }
 
-        // Si no hay userId (vista pública) y no hay storeSlug, no podemos determinar la tienda
+        // Solo para acceso directo al inventory del usuario logueado (admin panel)
         if (!userId) {
             return null;
         }
@@ -82,9 +83,16 @@ export const inventoryService = {
 
     // Obtener inventario público (sin autenticación) via RPC segura
     async fetchPublicInventory(storeSlug: string, productId: string): Promise<InventoryItem | null> {
+        const numericProductId = parseInt(productId, 10);
+        
+        if (isNaN(numericProductId)) {
+            console.error('[fetchPublicInventory] Invalid productId:', productId);
+            return null;
+        }
+
         const { data, error } = await supabase.rpc('get_public_inventory', {
             p_store_slug: storeSlug,
-            p_product_id: productId
+            p_product_id: numericProductId
         });
 
         if (error && error.code === 'PGRST116') return null;
