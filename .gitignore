@@ -3,6 +3,7 @@
 # 1. Documentación Externa (Pública)
 *.md
 !README.md
+!AI_ONBOARDING.md
 
 # 2. Documentación Interna y Auditoría (PRIVADO)
 # Estos archivos contienen estrategias, planes y auditorías sensibles
